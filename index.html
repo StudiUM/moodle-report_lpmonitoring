@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Moodle-report lpmonitoring by StudiUM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Moodle-report lpmonitoring</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/StudiUM/moodle-report_lpmonitoring" class="btn">View on GitHub</a>
+      <a href="https://github.com/StudiUM/moodle-report_lpmonitoring/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/StudiUM/moodle-report_lpmonitoring/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
+
+<p>The main goal of this plugin is to facilitate the work of learning plan managers. 
+It provides an overview of user learning plan, without leaving the page to get information related to this learning plan(such as rating in courses,user evidence,). It also offers statistics by learning plans and competencies.
+For learning plan templates with a very large number of learning plans (generated from cohorts), this plugin is the best solution, with its advanced filter, it allows you to filter the learning plans by several criteria.</p>
+
+<h1>
+<a id="plugin-configuration" class="anchor" href="#plugin-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Plugin configuration</h1>
+
+<h2>
+<a id="role-and-permissions" class="anchor" href="#role-and-permissions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Role and permissions</h2>
+
+<p>This plugin can be used in system context or a category context.
+The user using this plugin in the category must have these permissions:</p>
+
+<ul>
+<li>moodle/competency:competencyview</li>
+<li>moodle/competency:coursecompetencyview</li>
+<li>moodle/competency:usercompetencyview</li>
+<li>moodle/competency:usercompetencymanage</li>
+<li>moodle/competency:competencygrade</li>
+<li>moodle/competency:planview</li>
+<li>moodle/competency:planmanage</li>
+<li>moodle/competency:templateview</li>
+</ul>
+
+<p>Note that planview is always set in user context level, so we have to use 
+"Home/Site administration/Users/Permissions/Assign user roles to cohort"
+to make the role of user using the plugin to have the "moodle/competency:planview" of the user (waiting the next cron execution to take effect).</p>
+
+<h2>
+<a id="color-configuration" class="anchor" href="#color-configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>color configuration</h2>
+
+<p>To fully benefit from the reports, a color must be associated to each value of the scale.
+To set the scale values colors, you must have "moodle/competency:competencymanage" permission.
+Here the steps to do this:</p>
+
+<ul>
+<li>Go on "Home / ► Site administration / ► Competencies / ► Competencies scale colors"</li>
+<li>Choose a framework competency</li>
+<li>Choose a scale from framework competency</li>
+<li>set the colors values using the ColorPicker</li>
+<li>save the changes</li>
+</ul>
+
+<p><img src="http://shorturl.ca/images/report_lpmonitoring_colors.PNG" alt="Colors configuration"></p>
+
+<p>That's it, now the colors are configured and ready to be used in the reports pages.</p>
+
+<h1>
+<a id="monitoring-of-learning-plans-page" class="anchor" href="#monitoring-of-learning-plans-page" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Monitoring of learning plans page</h1>
+
+<p>In a category context or system context go on "Reports / ► Monitoring of learning plans"</p>
+
+<h2>
+<a id="filter" class="anchor" href="#filter" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Filter</h2>
+
+<p>Filter helps us find a learning plan for a user, you can filter the learning plans on two levels:</p>
+
+<h3>
+<a id="by-learning-plan-template" class="anchor" href="#by-learning-plan-template" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>By learning plan template</h3>
+
+<p>We can, from a learning plan template, filtering learning plans. To do this:</p>
+
+<ul>
+<li>Select a template</li>
+<li>and from "Student using this template", select a user</li>
+<li>click on "Apply"</li>
+</ul>
+
+<p>You will see the learning plan of the student selected, and you can navigate between learning plan from the template.
+If there is no student selected, the first student from the template will be displayed.</p>
+
+<p><img src="http://shorturl.ca/images/report_lpmonitoring_filterbytemplatesimple.PNG" alt="Colors configuration"></p>
+
+<p>By clicking on "show more...", you can have more options to filter learning plans by scales values.</p>
+
+<p><img src="http://shorturl.ca/images/report_lpmonitoringscalesvaluesfilter.PNG" alt="Colors configuration"></p>
+
+<p>There are two options for using scales values filter</p>
+
+<p>screenshot report_lpmonitoringscalesvaluesfilteroptionsbycourse</p>
+
+<ul>
+<li>filtering learning plan by scales values rated in the course competency</li>
+<li>filtering learning plan by scales values rated in the plan</li>
+</ul>
+
+<p>When filtering by scales values, the number of rating in the student list will be displayed:</p>
+
+<p>screenshot report_lpmonitoringscalesvaluesfilternbrating</p>
+
+<h3>
+<a id="by-user" class="anchor" href="#by-user" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>By user</h3>
+
+<p>We can choose a particular student by writing his name in the user picker field, and get his learning plans </p>
+
+<p>screenshot report_lpmonitoring_filterbystudent</p>
+
+<p>Learning plan information</p>
+
+<p>Monitoring of learning plans page for student</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/StudiUM/moodle-report_lpmonitoring">Moodle-report lpmonitoring</a> is maintained by <a href="https://github.com/StudiUM">StudiUM</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
