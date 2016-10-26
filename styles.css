@@ -1,0 +1,1104 @@
+.competencyreport h3 {
+    font-size: 18px;
+    font-weight: 400;
+}
+.competencyreport .form-group {
+    margin-bottom: 10px;
+}
+.competencyreport .mform .fitem.fitem_fradiogroup {
+    margin-bottom: 0;
+}
+body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .felement.radio {
+    padding-top: 0;
+    margin-top : 0;
+}
+.competencyreport .scaleitem > label {
+    font-weight: bold;
+}
+
+.competencyreport .mform .fitem .fgroup button:first-child {
+    margin-left : 0;
+}
+.competencyreport .form-control:focus {
+    border-color: #ccd0d7;
+    box-shadow: none !important;
+}
+.competencyreport .x_panel {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px 0;
+    display: inline-block;
+    opacity: 1;
+    transition: all 250ms ease-in-out;
+}
+.competencyreport .x_title {
+    border-bottom: 1px solid transparent;
+    padding: 2px 5px;
+    transition: all 250ms ease-in-out;
+}
+.competencyreport .panel-collapsed .x_title {
+    border-bottom-color: #cfd1d5;
+}
+.competencyreport .x_title h4 a:hover {
+    text-decoration: none;
+}
+.competencyreport .x_title .filter {
+    width: 40%;
+    float: right;
+}
+.competencyreport .x_title h4 {
+    margin: 5px 0 6px;
+    display: inline-block;
+    font-size: 18px;
+    line-height: 1.2em;
+    font-weight: 400;
+    transition: all 250ms ease-in-out 0s;
+}
+.competencyreport .panel-collapsed .x_title h4 {
+    max-width: calc(100% - 150px);
+}
+.competencyreport .x_title span {
+    color: #333;
+}
+.competencyreport .x_title h4 small {
+    font-size: 14px;
+}
+.competencyreport .x_content {
+    padding: 0 5px 6px;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    float: left;
+    clear: both;
+}
+.competencyreport .toggle {
+    float: left;
+    margin: 0;
+    padding-top: 16px;
+    width: 70px;
+}
+.competencyreport .toggle a {
+    padding: 15px 15px 0;
+    margin: 0;
+    cursor: pointer;
+}
+.competencyreport .toggle a i {
+    font-size: 26px;
+}
+.competencyreport .nav.child_menu > li > a {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 12px;
+    padding: 9px;
+}
+.competencyreport a.collapse-link {
+    display: inline-block;
+    padding: 5px;
+    color: #999;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: top;
+    width: 16px;
+}
+.competencyreport a.collapse-link:hover {
+    background: #f5f7fa;
+}
+.competencyreport .clearfix::after,
+.competencyreport form::after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    visibility: hidden;
+}
+.competencyreport ul.to_do {
+    padding: 0;
+}
+.competencyreport ul.to_do li {
+    border-radius: 3px;
+    position: relative;
+    padding: 0;
+    margin-bottom: 2px;
+    list-style: none;
+}
+.competencyreport ul.to_do p {
+    margin: 0;
+}
+.competencyreport #userInfoContainer {
+    text-align: left;
+}
+.competencyreport .widget_profile_box {
+    background: #1375c7;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 14px;
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-content: center;
+    align-items: flex-start;
+}
+.competencyreport .widget_profile_box * {
+    color: #fff;
+}
+.competencyreport .widget_profile_box div,
+.competencyreport .widget_profile_box h3 {
+    display: inline-block;
+    line-height: 61px;
+    height: 61px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.competencyreport .widget_profile_box h3 {
+    margin: 0 0 0 5px;
+}
+.competencyreport .widget_profile_box h3 img {
+    display: inline-block;
+    overflow: hidden;
+    text-indent: -10000px;
+    margin-bottom: 2px;
+    -webkit-filter: brightness(1.7);
+    filter: url([[pix:report_lpmonitoring|white]]#white);
+}
+.competencyreport .widget_profile_box .plan-name {
+    margin-right: 5px;
+    width: 40%;
+    overflow: hidden;
+}
+.competencyreport .widget_profile_box #plan-user-info {
+    font-size: 14px;
+    position: relative;
+    top: -10px;
+    flex: 2 0 auto;
+}
+.competencyreport .widget_profile_box #plan-user-info #spinerprofile {
+    display: none;
+    left: 16px;
+    position: absolute;
+    line-height: 81px;
+    z-index: 1;
+}
+.competencyreport .widget_profile_box #plan-user-info.loading #spinerprofile {
+    display: block;
+}
+.competencyreport .widget_profile_box .img-wrapper {
+    height: 81px;
+    width: 81px;
+}
+.competencyreport .widget_profile_box #plan-user-info.loading .img-wrapper:before {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 50%;
+    content: "";
+    display: block;
+    height: 81px;
+    left: 0;
+    position: absolute;
+    width: 81px;
+}
+.competencyreport .widget_profile_box #plan-user-info .img-wrapper .img-circle.profile_img {
+    display: block;
+    background: #fff;
+    border: 1px solid rgba(32, 85, 130, 0.6);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 5px;
+    width: 81px;
+    height: 81px;
+}
+.competencyreport .widget_profile_box a.navigatetoplan {
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    box-sizing: border-box;
+    font-size: 10px;
+    line-height: 61px;
+    position: relative;
+    text-align: center;
+    width: 102px;
+}
+.competencyreport .widget_profile_box a.nexplan {
+    padding-right: 10px;
+}
+.competencyreport .widget_profile_box a.nexplan i {
+    right: 5px;
+}
+.competencyreport .widget_profile_box a.prevplan {
+    padding-left: 10px;
+}
+.competencyreport .widget_profile_box a.prevplan i {
+    left: 5px;
+}
+.competencyreport .widget_profile_box a.navigatetoplan img {
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    display: block;
+    margin: 0 auto;
+}
+.competencyreport .widget_profile_box a.navigatetoplan i {
+    line-height: 0;
+    position: absolute;
+    top: 50%;
+}
+.competencyreport .widget_profile_box a.navigatetoplan .user-profile-small {
+    display: inline-block;
+    line-height: 61px;
+    vertical-align: middle;
+    white-space: normal;
+}
+.competencyreport .widget_profile_box a.navigatetoplan .user-profile-small p {
+    line-height: 11px;
+    margin: 0;
+    width: 90px;
+}
+@media (max-width: 998px) {
+    .competencyreport .widget_profile_box {
+        flex-flow : row wrap;
+        height: auto;
+        text-align: center;
+        padding: 0 40px;
+    }
+    .competencyreport .widget_profile_box div,
+    .competencyreport .widget_profile_box h3 {
+        display: block;
+        height: auto;
+        line-height: 1.2em;
+        margin: 0 auto;
+    }
+    .competencyreport .widget_profile_box h3 {
+        width: 100%;
+        white-space: normal;
+    }
+    .competencyreport .widget_profile_box .plan-name {
+        width: 100%;
+        margin: 10px 0;
+    }
+    .competencyreport .widget_profile_box #plan-user-info {
+        height: auto;
+        width: 100%;
+    }
+    .competencyreport .widget_profile_box a.navigatetoplan {
+        position: absolute;
+        width: 40px;
+        top: 0;
+        bottom: 0;
+        height: auto;
+    }
+    .competencyreport .widget_profile_box a.nexplan {
+        right: 0;
+    }
+    .competencyreport .widget_profile_box a.prevplan {
+        left: 0;
+        border-left: none;
+        border-right: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .competencyreport .widget_profile_box a.navigatetoplan .user-profile-small {
+        display: none;
+    }
+    .competencyreport .widget_profile_box #plan-user-info {
+        top: 0;
+        margin-bottom: 10px;
+    }
+    .competencyreport .widget_profile_box a.navigatetoplan i,
+    .competencyreport .widget_profile_box #plan-user-info #spinerprofile {
+        left: 0;
+        right: 0;
+    }
+    .competencyreport .widget_profile_box #plan-user-info.loading .img-wrapper::before {
+        left: auto;
+        margin: 0 auto;
+    }
+}
+.competencyreport .green {
+    color: #4cae4c !important;
+}
+.competencyreport .blue {
+    color: #3590db;
+}
+.competencyreport .fail {
+    color: #ac2925 !important;
+}
+.competencyreport .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+}
+.competencyreport .truncate,
+.label.cr-scalename.truncate {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.competencyreport .x_panel table td p {
+    font-size: 12px;
+}
+.competencyreport .preuve {
+    font-weight: 600;
+    line-height: 25px;
+    font-size: 22px;
+}
+.competencyreport .modal-dialog td span.label {
+    font-size: 12px;
+}
+.competencyreport .widget_stats {
+    min-height: 60px;
+    padding: 1px 5px;
+}
+@media (min-width: 768px) {
+    .competencyreport .tile_count .tile_stats_count .count {
+        font-size: 28px;
+    }
+}
+.competencyreport .tile_count {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+    margin-bottom: 0;
+    margin-top: 4px;
+}
+.competencyreport .tile_count .tile_stats_count {
+    padding: 0 10px 0 20px;
+    position: relative;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+.competencyreport .tile_count .tile_stats_count table {
+    width: 100%;
+}
+.competencyreport .tile_count #rating {
+    -webkit-flex-grow: 2;
+    flex-grow: 2;
+}
+.competencyreport .tile_count #finalrating {
+    min-width: 250px;
+}
+@media (min-width: 992px) {
+    .competencyreport .tile_count .tile_stats_count {
+        margin-bottom: 0;
+        border-bottom: 0;
+        padding-bottom: 2px;
+    }
+    .competencyreport .tile_count .tile_stats_count:first-child {
+        border-left: 0;
+    }
+    .competencyreport .tile_count .tile_stats_count .count {
+        font-size: 28px;
+    }
+}
+.competencyreport .tile_count .tile_stats_count .count {
+    font-size: 28px;
+    line-height: 47px;
+    font-weight: 600;
+}
+@media (min-width: 992px) and (max-width: 1100px) {
+    .competencyreport .tile_count .tile_stats_count .count {
+        font-size: 28px;
+    }
+}
+.competencyreport .tile_count .tile_stats_count h5 {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #cfd1d5;
+}
+@media (min-width: 768px) {
+    .competencyreport .tile_count .tile_stats_count h5 {
+        font-size: 15px;
+    }
+}
+.competencyreport .btn {
+  border-radius: 3px;
+  box-shadow: none;
+  text-shadow: none;
+}
+.competencyreport .btn-primary {
+  background: #1375c7;
+}
+.competencyreport .btn-primary:hover,
+.competencyreport .btn-primary:focus,
+.competencyreport .btn-primary:active,
+.competencyreport .btn-primary.active,
+.competencyreport .btn-primary.disabled,
+.competencyreport .btn-primary[disabled] {
+  background: #1453c7;
+}
+.competencyreport .tile-stats {
+    min-height: 90px;
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding-bottom: 5px;
+}
+.competencyreport .tile-stats .icon {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 53px;
+    top: 22px;
+    z-index: 1;
+}
+.competencyreport .tile-stats .icon i {
+    margin: 0;
+    font-size: 60px;
+    line-height: 0;
+    vertical-align: bottom;
+    padding: 0;
+}
+.competencyreport .tile-stats .count {
+    font-size: 38px;
+    font-weight: bold;
+    line-height: 1.65857;
+}
+.competencyreport .tile-stats .count,
+.competencyreport .tile-stats h4,
+.competencyreport .tile-stats p {
+    position: relative;
+    margin: 0;
+    margin-left: 10px;
+    z-index: 0;
+    padding: 0;
+}
+.competencyreport .tile-stats h4 {
+    color: #bab8b8;
+}
+.competencyreport .tile-stats p {
+    margin-top: 5px;
+    font-size: 12px;
+}
+.competencyreport .tile-stats > .dash-box-footer {
+    position: relative;
+    text-align: center;
+    margin-top: 5px;
+    padding: 3px 0;
+    color: #fff;
+    color: rgba(255, 255, 255, 0.8);
+    display: block;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+.competencyreport .tile-stats > .dash-box-footer:hover {
+    color: #fff;
+    background: rgba(0, 0, 0, 0.15);
+}
+.competencyreport .tile-stats > .dash-box-footer:hover {
+    color: #fff;
+    background: rgba(0, 0, 0, 0.15);
+}
+.competencyreport .navbar-right {
+    margin-right: 0;
+}
+.competencyreport .ln_solid {
+    border-top: 1px solid #e5e5e5;
+    color: #fff;
+    background-color: #fff;
+    height: 1px;
+    margin: 0 0 20px;
+}
+.competencyreport table.tile_info {
+    padding: 10px 15px;
+}
+.competencyreport table.tile_info td {
+    text-align: left;
+    padding: 0;
+    font-size: 15px;
+}
+.competencyreport table.tile_info tr:not(:first-child):hover {
+    background: #f5f5f5;
+}
+.competencyreport table.tile_info td:first-child {
+    width: 83%;
+}
+.competencyreport table.tile_info td p {
+    margin: 0;
+    line-height: 17px;
+}
+.competencyreport table.tile_info td i {
+    margin: 0 8px;
+    font-size: 17px;
+    float: left;
+    line-height: 17px;
+}
+.competencyreport table.tile_info td a {
+    cursor: pointer;
+    font-weight: bold;
+    overflow: auto;
+}
+.competencyreport table.tile_info td a,
+.competencyreport table.tile_info td span.nbcourses,
+.competencyreport table.tile_info td span.nbusers{
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+}
+.competencyreport table.tile_info td span {
+    line-height: 28px;
+}
+.competencyreport table.tile_info span.right {
+    margin-right: 0;
+    float: right;
+    position: absolute;
+    right: 4%;
+}
+.competencyreport .h1,
+.competencyreport .h2,
+.competencyreport .h3,
+.competencyreport .h4,
+.competencyreport .h5,
+.competencyreport .h6,
+.competencyreport h1,
+.competencyreport h2,
+.competencyreport h3,
+.competencyreport h4,
+.competencyreport h5,
+.competencyreport h6 {
+    color: inherit;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+}
+.competencyreport .nav {
+    margin-bottom: 5px;
+}
+.competencyreport .rate-competency {
+    position: relative;
+    top: 10px;
+    left: 5px;
+}
+.competencyreport .tile_stats_count .tile-stats .level-proficiency {
+    font-size: 13px;
+    margin-right: 5px;
+    width: 80px;
+    text-align: center;
+    line-height: 1.5em;
+    margin-top: 17px;
+}
+.competencyreport .tile_stats_count .tile-stats .icon-proficiency {
+    clear: both;
+    margin-top: 30px;
+    height: 0;
+    width: 0;
+}
+.competencyreport .tile_stats_count .tile-stats .icon-proficiency i {
+    font-size: 35px;
+}
+.competencyreport .fautocomplete .form-autocomplete-downarrow {
+    color: #333;
+    cursor: pointer;
+    position: relative;
+    top: 0;
+}
+.competencyreport .fautocomplete span[data-value=""] {
+    padding: 0;
+}
+.competencyreport .fautocomplete input[type="text"] {
+    margin-bottom: 2px;
+}
+.competencyreport .fautocomplete .label-info span {
+    padding: 2px 4px;
+}
+.competencyreport .input-group {
+    margin-left: 5px;
+    border-collapse: separate;
+    display: table;
+    position: relative;
+}
+.competencyreport  .input-group-addon, .input-group-btn {
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 1%;
+}
+.competencyreport .input-group-addon {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #555;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    padding: 8px 18px;
+    text-align: center;
+}
+.competencyreport .input-group-addon.input-sm {
+    border-radius: 3px;
+    font-size: 12px;
+    padding: 5px 10px;
+}
+.competencyreport .input-group-addon.input-lg {
+    border-radius: 6px;
+    font-size: 18px;
+    padding: 10px 16px;
+}
+.competencyreport .input-group-addon input[type="checkbox"],
+.input-group-addon input[type="radio"] {
+    margin-top: 0;
+}
+.competencyreport .input-group .form-control:first-child,
+.competencyreport .input-group-addon:first-child,
+.competencyreport .input-group-btn:first-child > .btn,
+.competencyreport .input-group-btn:first-child > .btn-group > .btn,
+.competencyreport .input-group-btn:first-child > .dropdown-toggle,
+.competencyreport .input-group-btn:last-child > .btn-group:not(:last-child) > .btn,
+.competencyreport .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+}
+.competencyreport .input-group-addon:first-child {
+    border-right: 0 none;
+}
+.competencyreport .input-group .form-control:last-child,
+.competencyreport .input-group-addon:last-child,
+.input-group-btn:first-child > .btn-group:not(:first-child) > .btn,
+.input-group-btn:first-child > .btn:not(:first-child),
+.input-group-btn:last-child > .btn,
+.input-group-btn:last-child > .btn-group > .btn,
+.input-group-btn:last-child > .dropdown-toggle {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+.competencyreport .input-group-addon:last-child {
+    border-left: 0 none;
+}
+.competencyreport .input-group-btn {
+    font-size: 0;
+    position: relative;
+    white-space: nowrap;
+}
+.competencyreport .input-group-btn > .btn {
+    position: relative;
+}
+.competencyreport .input-group-btn > .btn + .btn {
+    margin-left: -1px;
+}
+.competencyreport .input-group-btn > .btn:active,
+.input-group-btn > .btn:focus,
+.competencyreport .input-group-btn > .btn:hover {
+    z-index: 2;
+}
+.competencyreport .input-group-btn:first-child > .btn,
+.competencyreport .input-group-btn:first-child > .btn-group {
+    margin-right: -1px;
+}
+.competencyreport .input-group-btn:last-child > .btn,
+.competencyreport .input-group-btn:last-child > .btn-group {
+    margin-left: -1px;
+    z-index: 2;
+}
+.competencyreport #loaderscalevalues {
+    width: 197px;
+    text-align: center;
+}
+.competencyreport #scalevalues .form-group {
+    clear: both;
+    display: table;
+    margin-bottom: 10px;
+}
+.competencyreport #scalevalues span.input-group-addon,
+.competencyreport #scalevalues input[type="text"] {
+    float: left;
+}
+.competencyreport #scalevalues span.input-group-addon {
+    padding: 8px;
+    width: 16px;
+    height: 16px;
+}
+.competencyreport #scalevalues input[type="text"] {
+    height: 24px;
+    width: 150px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.competencyreport #scalevalues .fitemtitle.proficient label small {
+    display: block;
+    color: #666;
+}
+.competencyreport .disabled-option {
+    display: none;
+}
+.competencyreport .disabled-option .fautocomplete input,
+.competencyreport .disabled-option .fautocomplete select {
+    background: #eee;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+.competencyreport .disabled-option .fautocomplete .form-autocomplete-downarrow {
+    display: none;
+}
+.competencyreport #learningplanSelectorReport {
+    margin-top: 29px;
+}
+.competencyreport #studentselectorreport {
+    margin-top: 25px;
+}
+.competencyreport label.templabel {
+    text-align: left;
+    padding-left: 0;
+}
+.competencyreport button .fa-spin {
+    margin-left: 7px;
+    position: static;
+    display: none;
+}
+.competencyreport button.loading .fa-spin {
+    display: inline-table;
+}
+.competencyreport span.user-nav-separator {
+    display: block;
+    border-left: 2px solid #fff;
+    height: 50px;
+}
+.competencyreport .level {
+    display: block;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 30px;
+    min-width: 20px;
+    opacity: 0;
+    position: absolute;
+    right: 5px;
+    top: 7px;
+    transition: all 250ms ease-in-out 0s;
+    visibility: hidden;
+}
+.competencyreport .fa-certificate,
+.competencyreport .fa-question-circle {
+    color: #999;
+}
+.competencyreport .panel-collapsed .x_content {
+    display: none;
+}
+.competencyreport .panel-collapsed .level {
+    opacity: 1;
+    visibility: visible;
+}
+.competencyreport .form-autocomplete-suggestions {
+    z-index: 40;
+}
+#listPlanCompetencies {
+    clear: both;
+}
+#listPlanCompetencies p.alert-info {
+    font-size: 15px;
+    margin-top: 20px;
+}
+.competencyreport canvas.detail-competency {
+    margin: 1px 1px 1px 0;
+    width: 80px;
+    height: 80px;
+}
+.competencyreport .breadcrumb > li + li::before {
+    color: #666;
+    content: "/ ";
+    padding: 0 5px;
+}
+.competencyreport .no-data-available {
+    border-radius: 50%;
+    text-align: center;
+    background: rgb(255, 255, 255);
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    line-height: 1.2;
+    border: 2px solid rgb(204, 204, 204);
+    padding: 0.1em;
+    height: 74px;
+    width: 74px;
+    white-space: normal;
+}
+.competencyreport .no-data-available span {
+    font-size: 0.8em;
+}
+/* Important, the following selectors must not be prefixed with the class ".competency" because of their use in dialogues. */
+.cr-caption {
+    max-width: 100%;
+}
+.label.cr-scalename {
+    color: #000;
+    font-size: 13px;
+    text-shadow: none;
+    vertical-align: middle;
+}
+#finalrating .label.cr-scalename.truncate {
+    max-width: calc(100% - 100px);
+}
+.label.cr-scalename.light-color {
+    color: #fff;
+}
+
+@media (min-width: 1200px) {
+    .competencyreport .scalecontainer {
+        margin-top: 5px;
+    }
+    .competencyreport #scalevalues .fitemtitle.proficient {
+        padding-top: 0;
+        margin-top : -2px;
+    }
+    .competencyreport #loaderscalevalues {
+        width: 462px;
+    }
+}
+.competencyreport .templatelist input {
+    width:35%;
+}
+.competencyreport .compstats {
+    display: flex;
+    flex-flow: row wrap;
+}
+.competencyreport .compstats .competency-detail {
+    flex: 0 1 315px;
+    margin-right: 20px;
+}
+.competencyreport div.stats .x_title {
+    border-bottom-color: #cfd1d5;
+}
+.competencyreport td.convaschart {
+    padding-top: 30px;
+    vertical-align: top;
+}
+.competencyreport .loaderstatscompetency {
+    text-align: center;
+    width: 100%;
+    min-height: 190px;
+}
+.competencyreport .loaderstatscompetency {
+    display: none;
+}
+.competencyreport .loaderstatscompetency i.fa-refresh {
+    line-height: 190px;
+    vertical-align: middle;
+}
+.competencyreport .loading .loaderstatscompetency {
+    display: block;
+}
+
+.competencyreport .plan-info-report {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    display: flex;
+    flex-flow: row wrap;
+    padding: 5px;
+}
+.competencyreport .plan-info-report:empty {
+    border-bottom: none;
+}
+.competencyreport .report-stats-competencies {
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #cfd1d5;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    margin: 0.5em auto;
+    padding: 1em 1.5em;
+    text-align: center;
+}
+.competencyreport .report-stats-competencies .plan-status {
+    padding-bottom: 0.5em;
+    flex: 1 0 auto;
+}
+.competencyreport .plan-info-report .report-stats-competencies .stats-cmp-proficient {
+    font-size: 12px;
+}
+.competencyreport .plan-info-report .report-stats-competencies .count-stats {
+    font-size: 2.9em;
+    font-weight: 600;
+    line-height: 47px;
+}
+.competencyreport .plan-info-report > div.report-stats-competencies {
+    min-width: 145px;
+}
+.competencyreport .plan-info-report .report-stats-competencies .empty-value {
+    color: #cfd1d5;
+}
+.competencyreport .plan-info-report .collapsible-actions {
+    text-align: right;
+    position: relative;
+    color:#555;
+    align-self: end;
+    min-width: 120px;
+}
+.competencyreport .compstats .competency-detail .totalnbusers {
+    font-size: 0.8em;
+}
+.competencyreport .compstats .competency-detail .count {
+    line-height: 15px;
+    padding-left: 5px;
+}
+.competencyreport .compstats .competency-detail h5 {
+    border: medium none;
+    font-size: 11px;
+    margin: 10px 0;
+    max-width: 130px;
+    padding: 0;
+    padding: 0 0 0 5px;
+}
+.competencyreport .compstats .competency-detail td.convaschart {
+    width: 30%;
+}
+.competencyreport .compstats .competency-detail td.scalevalues {
+    vertical-align: top;
+}
+.competencyreport .compstats .competency-detail .tile_count #rating {
+    flex-grow: unset;
+    width: 100%;
+}
+.competencyreport .compstats .tile_count .tile_stats_count {
+    padding: 0;
+}
+.competencyreport .borderbottom {
+    border-bottom: 1px solid #cfd1d5;
+}
+.lpmonitoringdialogue .stats-rated-column {
+    min-width: 20%;
+}
+.lpmonitoringdialogue div.dataTables_paginate a.paginate_button.first,
+.lpmonitoringdialogue div.dataTables_paginate a.paginate_button.previous {
+    position: relative;
+    padding-left: 24px;
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.paginate_button.next,
+.lpmonitoringdialogue div.dataTables_paginate a.paginate_button.last {
+    position: relative;
+    padding-right: 24px;
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.first:before,
+.lpmonitoringdialogue div.dataTables_paginate a.previous:before {
+    display: block;
+    font-family: FontAwesome;
+    font-size: 1.5em;
+    left: 10px;
+    position: absolute;
+    top: 2px;
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.next:after,
+.lpmonitoringdialogue div.dataTables_paginate a.last:after {
+    display: block;
+    font-family: FontAwesome;
+    font-size: 1.5em;
+    position: absolute;
+    right: 10px;
+    top: 2px;
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.first:before {
+    content: "\f100";
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.previous:before {
+    content: "\f104";
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.next:after {
+    content: "\f105";
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.last:after {
+    content: "\f101";
+}
+.lpmonitoringdialogue .dataTables_wrapper {
+    position: relative;
+    clear: both;
+    *zoom: 1;
+    zoom: 1;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_length {
+    float: left;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: right;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_filter input {
+    margin-left: 0.5em;
+}
+.lpmonitoringdialogue table.dataTable thead th {
+    position: relative;
+    background-image: none !important;
+}
+
+.lpmonitoringdialogue table.dataTable thead th.sorting:after,
+.lpmonitoringdialogue table.dataTable thead th.sorting_asc:after,
+.lpmonitoringdialogue table.dataTable thead th.sorting_desc:after {
+    position: absolute;
+    top: 10px;
+    right: 8px;
+    display: block;
+    font-family: FontAwesome;
+}
+
+.lpmonitoringdialogue table.dataTable thead th.sorting:after {
+    content: "\f0dc";
+    color: #ddd;
+    font-size: 0.8em;
+    padding-top: 0.12em;
+}
+.lpmonitoringdialogue table.dataTable thead th.sorting_asc:after {
+    content: "\f0de";
+}
+.lpmonitoringdialogue table.dataTable thead th.sorting_desc:after {
+    content: "\f0dd";
+}
+
+.lpmonitoringdialogue div.dataTables_scrollBody table.dataTable thead th.sorting:after,
+.lpmonitoringdialogue div.dataTables_scrollBody table.dataTable thead th.sorting_asc:after,
+.lpmonitoringdialogue div.dataTables_scrollBody table.dataTable thead th.sorting_desc:after {
+    content: "";
+}
+.lpmonitoringdialogue table.dataTable thead .sorting_asc,
+.lpmonitoringdialogue table.dataTable thead .sorting_desc,
+.lpmonitoringdialogue table.dataTable thead .sorting {
+    cursor: pointer;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+    background: transparent none repeat scroll 0 0;
+    border: 1px solid transparent;
+    box-shadow: none;
+    color: #666 !important;
+    cursor: default;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button {
+    box-sizing: border-box;
+    color: #333333 !important;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 1.5em;
+    margin-left: 2px;
+    min-width: 1.5em;
+    padding: 0.2em 0.6em;
+    text-align: center;
+    text-decoration: none !important;
+    border-radius: 3px;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: rgba(0, 0, 0, 0) linear-gradient(to bottom, white 0%, gainsboro 100%) repeat scroll 0 0;
+    border: 1px solid #cacaca;
+    color: #333333 !important;
+}
+.lpmonitoringdialogue .dataTables_paginate {
+    text-align: center;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: white !important;
+    background-color: #0d70c4;
+}
+.competencyreport .form-autocomplete-suggestions .nbratinguser {
+    float:right;
+    margin-left: 40px;
+}
