@@ -858,6 +858,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .competencyreport .compstats .competency-detail {
     flex: 0 1 315px;
     margin-right: 20px;
+    min-width: 315px;
 }
 .competencyreport div.stats .x_title {
     border-bottom-color: #cfd1d5;
