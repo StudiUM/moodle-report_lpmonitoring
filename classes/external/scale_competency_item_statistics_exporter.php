@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 use report_lpmonitoring\external\scale_value_user_exporter;
 use core_competency\external\exporter;
 use renderer_base;
-use stdClass;
 
 /**
  * Class for exporting scale info and users rated with the scale value.

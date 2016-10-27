@@ -25,9 +25,7 @@
 namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
-use context_course;
 use renderer_base;
-use stdClass;
 
 /**
  * Class for exporting data of course linked to a competency.

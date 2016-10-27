@@ -28,12 +28,9 @@ global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
-use core_competency\invalid_persistent_exception;
 use core_competency\plan;
 use core_competency\user_competency;
-use report_lpmonitoring\api;
 use report_lpmonitoring\external;
-use report_lpmonitoring\external\report_competency_detail_exporter;
 use report_lpmonitoring\report_competency_config;
 use core_competency\url;
 

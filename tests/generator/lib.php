@@ -25,7 +25,6 @@
  */
 
 use report_lpmonitoring\report_competency_config;
-use report_lpmonitoring\external;
 
 defined('MOODLE_INTERNAL') || die();
 

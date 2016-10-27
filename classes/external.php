@@ -44,8 +44,6 @@ use core_competency\external\competency_exporter;
 use core_competency\external\template_exporter;
 use core_competency\external\user_competency_exporter;
 use core_competency\external\user_competency_plan_exporter;
-use tool_lp\external\competency_summary_exporter;
-use tool_lp\external\course_summary_exporter;
 use report_lpmonitoring\external\stats_plan_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_detail_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_exporter;

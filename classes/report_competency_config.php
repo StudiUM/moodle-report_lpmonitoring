@@ -27,10 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use core_competency\persistent;
 use core_competency\competency_framework;
-use coding_exception;
-use context;
 use lang_string;
-use stdClass;
 
 require_once($CFG->libdir . '/grade/grade_scale.php');
 

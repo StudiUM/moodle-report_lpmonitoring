@@ -26,11 +26,9 @@ namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
 use renderer_base;
-use core_competency\external\exporter;
 use core_competency\user_evidence;
 use core_competency\user_competency;
 use tool_lp\external\competency_path_exporter;
-use tool_lp\external\user_evidence_summary_exporter;
 use report_lpmonitoring\external\linked_course_exporter;
 use report_lpmonitoring\external\scale_competency_item_exporter;
 use report_lpmonitoring\external\report_user_evidence_summary_exporter;

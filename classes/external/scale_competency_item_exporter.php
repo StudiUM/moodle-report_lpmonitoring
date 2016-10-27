@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 use report_lpmonitoring\external\scale_value_course_exporter;
 use renderer_base;
-use stdClass;
 
 /**
  * Class for exporting scale info and courses that rated with the scale value.

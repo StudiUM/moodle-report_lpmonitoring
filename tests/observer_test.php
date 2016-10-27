@@ -26,9 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
-use core_competency\competency;
-use core_competency\competency_framework;
-use report_lpmonitoring\api;
 use core_competency\api as core_competency_api;
 use report_lpmonitoring\report_competency_config;
 
