@@ -33,19 +33,14 @@ use core_competency\api as core_competency_api;
 use core_competency\course_competency;
 use core_competency\competency;
 use core_competency\template;
-use core_competency\user_evidence;
-use core_competency\evidence;
-use core_competency\user_competency;
-use core_competency\user_competency_plan;
+use core_competency\plan;
 use core_competency\template_competency;
-use tool_lp\external\user_evidence_summary_exporter;
 use core_competency\competency_framework;
-use tool_lp\external\competency_path_exporter;
 use report_lpmonitoring\report_competency_config;
 use stdClass;
 use Exception;
 use required_capability_exception;
-use context_system;
+use moodle_exception;
 
 /**
  * Class for doing reports for competency.
@@ -527,6 +522,11 @@ class api {
         }
 
         if (!empty($currentplanid)) {
+            $plan = new plan($currentplanid);
+            if (!$plan->can_read()) {
+                $currentuserfullname = $userplans[$currentindex]['fullname'];
+                throw new moodle_exception('nopermissionsplanview', 'report_lpmonitoring', '', $currentuserfullname);
+            }
             $currentplan = core_competency_api::read_plan($currentplanid);
         }
 

@@ -45,6 +45,7 @@ $string['nextuser'] = 'Next User';
 $string['nodataavailable'] = 'No data available';
 $string['nolearningplanavailable'] = 'No learning plan available';
 $string['nomatchingrecords'] = 'No matching records found';
+$string['nopermissionsplanview'] = 'Sorry, but you do not currently have permissions to view learning plan for {$a}';
 $string['noscaleavailable'] = 'No scale available';
 $string['notemplateselected'] = 'No template selected';
 $string['nostudentselected'] = 'No student selected';

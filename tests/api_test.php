@@ -676,6 +676,117 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     }
 
     /**
+     * Test we can read plan with no permissions.
+     */
+    public function test_read_plan_with_nopermissions() {
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $cpg = $dg->get_plugin_generator('core_competency');
+
+        // Create category.
+        $cat1 = $dg->create_category(array('name' => 'Cat test 1'));
+        $cat1ctx = context_coursecat::instance($cat1->id);
+
+        // Create templates.
+        $template = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
+
+        // Create scales.
+        $scale = $dg->create_scale(array("name" => "Scale default", "scale" => "not good, good"));
+
+        $scaleconfiguration = '[{"scaleid":"'.$scale->id.'"},' .
+                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+
+        // Create the framework competency.
+        $framework = array(
+            'shortname' => 'Framework Medicine',
+            'idnumber' => 'fr-medicine',
+            'scaleid' => $scale->id,
+            'scaleconfiguration' => $scaleconfiguration,
+            'visible' => true,
+            'contextid' => $cat1ctx->id
+        );
+        $framework = $cpg->create_framework($framework);
+        $c1 = $cpg->create_competency(array(
+            'competencyframeworkid' => $framework->get_id(),
+            'shortname' => 'Competency A')
+        );
+
+        $c2 = $cpg->create_competency(array(
+            'competencyframeworkid' => $framework->get_id(),
+            'shortname' => 'Competency B')
+        );
+        // Create template competency.
+        $cpg->create_template_competency(array('templateid' => $template->get_id(), 'competencyid' => $c1->get_id()));
+        $cpg->create_template_competency(array('templateid' => $template->get_id(), 'competencyid' => $c2->get_id()));
+
+        $user1 = $dg->create_user(array(
+            'firstname' => 'Rebecca',
+            'lastname' => 'Armenta')
+        );
+        $user2 = $dg->create_user(array(
+            'firstname' => 'Donald',
+            'lastname' => 'Fletcher')
+        );
+        $user3 = $dg->create_user(array(
+            'firstname' => 'Stepanie',
+            'lastname' => 'Grant')
+        );
+
+        $appreciator = $dg->create_user(
+                array(
+                    'firstname' => 'Appreciator',
+                    'lastname' => 'Test',
+                    'username' => 'appreciator',
+                    'password' => 'appreciator'
+                )
+        );
+
+        $cohort = $dg->create_cohort(array('contextid' => $cat1ctx->id));
+        cohort_add_member($cohort->id, $user1->id);
+        cohort_add_member($cohort->id, $user2->id);
+
+        // Generate plans for cohort.
+        core_competency_api::create_plans_from_template_cohort($template->get_id(), $cohort->id);
+        // Create plan from template for Stephanie.
+        $planstephanie = core_competency_api::create_plan_from_template($template->get_id(), $user3->id);
+        $syscontext = context_system::instance();
+
+        $roleid = create_role('Appreciator role', 'roleappreciatortest', 'learning plan appreciator role description');
+        assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:planmanage', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:competencygrade', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:templateview', CAP_ALLOW, $roleid, $cat1ctx->id);
+
+        role_assign($roleid, $appreciator->id, $cat1ctx->id);
+        $params = (object) array(
+            'userid' => $appreciator->id,
+            'roleid' => $roleid,
+            'cohortid' => $cohort->id
+        );
+        tool_cohortroles_api::create_cohort_role_assignment($params);
+        $roles = tool_cohortroles_api::sync_all_cohort_roles();
+        $this->setUser($appreciator);
+        // Test we can read the first plan for the template (Rebecca).
+        $result = api::read_plan(0, $template->get_id());
+        $this->assertEquals($user1->id, $result->current->get_userid());
+
+        // Test we can not read Stephanie learning plan (do not belong to the cohort).
+        try {
+            api::read_plan($planstephanie->get_id(), $template->get_id());
+            $this->fail("We don't have read plan permission for Stephanie Grant");
+        } catch (Exception $ex) {
+            $this->assertContains('Stepanie Grant', $ex->getMessage());
+        }
+    }
+
+    /**
      * Test read current plan and get previous and next user plans.
      */
     public function test_get_plans() {
