@@ -1046,10 +1046,17 @@ define(['jquery',
                 promise[0].then(function(results) {
                     var promises = [],
                         i = 0;
-
                     // Render the label.
                     $.each(results, function(index, user) {
-                        var ctx = user;
+                        var ctx = user,
+                            identity = [];
+                        $.each(['idnumber', 'email', 'phone1', 'phone2', 'department', 'institution'], function(i, k) {
+                            if (typeof user[k] !== 'undefined' && user[k] !== '') {
+                                ctx.hasidentity = true;
+                                identity.push(user[k]);
+                            }
+                        });
+                        ctx.identity = identity.join(', ');
                         promises.push(templates.render('report_lpmonitoring/form-user-selector-suggestion', ctx));
                     });
 

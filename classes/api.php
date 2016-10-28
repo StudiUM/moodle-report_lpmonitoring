@@ -262,7 +262,7 @@ class api {
         $context = $template->get_context();
 
         $extrasearchfields = array();
-        if (!empty($CFG->showuseridentity) && has_capability('moodle/site:viewuseridentity', $context)) {
+        if (!empty($CFG->showuseridentity)) {
             $extrasearchfields = explode(',', $CFG->showuseridentity);
         }
         $fields = \user_picture::fields('u', $extrasearchfields);
@@ -326,7 +326,6 @@ class api {
                                       gradecount,
                                       tempid,
                                       $fields,
-                                      u.username,
                                       p.id AS planid
                                 FROM  (
                                         (SELECT ucc.userid AS useridentifier, Count(ucc.grade) gradecount, tc.templateid AS tempid
@@ -369,7 +368,7 @@ class api {
                 ORDER BY $sort";
         } else {
             // If no scale filter defined.
-            $sql = "SELECT $fields, u.username, p.id as planid
+            $sql = "SELECT $fields, p.id as planid
                   FROM {" . \core_competency\plan::TABLE . "} p
                   JOIN {user} u ON u.id = p.userid
                  WHERE p.templateid = :templateid
@@ -385,15 +384,18 @@ class api {
         foreach ($result as $key => $user) {
             // Add user picture.
             $userplan = array();
-            $userpicture = new \user_picture($user);
-            $userpicture->size = 1;
-            $userplan['profileimage'] = $userpicture;
+            $userplan['profileimage'] = new \user_picture($user);
             $userplan['fullname'] = fullname($user);
-            $userplan['email'] = $user->email;
-            $userplan['username'] = $user->username;
             $userplan['userid'] = $user->id;
             $userplan['planid'] = $user->planid;
             $userplan['nbrating'] = (isset($user->gradecount)) ? $user->gradecount : 0;
+            $usercontext = \context_user::instance($user->id);
+            // Build identity fields.
+            if (!empty($extrasearchfields) && has_capability('moodle/site:viewuseridentity', $usercontext)) {
+                foreach ($extrasearchfields as $field) {
+                    $userplan[$field] = $user->$field;
+                }
+            }
             $users[$key] = $userplan;
         }
         $result->close();

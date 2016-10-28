@@ -447,7 +447,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($plan4->get_name(), $result['plan']['name']);
         $this->assertEquals($user1->id, $result['plan']['user']['id']);
         $this->assertEquals('Sharon Austin', $result['plan']['user']['fullname']);
-        $this->assertEquals($user1->email, $result['plan']['user']['email']);
         $this->assertFalse($result['plan']['isactive']);
         $this->assertFalse($result['plan']['isdraft']);
         $this->assertTrue($result['plan']['iscompleted']);
@@ -464,7 +463,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($plan1->get_name(), $result['plan']['name']);
         $this->assertEquals($user1->id, $result['plan']['user']['id']);
         $this->assertEquals('Sharon Austin', $result['plan']['user']['fullname']);
-        $this->assertEquals($user1->email, $result['plan']['user']['email']);
         $this->assertFalse($result['plan']['isactive']);
         $this->assertTrue($result['plan']['isdraft']);
         $this->assertEquals($statusnamedraft, $result['plan']['statusname']);
@@ -475,7 +473,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertArrayHasKey('navnext', $result);
         $this->assertEquals($user2->id, $result['navnext']['userid']);
         $this->assertEquals('Jonathan Cortez', $result['navnext']['fullname']);
-        $this->assertEquals($user2->email, $result['navnext']['email']);
         $this->assertEquals($plan2->get_id(), $result['navnext']['planid']);
 
         // Test plan based on a template that is in the middle in the list of plans.
@@ -485,7 +482,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($plan2->get_name(), $result['plan']['name']);
         $this->assertEquals($user2->id, $result['plan']['user']['id']);
         $this->assertEquals('Jonathan Cortez', $result['plan']['user']['fullname']);
-        $this->assertEquals($user2->email, $result['plan']['user']['email']);
         $this->assertTrue($result['plan']['isactive']);
         $this->assertEquals($statusnameactive, $result['plan']['statusname']);
         $this->assertFalse($result['plan']['isdraft']);
@@ -495,12 +491,10 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertArrayHasKey('navprev', $result);
         $this->assertEquals($user1->id, $result['navprev']['userid']);
         $this->assertEquals('Sharon Austin', $result['navprev']['fullname']);
-        $this->assertEquals($user1->email, $result['navprev']['email']);
         $this->assertEquals($plan1->get_id(), $result['navprev']['planid']);
         $this->assertArrayHasKey('navnext', $result);
         $this->assertEquals($user3->id, $result['navnext']['userid']);
         $this->assertEquals('Alicia Underwood', $result['navnext']['fullname']);
-        $this->assertEquals($user3->email, $result['navnext']['email']);
         $this->assertEquals($plan3->get_id(), $result['navnext']['planid']);
         $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
@@ -514,7 +508,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($plan3->get_name(), $result['plan']['name']);
         $this->assertEquals($user3->id, $result['plan']['user']['id']);
         $this->assertEquals('Alicia Underwood', $result['plan']['user']['fullname']);
-        $this->assertEquals($user3->email, $result['plan']['user']['email']);
         $this->assertTrue($result['plan']['isactive']);
         $this->assertEquals($statusnameactive, $result['plan']['statusname']);
         $this->assertFalse($result['plan']['isdraft']);
@@ -524,7 +517,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertArrayHasKey('navprev', $result);
         $this->assertEquals($user2->id, $result['navprev']['userid']);
         $this->assertEquals('Jonathan Cortez', $result['navprev']['fullname']);
-        $this->assertEquals($user2->email, $result['navprev']['email']);
         $this->assertEquals($plan2->get_id(), $result['navprev']['planid']);
         $this->assertArrayNotHasKey('navnext', $result);
         $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
@@ -539,7 +531,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($plan1->get_name(), $result['plan']['name']);
         $this->assertEquals($user1->id, $result['plan']['user']['id']);
         $this->assertEquals('Sharon Austin', $result['plan']['user']['fullname']);
-        $this->assertEquals($user1->email, $result['plan']['user']['email']);
         $this->assertFalse($result['plan']['isactive']);
         $this->assertTrue($result['plan']['isdraft']);
         $this->assertEquals($statusnamedraft, $result['plan']['statusname']);
@@ -549,7 +540,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertArrayHasKey('navnext', $result);
         $this->assertEquals($user2->id, $result['navnext']['userid']);
         $this->assertEquals('Jonathan Cortez', $result['navnext']['fullname']);
-        $this->assertEquals($user2->email, $result['navnext']['email']);
         $this->assertEquals($plan2->get_id(), $result['navnext']['planid']);
     }
 

@@ -27,12 +27,13 @@
 
     Context variables required for this template:
     * profileimageurlsmall Url to a small profile image.
-    * profileimageurl Url to a profile image.
     * fullname Users full name
     * userid user id field
     * email user email field
     * planid user plan id
     * nbrating total number of rating
+    * hasidentity true if has identity to display
+    * identity extra user fields to display
 
     Example context (json):
     { "userid": "1",
@@ -41,13 +42,20 @@
       "planid": "5",
       "profileimageurl": "invalid url",
       "profileimageurlsmall": "invalid url",
-      "nbrating": "6"
+      "nbrating": "6",
+      "hasidentity": true,
+      "identity": "p001421, useremail@nomailtest.com"
+      
     }
 }}
 <span class="userplan-fullname">
     <img height="18" src="{{profileimagesmall}}" alt="" role="presentation">
     <span>{{fullname}}</span>
+    {{#hasidentity}}
+    <span><small>{{identity}}</small></span>
+    {{/hasidentity}}
 </span>
+
 {{#nbrating}}
 <span class="nbratinguser">{{#str}}ratingnumber, report_lpmonitoring, {{{nbrating}}}{{/str}}</span>
 {{/nbrating}}

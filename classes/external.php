@@ -134,7 +134,6 @@ class external extends external_api {
 
         foreach ($records as $key => $record) {
             $profileimage = $record['profileimage'];
-            $record['profileimage'] = $profileimage->get_url($PAGE)->out(false);
             $profileimage->size = 0;
             $record['profileimagesmall']  = $profileimage->get_url($PAGE)->out(false);
             $records[$key] = $record;
@@ -151,13 +150,16 @@ class external extends external_api {
         return new external_multiple_structure(
             new external_single_structure(array(
                 'fullname' => new external_value(PARAM_TEXT, 'The fullname of the user'),
-                'email' => new external_value(PARAM_TEXT, 'The email of the user'),
-                'username' => new external_value(PARAM_TEXT, 'The username of the user'),
-                'profileimage' => new external_value(PARAM_TEXT, 'The profile image small size'),
                 'profileimagesmall' => new external_value(PARAM_TEXT, 'The profile image small size'),
                 'userid' => new external_value(PARAM_INT, 'The user id value'),
                 'planid' => new external_value(PARAM_INT, 'The plan id value'),
-                'nbrating' => new external_value(PARAM_INT, 'Total rating number')
+                'nbrating' => new external_value(PARAM_INT, 'Total rating number'),
+                'email' => new external_value(PARAM_TEXT, 'The email of the user', VALUE_OPTIONAL),
+                'idnumber' => new external_value(PARAM_TEXT, 'The idnumber of the user', VALUE_OPTIONAL),
+                'phone1' => new external_value(PARAM_TEXT, 'The phone1 of the user', VALUE_OPTIONAL),
+                'phone2' => new external_value(PARAM_TEXT, 'The phone2 of the user', VALUE_OPTIONAL),
+                'department' => new external_value(PARAM_TEXT, 'The department of the user', VALUE_OPTIONAL),
+                'institution' => new external_value(PARAM_TEXT, 'The institution of the user', VALUE_OPTIONAL)
             ))
         );
     }
@@ -717,7 +719,6 @@ class external extends external_api {
 
         $usernav = new external_single_structure(array(
             'fullname' => new external_value(PARAM_TEXT, 'The fullname of the user'),
-            'email' => new external_value(PARAM_TEXT, 'The email of the user'),
             'profileimage' => new external_value(PARAM_TEXT, 'The profile image small size'),
             'profileimagesmall' => new external_value(PARAM_TEXT, 'The profile image small size'),
             'userid' => new external_value(PARAM_INT, 'The user ID value'),
