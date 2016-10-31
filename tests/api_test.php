@@ -61,6 +61,33 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     /** @var stdClass creator context. */
     protected $contextcreator = null;
 
+    /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in category context. */
+    protected $appreciatorforcategory = null;
+
+    /** @var stdClass $category Category. */
+    protected $category = null;
+
+    /** @var stdClass $category Category. */
+    protected $templateincategory = null;
+
+    /** @var stdClass $frameworkincategory Competency framework in category context. */
+    protected $frameworkincategory = null;
+
+    /** @var stdClass $user1 User for generating plans. */
+    protected $user1 = null;
+
+    /** @var stdClass $user1 User for generating plans. */
+    protected $user2 = null;
+
+    /** @var stdClass $user1 User for generating plans. */
+    protected $user3 = null;
+
+    /** @var stdClass $comp1 Competency to be added to the framework. */
+    protected $comp1 = null;
+
+    /** @var stdClass $comp2 Competency to be added to the framework. */
+    protected $comp2 = null;
+
     protected function setUp() {
 
         $this->resetAfterTest(true);
@@ -89,9 +116,117 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         role_assign($this->roleappreciator, $appreciator->id, $syscontext->id);
-
         $this->creator = $creator;
         $this->appreciator = $appreciator;
+
+        $this->setAdminUser();
+        // Create category.
+        $this->category = $dg->create_category(array('name' => 'Cat test 1'));
+        $cat1ctx = context_coursecat::instance($this->category->id);
+
+        // Create templates in category.
+        $this->templateincategory = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
+
+        // Create scales.
+        $scale = $dg->create_scale(array("name" => "Scale default", "scale" => "not good, good"));
+
+        $scaleconfiguration = '[{"scaleid":"'.$scale->id.'"},' .
+                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+
+        // Create the framework competency.
+        $framework = array(
+            'shortname' => 'Framework Medicine',
+            'idnumber' => 'fr-medicine',
+            'scaleid' => $scale->id,
+            'scaleconfiguration' => $scaleconfiguration,
+            'visible' => true,
+            'contextid' => $cat1ctx->id
+        );
+        $this->frameworkincategory = $cpg->create_framework($framework);
+        $this->comp1 = $cpg->create_competency(array(
+            'competencyframeworkid' => $this->frameworkincategory->get_id(),
+            'shortname' => 'Competency A')
+        );
+
+        $this->comp2 = $cpg->create_competency(array(
+            'competencyframeworkid' => $this->frameworkincategory->get_id(),
+            'shortname' => 'Competency B')
+        );
+        // Create template competency.
+        $cpg->create_template_competency(array('templateid' => $this->templateincategory->get_id(),
+            'competencyid' => $this->comp1->get_id()));
+        $cpg->create_template_competency(array('templateid' => $this->templateincategory->get_id(),
+            'competencyid' => $this->comp2->get_id()));
+
+        $this->user1 = $dg->create_user(array(
+            'firstname' => 'Rebecca',
+            'lastname' => 'Armenta',
+            'email' => 'user11test@nomail.com',
+            'phone1' => 1111111111,
+            'phone2' => 2222222222,
+            'institution' => 'Institution Name',
+            'department' => 'Dep Name')
+        );
+        $this->user2 = $dg->create_user(array(
+            'firstname' => 'Donald',
+            'lastname' => 'Fletcher',
+            'email' => 'user12test@nomail.com',
+            'phone1' => 1111111111,
+            'phone2' => 2222222222,
+            'institution' => 'Institution Name',
+            'department' => 'Dep Name')
+        );
+        $this->user3 = $dg->create_user(array(
+            'firstname' => 'Stepanie',
+            'lastname' => 'Grant',
+            'email' => 'user13test@nomail.com',
+            'phone1' => 1111111111,
+            'phone2' => 2222222222,
+            'institution' => 'Institution Name',
+            'department' => 'Dep Name')
+        );
+
+        $appreciatorforcategory = $dg->create_user(
+                array(
+                    'firstname' => 'Appreciator',
+                    'lastname' => 'Test',
+                    'username' => 'appreciator',
+                    'password' => 'appreciator'
+                )
+        );
+
+        $cohort = $dg->create_cohort(array('contextid' => $cat1ctx->id));
+        cohort_add_member($cohort->id, $this->user1->id);
+        cohort_add_member($cohort->id, $this->user2->id);
+
+        // Generate plans for cohort.
+        core_competency_api::create_plans_from_template_cohort($this->templateincategory->get_id(), $cohort->id);
+        // Create plan from template for Stephanie.
+        $syscontext = context_system::instance();
+
+        $roleid = create_role('Appreciator role', 'roleappreciatortest', 'learning plan appreciator role description');
+        assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:planmanage', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:competencygrade', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:templateview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/site:viewuseridentity', CAP_ALLOW, $roleid, $syscontext->id);
+
+        role_assign($roleid, $appreciatorforcategory->id, $cat1ctx->id);
+        $params = (object) array(
+            'userid' => $appreciatorforcategory->id,
+            'roleid' => $roleid,
+            'cohortid' => $cohort->id
+        );
+        tool_cohortroles_api::create_cohort_role_assignment($params);
+        tool_cohortroles_api::sync_all_cohort_roles();
+        $this->appreciatorforcategory = $appreciatorforcategory;
 
         $this->setUser($this->creator);
     }
@@ -677,107 +812,17 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
      * Test we can read plan with no permissions.
      */
     public function test_read_plan_with_nopermissions() {
-        $this->setAdminUser();
-        $dg = $this->getDataGenerator();
-        $cpg = $dg->get_plugin_generator('core_competency');
-
-        // Create category.
-        $cat1 = $dg->create_category(array('name' => 'Cat test 1'));
-        $cat1ctx = context_coursecat::instance($cat1->id);
-
-        // Create templates.
-        $template = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
-
-        // Create scales.
-        $scale = $dg->create_scale(array("name" => "Scale default", "scale" => "not good, good"));
-
-        $scaleconfiguration = '[{"scaleid":"'.$scale->id.'"},' .
-                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
-                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
-
-        // Create the framework competency.
-        $framework = array(
-            'shortname' => 'Framework Medicine',
-            'idnumber' => 'fr-medicine',
-            'scaleid' => $scale->id,
-            'scaleconfiguration' => $scaleconfiguration,
-            'visible' => true,
-            'contextid' => $cat1ctx->id
-        );
-        $framework = $cpg->create_framework($framework);
-        $c1 = $cpg->create_competency(array(
-            'competencyframeworkid' => $framework->get_id(),
-            'shortname' => 'Competency A')
-        );
-
-        $c2 = $cpg->create_competency(array(
-            'competencyframeworkid' => $framework->get_id(),
-            'shortname' => 'Competency B')
-        );
-        // Create template competency.
-        $cpg->create_template_competency(array('templateid' => $template->get_id(), 'competencyid' => $c1->get_id()));
-        $cpg->create_template_competency(array('templateid' => $template->get_id(), 'competencyid' => $c2->get_id()));
-
-        $user1 = $dg->create_user(array(
-            'firstname' => 'Rebecca',
-            'lastname' => 'Armenta')
-        );
-        $user2 = $dg->create_user(array(
-            'firstname' => 'Donald',
-            'lastname' => 'Fletcher')
-        );
-        $user3 = $dg->create_user(array(
-            'firstname' => 'Stepanie',
-            'lastname' => 'Grant')
-        );
-
-        $appreciator = $dg->create_user(
-                array(
-                    'firstname' => 'Appreciator',
-                    'lastname' => 'Test',
-                    'username' => 'appreciator',
-                    'password' => 'appreciator'
-                )
-        );
-
-        $cohort = $dg->create_cohort(array('contextid' => $cat1ctx->id));
-        cohort_add_member($cohort->id, $user1->id);
-        cohort_add_member($cohort->id, $user2->id);
-
-        // Generate plans for cohort.
-        core_competency_api::create_plans_from_template_cohort($template->get_id(), $cohort->id);
-        // Create plan from template for Stephanie.
-        $planstephanie = core_competency_api::create_plan_from_template($template->get_id(), $user3->id);
-        $syscontext = context_system::instance();
-
-        $roleid = create_role('Appreciator role', 'roleappreciatortest', 'learning plan appreciator role description');
-        assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:planmanage', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:competencygrade', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:templateview', CAP_ALLOW, $roleid, $cat1ctx->id);
-
-        role_assign($roleid, $appreciator->id, $cat1ctx->id);
-        $params = (object) array(
-            'userid' => $appreciator->id,
-            'roleid' => $roleid,
-            'cohortid' => $cohort->id
-        );
-        tool_cohortroles_api::create_cohort_role_assignment($params);
-        $roles = tool_cohortroles_api::sync_all_cohort_roles();
-        $this->setUser($appreciator);
+        $this->setUser($this->appreciatorforcategory);
         // Test we can read the first plan for the template (Rebecca).
-        $result = api::read_plan(0, $template->get_id());
-        $this->assertEquals($user1->id, $result->current->get_userid());
+        $result = api::read_plan(0, $this->templateincategory->get_id());
+        $this->assertEquals($this->user1->id, $result->current->get_userid());
+        $this->setAdminUser();
+        $planstephanie = core_competency_api::create_plan_from_template($this->templateincategory->get_id(), $this->user3->id);
 
+        $this->setUser($this->appreciatorforcategory);
         // Test we can not read Stephanie learning plan (do not belong to the cohort).
         try {
-            api::read_plan($planstephanie->get_id(), $template->get_id());
+            api::read_plan($planstephanie->get_id(), $this->templateincategory->get_id());
             $this->fail("We don't have read plan permission for Stephanie Grant");
         } catch (Exception $ex) {
             $this->assertContains('Stepanie Grant', $ex->getMessage());
@@ -877,75 +922,11 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
      * Test get learning plans from templateid.
      */
     public function test_search_users_by_templateid() {
-        $this->resetAfterTest(true);
-        $this->setAdminUser();
-        $dg = $this->getDataGenerator();
-        $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
-        $framework = $cpg->create_framework();
-        $c1 = $cpg->create_competency(array('competencyframeworkid' => $framework->get_id(), 'shortname' => 'c1'));
-        $c2 = $cpg->create_competency(array('competencyframeworkid' => $framework->get_id(), 'shortname' => 'c2'));
-        $cat1 = $dg->create_category();
-        $cat1ctx = context_coursecat::instance($cat1->id);
-        $template = $cpg->create_template(array('contextid' => $cat1ctx->id));
-        $user1 = $dg->create_user(array(
-            'firstname' => 'User11',
-            'lastname' => 'Lastname1',
-            'email' => 'user11test@nomail.com',
-            'phone1' => 1111111111,
-            'phone2' => 2222222222,
-            'institution' => 'Institution Name',
-            'department' => 'Dep Name'));
-        $user2 = $dg->create_user(array(
-            'firstname' => 'User12',
-            'lastname' => 'Lastname2',
-            'email' => 'user12test@nomail.com',
-            'phone1' => 1111111111,
-            'phone2' => 2222222222,
-            'institution' => 'Institution Name',
-            'department' => 'Dep Name'
-            ));
-        $user3 = $dg->create_user(array('firstname' => 'User3', 'lastname' => 'Lastname3'));
-        $user4 = $dg->create_user(array('firstname' => 'User4', 'lastname' => 'Lastname4'));
-        $user5 = $dg->create_user(array('firstname' => 'User5', 'lastname' => 'Lastname5'));
-        $appreciator = $dg->create_user(array('firstname' => 'Appreciator', 'lastname' => 'Test'));
+        $this->setUser($this->appreciatorforcategory);
+        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Re');
+        $this->assertCount(1, $users);
 
-        $roleprevent = create_role('Allow', 'allow', 'Allow read');
-        assign_capability('moodle/competency:templateview', CAP_ALLOW, $roleprevent, $cat1ctx->id);
-        role_assign($roleprevent, $appreciator->id, $cat1ctx->id);
-
-        $tc1 = $cpg->create_template_competency(array(
-            'templateid' => $template->get_id(),
-            'competencyid' => $c1->get_id()
-        ));
-        $tc2 = $cpg->create_template_competency(array(
-            'templateid' => $template->get_id(),
-            'competencyid' => $c2->get_id()
-        ));
-        $plan1 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user1->id));
-        $plan2 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user2->id));
-        $plan3 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user3->id));
-        $plan4 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user4->id));
-
-        $cohort = $this->getDataGenerator()->create_cohort();
-        cohort_add_member($cohort->id, $user1->id);
-        cohort_add_member($cohort->id, $user2->id);
-        cohort_add_member($cohort->id, $user3->id);
-        cohort_add_member($cohort->id, $user4->id);
-
-        $roleid = create_role('Role', 'appreciatorrole', 'mmmm');
-        $params = (object) array(
-            'userid' => $appreciator->id,
-            'roleid' => $roleid,
-            'cohortid' => $cohort->id
-        );
-        tool_cohortroles_api::create_cohort_role_assignment($params);
-        tool_cohortroles_api::sync_all_cohort_roles();
-
-        $this->setUser($appreciator);
-        $users = api::search_users_by_templateid($template->get_id(), 'User');
-        $this->assertCount(4, $users);
-
-        $users = api::search_users_by_templateid($template->get_id(), 'User1');
+        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 't');
         $this->assertCount(2, $users);
     }
 
@@ -953,166 +934,67 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
      * Test we can search users with identity informations.
      */
     public function test_search_users_by_templateid_withidentityuser() {
-        global $CFG;
-        $this->setAdminUser();
-        $dg = $this->getDataGenerator();
-        $cpg = $dg->get_plugin_generator('core_competency');
-
-        // Create category.
-        $cat1 = $dg->create_category(array('name' => 'Cat test 1'));
-        $cat1ctx = context_coursecat::instance($cat1->id);
-
-        // Create templates.
-        $template = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
-
-        // Create scales.
-        $scale = $dg->create_scale(array("name" => "Scale default", "scale" => "not good, good"));
-
-        $scaleconfiguration = '[{"scaleid":"'.$scale->id.'"},' .
-                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
-                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
-
-        // Create the framework competency.
-        $framework = array(
-            'shortname' => 'Framework Medicine',
-            'idnumber' => 'fr-medicine',
-            'scaleid' => $scale->id,
-            'scaleconfiguration' => $scaleconfiguration,
-            'visible' => true,
-            'contextid' => $cat1ctx->id
-        );
-        $framework = $cpg->create_framework($framework);
-        $c1 = $cpg->create_competency(array(
-            'competencyframeworkid' => $framework->get_id(),
-            'shortname' => 'Competency A'
-        ));
-
-        $c2 = $cpg->create_competency(array(
-            'competencyframeworkid' => $framework->get_id(),
-            'shortname' => 'Competency B'
-        ));
-        // Create template competency.
-        $cpg->create_template_competency(array('templateid' => $template->get_id(), 'competencyid' => $c1->get_id()));
-        $cpg->create_template_competency(array('templateid' => $template->get_id(), 'competencyid' => $c2->get_id()));
-
-        $user1 = $dg->create_user(array(
-            'firstname' => 'User11',
-            'lastname' => 'Lastname1',
-            'email' => 'user11test@nomail.com',
-            'phone1' => 1111111111,
-            'phone2' => 2222222222,
-            'institution' => 'Institution Name',
-            'department' => 'Dep Name'
-        ));
-        $user2 = $dg->create_user(array(
-            'firstname' => 'User12',
-            'lastname' => 'Lastname2',
-            'email' => 'user12test@nomail.com',
-            'phone1' => 1111111111,
-            'phone2' => 2222222222,
-            'institution' => 'Institution Name',
-            'department' => 'Dep Name'
-        ));
-
-        $appreciator = $dg->create_user(
-                array(
-                    'firstname' => 'Appreciator',
-                    'lastname' => 'Test',
-                    'username' => 'appreciator',
-                    'password' => 'appreciator'
-                )
-        );
-
-        $cohort = $dg->create_cohort(array('contextid' => $cat1ctx->id));
-        cohort_add_member($cohort->id, $user1->id);
-        cohort_add_member($cohort->id, $user2->id);
-
-        // Generate plans for cohort.
-        core_competency_api::create_plans_from_template_cohort($template->get_id(), $cohort->id);
-        $syscontext = context_system::instance();
-
-        $roleid = create_role('Appreciator role', 'roleappreciatortest', 'learning plan appreciator role description');
-        assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:planmanage', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:competencygrade', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:templateview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/site:viewuseridentity', CAP_ALLOW, $roleid, $syscontext->id);
-
-        role_assign($roleid, $appreciator->id, $cat1ctx->id);
-        $params = (object) array(
-            'userid' => $appreciator->id,
-            'roleid' => $roleid,
-            'cohortid' => $cohort->id
-        );
-        tool_cohortroles_api::create_cohort_role_assignment($params);
-        $roles = tool_cohortroles_api::sync_all_cohort_roles();
-        $this->setUser($appreciator);
+        $this->setUser($this->appreciatorforcategory);
 
         // Test with show user identity disabled.
         set_config('showuseridentity', '');
-        $users = api::search_users_by_templateid($template->get_id(), 'User11');
+        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEmpty(isset($users[$user1->id]['email']));
-        $this->assertFalse(isset($users[$user1->id]['phone1']));
-        $this->assertFalse(isset($users[$user1->id]['phone2']));
-        $this->assertFalse(isset($users[$user1->id]['institution']));
-        $this->assertFalse(isset($users[$user1->id]['department']));
+        $this->assertEmpty(isset($users[$this->user1->id]['email']));
+        $this->assertFalse(isset($users[$this->user1->id]['phone1']));
+        $this->assertFalse(isset($users[$this->user1->id]['phone2']));
+        $this->assertFalse(isset($users[$this->user1->id]['institution']));
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add email to show user identity.
         set_config('showuseridentity', 'email');
-        $users = api::search_users_by_templateid($template->get_id(), 'User11');
+        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$user1->id]['email']);
-        $this->assertFalse(isset($users[$user1->id]['phone1']));
-        $this->assertFalse(isset($users[$user1->id]['phone2']));
-        $this->assertFalse(isset($users[$user1->id]['institution']));
-        $this->assertFalse(isset($users[$user1->id]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertFalse(isset($users[$this->user1->id]['phone1']));
+        $this->assertFalse(isset($users[$this->user1->id]['phone2']));
+        $this->assertFalse(isset($users[$this->user1->id]['institution']));
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add phone1 to show user identity.
         set_config('showuseridentity', 'email,phone1');
-        $users = api::search_users_by_templateid($template->get_id(), 'User11');
+        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$user1->id]['email']);
-        $this->assertEquals(1111111111, $users[$user1->id]['phone1']);
-        $this->assertFalse(isset($users[$user1->id]['phone2']));
-        $this->assertFalse(isset($users[$user1->id]['institution']));
-        $this->assertFalse(isset($users[$user1->id]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
+        $this->assertFalse(isset($users[$this->user1->id]['phone2']));
+        $this->assertFalse(isset($users[$this->user1->id]['institution']));
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add phone2 to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2');
-        $users = api::search_users_by_templateid($template->get_id(), 'User11');
+        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$user1->id]['email']);
-        $this->assertEquals(1111111111, $users[$user1->id]['phone1']);
-        $this->assertEquals(2222222222, $users[$user1->id]['phone2']);
-        $this->assertFalse(isset($users[$user1->id]['institution']));
-        $this->assertFalse(isset($users[$user1->id]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
+        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
+        $this->assertFalse(isset($users[$this->user1->id]['institution']));
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add institution to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2,institution');
-        $users = api::search_users_by_templateid($template->get_id(), 'User11');
+        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$user1->id]['email']);
-        $this->assertEquals(1111111111, $users[$user1->id]['phone1']);
-        $this->assertEquals(2222222222, $users[$user1->id]['phone2']);
-        $this->assertEquals('Institution Name', $users[$user1->id]['institution']);
-        $this->assertFalse(isset($users[$user1->id]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
+        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
+        $this->assertEquals('Institution Name', $users[$this->user1->id]['institution']);
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add department to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2,institution,department');
-        $users = api::search_users_by_templateid($template->get_id(), 'User11');
+        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$user1->id]['email']);
-        $this->assertEquals(1111111111, $users[$user1->id]['phone1']);
-        $this->assertEquals(2222222222, $users[$user1->id]['phone2']);
-        $this->assertEquals('Institution Name', $users[$user1->id]['institution']);
-        $this->assertEquals('Dep Name', $users[$user1->id]['department']);
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
+        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
+        $this->assertEquals('Institution Name', $users[$this->user1->id]['institution']);
+        $this->assertEquals('Dep Name', $users[$this->user1->id]['department']);
     }
 
     /**
@@ -1839,6 +1721,29 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     }
 
     /**
+     * Test get competency statistics for lpmonitoring report when no permissions.
+     */
+    public function test_get_lp_monitoring_competency_stat_permissions() {
+        $this->setAdminUser();
+
+        // Create plan from template for Stephanie.
+        $planstephanie = core_competency_api::create_plan_from_template($this->templateincategory->get_id(), $this->user3->id);
+        $syscontext = context_system::instance();
+        $this->setUser($this->appreciatorforcategory);
+        // Test we can read the first plan for the template (Rebecca).
+        $result = api::read_plan(0, $this->templateincategory->get_id());
+        $this->assertEquals($this->user1->id, $result->current->get_userid());
+
+        // Test we can not read competency stats because of permissions for Stephanie user competency.
+        try {
+            api::get_competency_statistics($this->comp1->get_id(), $this->templateincategory->get_id());
+            $this->fail("We don't have read plan permission for Stephanie Grant");
+        } catch (Exception $ex) {
+            $this->assertContains('Stepanie Grant', $ex->getMessage());
+        }
+    }
+
+    /**
      * Test get competency statistics for lpmonitoring report when scale is defined in competency.
      */
     public function test_get_lp_monitoring_competency_stat_specific_scale() {
@@ -1912,9 +1817,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $mpg->create_report_competency_config($record);
 
         // Create plan from template for all users.
-        $plan = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
+        $p1 = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
+        $p2 = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
+        $p3 = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
 
         // Rate user competency1 for all users.
         $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp2->get_id(),
@@ -1971,6 +1876,13 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
                 }
             }
         }
+        // Test read competency stats on non existing competency for user plan completed.
+        $this->setAdminUser();
+        core_competency_api::complete_plan($p3->get_id());
+        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
+        core_competency_api::add_competency_to_template($template->get_id(), $comp3->get_id());
+        $result = api::get_competency_statistics($comp3->get_id(), $template->get_id());
+        $this->assertCount(2, $result->listusers);
     }
 
     /**

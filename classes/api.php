@@ -36,6 +36,8 @@ use core_competency\template;
 use core_competency\plan;
 use core_competency\template_competency;
 use core_competency\competency_framework;
+use core_competency\user_competency;
+use core_competency\user_competency_plan;
 use report_lpmonitoring\report_competency_config;
 use stdClass;
 use Exception;
@@ -691,18 +693,25 @@ class api {
         }
         $competencystatistics->reportscaleconfig = $reportscaleconfig;
 
-        // Find rate for each user in the plane for the the competency.
-        $sql = "SELECT *
-                  FROM {competency_plan}
-                 WHERE templateid = ?";
+        // Get plans by template.
+        $userplans = plan::get_records_for_template($templateid);
 
-        $userplans = $DB->get_records_sql($sql, array($templateid));
-
+        // Find rate for each user in the plan for the the competency.
         $competencystatistics->listusers = array();
         foreach ($userplans as $userplan) {
             $user = new stdClass();
-            $user->userinfo = core_user::get_user($userplan->userid, '*', \MUST_EXIST);
-            $plancompetency = core_competency_api::get_plan_competency($userplan->id, $competencyid);
+            $user->userinfo = core_user::get_user($userplan->get_userid(), '*', \MUST_EXIST);
+            // Throw an exception if user can not read the user competency.
+            if (!user_competency::can_read_user($userplan->get_userid())) {
+                $userfullname = fullname($user->userinfo);
+                throw new moodle_exception('nopermissionsusercompetencyview', 'report_lpmonitoring', '', $userfullname);
+            }
+            if ($userplan->get_status() == plan::STATUS_COMPLETE &&
+                    !self::has_records_for_competency_user_in_plan($userplan->get_id(), $competencyid)) {
+                continue;
+            }
+
+            $plancompetency = core_competency_api::get_plan_competency($userplan->get_id(), $competencyid);
             $user->usercompetency = $plancompetency->usercompetency;
             $user->usercompetencyplan = $plancompetency->usercompetencyplan;
             $competencystatistics->listusers[] = $user;
@@ -786,6 +795,24 @@ class api {
         }
         $sql = '(' . implode(' OR ', $conditions) . ')';
         return array($sql, $params);
+    }
+
+    /**
+     * Check if competency exist for plan in the user_competency_plan Table.
+     *
+     * @param int $planid The plan ID
+     * @param int $competencyid The competency ID
+     * @return bool True if record exist
+     */
+    static protected function has_records_for_competency_user_in_plan($planid, $competencyid) {
+        global $DB;
+        $sql = "SELECT c.*
+                  FROM {" . user_competency_plan::TABLE . "} ucp
+                  JOIN {" . competency::TABLE . "} c
+                    ON c.id = ucp.competencyid
+                 WHERE ucp.planid = ?
+                   AND ucp.competencyid = ?";
+        return $DB->record_exists_sql($sql, array($planid, $competencyid));
     }
 
 }

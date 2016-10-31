@@ -160,9 +160,9 @@ define(['jquery',
                 });
             });
             $('.competencyreport .competency-detail').addClass('loading');
-            var promises = ajax.call(requests);
-            $.each(promises, function(index, promise) {
-                promise.then(function(context) {
+            $.when.apply($.when, ajax.call(requests))
+            .then(function() {
+                $.each(arguments, function(index, context) {
                     var compid = context.competencyid;
                     // Locally store competency statitstics.
                     self.competencies[compid].competencydetail = context;
@@ -177,6 +177,9 @@ define(['jquery',
                         self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .label.cr-scalename');
                     });
                 });
+            }).fail(function(ex) {
+                $("#list-competencies-template").empty();
+                notification.exception(ex);
             });
         };
 
