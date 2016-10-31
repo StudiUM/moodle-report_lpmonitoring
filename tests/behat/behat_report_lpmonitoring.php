@@ -77,6 +77,9 @@ class behat_report_lpmonitoring extends behat_base {
             case 'totalnbcourses':
                 $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
                 break;
+            case 'totalnbusers':
+                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
+                break;
             case 'listevidence':
                 $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
                 break;
@@ -115,6 +118,9 @@ class behat_report_lpmonitoring extends behat_base {
         $xpath = '';
         switch ($targetclass) {
             case 'totalnbcourses':
+                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
+                break;
+            case 'totalnbusers':
                 $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
                 break;
             case 'listevidence':
