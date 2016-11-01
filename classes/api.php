@@ -648,8 +648,78 @@ class api {
      * @return \stdClass The record of competency statistics.
      */
     public static function get_competency_statistics($competencyid, $templateid) {
-        global $DB;
+        // Prepare some data for competency stats (scale, colors configuration, ...).
+        $competencystatistics = self::prepare_competency_stats_data($competencyid, $templateid);
 
+        // Get plans by template.
+        $userplans = plan::get_records_for_template($templateid);
+
+        // Find rate for each user in the plan for the the competency.
+        $competencystatistics->listusers = array();
+        foreach ($userplans as $userplan) {
+            $user = new stdClass();
+            $user->userinfo = core_user::get_user($userplan->get_userid(), '*', \MUST_EXIST);
+            // Throw an exception if user can not read the user competency.
+            if (!user_competency::can_read_user($userplan->get_userid())) {
+                $userfullname = fullname($user->userinfo);
+                throw new moodle_exception('nopermissionsusercompetencyview', 'report_lpmonitoring', '', $userfullname);
+            }
+            if ($userplan->get_status() == plan::STATUS_COMPLETE &&
+                    !self::has_records_for_competency_user_in_plan($userplan->get_id(), $competencyid)) {
+                continue;
+            }
+
+            $plancompetency = core_competency_api::get_plan_competency($userplan->get_id(), $competencyid);
+            $user->usercompetency = $plancompetency->usercompetency;
+            $user->usercompetencyplan = $plancompetency->usercompetencyplan;
+            $competencystatistics->listusers[] = $user;
+        }
+
+        return $competencystatistics;
+    }
+
+    /**
+     * Get competency statistics in course.
+     *
+     * @param int $competencyid Competency id.
+     * @param int $templateid Template id.
+     * @return \stdClass The record of competency statistics.
+     */
+    public static function get_competency_statistics_in_course($competencyid, $templateid) {
+        // Prepare some data for competency stats (scale, colors configuration, ...).
+        $competencystatistics = self::prepare_competency_stats_data($competencyid, $templateid);
+
+        // Get course competency by template.
+        $userplans = plan::get_records_for_template($templateid);
+
+        // Find rate for each user in the plan for the the competency.
+        $competencystatistics->listratings = array();
+        foreach ($userplans as $plan) {
+            $userid = $plan->get_userid();
+            $courses = course_competency::get_courses_with_competency_and_user($competencyid, $userid);
+
+            foreach ($courses as $course) {
+                $courseinfo = new \stdClass();
+                $courseinfo->course = $course;
+
+                // Find ratings in course.
+                $ucc = core_competency_api::get_user_competency_in_course($course->id, $userid,
+                        $competencyid);
+                $competencystatistics->listratings[] = $ucc;
+            }
+        }
+
+        return $competencystatistics;
+    }
+
+    /**
+     * Prepare data for competency statistics.
+     *
+     * @param int $competencyid Competency id.
+     * @param int $templateid Template id.
+     * @return \stdClass The record of competency statistics.
+     */
+    protected static function prepare_competency_stats_data($competencyid, $templateid) {
         $competencystatistics = new \stdClass();
 
         $competency = template_competency::get_competency($templateid, $competencyid);
@@ -692,33 +762,9 @@ class api {
             throw new coding_exception('Unexpected report scale configuration.');
         }
         $competencystatistics->reportscaleconfig = $reportscaleconfig;
-
-        // Get plans by template.
-        $userplans = plan::get_records_for_template($templateid);
-
-        // Find rate for each user in the plan for the the competency.
-        $competencystatistics->listusers = array();
-        foreach ($userplans as $userplan) {
-            $user = new stdClass();
-            $user->userinfo = core_user::get_user($userplan->get_userid(), '*', \MUST_EXIST);
-            // Throw an exception if user can not read the user competency.
-            if (!user_competency::can_read_user($userplan->get_userid())) {
-                $userfullname = fullname($user->userinfo);
-                throw new moodle_exception('nopermissionsusercompetencyview', 'report_lpmonitoring', '', $userfullname);
-            }
-            if ($userplan->get_status() == plan::STATUS_COMPLETE &&
-                    !self::has_records_for_competency_user_in_plan($userplan->get_id(), $competencyid)) {
-                continue;
-            }
-
-            $plancompetency = core_competency_api::get_plan_competency($userplan->get_id(), $competencyid);
-            $user->usercompetency = $plancompetency->usercompetency;
-            $user->usercompetencyplan = $plancompetency->usercompetencyplan;
-            $competencystatistics->listusers[] = $user;
-        }
-
         return $competencystatistics;
     }
+
     /**
      * Search templates by contextid.
      *

@@ -101,7 +101,12 @@ define(['jquery',
          * @function
          */
         LearningplanStats.prototype.loadListCompetencies = function(templateid) {
-            var self = this;
+            var self = this,
+                ratingincourse = true;
+
+            if ($("#ratinginplanoption").is(':checked')) {
+                ratingincourse = false;
+            }
 
             var promiselistCompetencies = ajax.call([{
                 methodname: 'core_competency_list_competencies_in_template',
@@ -118,7 +123,7 @@ define(['jquery',
                         $("#list-competencies-template").html(html);
                         templates.runTemplateJS(js);
                         elementloading.removeClass('loading');
-                        self.loadCompetencyDetail(results, templateid);
+                        self.loadCompetencyDetail(results, templateid, ratingincourse);
                     });
                 } else {
                     elementloading.removeClass('loading');
@@ -141,18 +146,25 @@ define(['jquery',
          * @name  loadCompetencyDetail
          * @param {Object[]} competencies
          * @param {Number} templateid
+         * @param {Boolean} ratingincourse
          * @return {Void}
          * @function
          */
-        LearningplanStats.prototype.loadCompetencyDetail = function(competencies, templateid) {
+        LearningplanStats.prototype.loadCompetencyDetail = function(competencies, templateid, ratingincourse) {
             var requests = [];
             var self = this;
+            var servicename = 'report_lpmonitoring_get_competency_statistics';
+            var templatename = 'report_lpmonitoring/competency_detail_stats';
+            if (ratingincourse) {
+                servicename = 'report_lpmonitoring_get_competency_statistics_incourse';
+                templatename = 'report_lpmonitoring/competency_detail_stats_incourse';
+            }
 
             $.each(competencies, function(index, record) {
                 // Locally store competency information.
                 self.competencies[record.id] = {infocompetency: record};
                 requests.push({
-                    methodname: 'report_lpmonitoring_get_competency_statistics',
+                    methodname: servicename,
                     args: {
                         competencyid: record.id,
                         templateid: templateid
@@ -166,12 +178,42 @@ define(['jquery',
                     var compid = context.competencyid;
                     // Locally store competency statitstics.
                     self.competencies[compid].competencydetail = context;
-                    templates.render('report_lpmonitoring/competency_detail_stats', context).done(function(html, js) {
+                    templates.render(templatename, context).done(function(html, js) {
                         $('#comp-' + compid).removeClass('loading');
                         $('#comp-' + compid + ' .x_content').html(html);
                         // Apply Donut Graph to the competency.
-                        if (context.nbuserrated !== 0) {
-                            self.ApplyDonutGraph(compid, context);
+                        var options = {
+                            legend: false,
+                            responsive: false,
+                            tooltips: {enabled: false}
+                        };
+                        var colors = [];
+                        var datascales = [];
+                        if (ratingincourse === false && context.nbuserrated !== 0) {
+                            $.each(context.scalecompetencyitems, function(index, record) {
+                                colors.push(record.color);
+                                datascales.push(record.nbusers);
+                            });
+                        }
+                        if (ratingincourse === true && context.nbratings !== 0) {
+                            $.each(context.scalecompetencyitems, function(index, record) {
+                                colors.push(record.color);
+                                datascales.push(record.nbratings);
+                            });
+                        }
+                        if (context.nbratings !== 0 || context.nbuserrated !== 0) {
+                            new Chart($('#canvas-graph-' + compid), {
+                                type: 'doughnut',
+                                data: {
+                                    labels: [],
+                                    datasets: [{
+                                        data: datascales,
+                                        backgroundColor: colors,
+                                        hoverBackgroundColor: []
+                                    }]
+                                },
+                                options: options
+                            });
                         }
                         templates.runTemplateJS(js);
                         self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .label.cr-scalename');
@@ -181,42 +223,6 @@ define(['jquery',
                 $("#list-competencies-template").empty();
                 notification.exception(ex);
             });
-        };
-
-        /**
-         * Apply Donut Grapth to the competency.
-         *
-         * @name   ApplyDonutGraph
-         * @param  {Number} competencyid
-         * @param  {Array} data
-         * @return {Void}
-         * @function
-         */
-        LearningplanStats.prototype.ApplyDonutGraph = function(competencyid, data) {
-            var options = {
-                legend: false,
-                responsive: false,
-                tooltips: {enabled: false}
-            };
-            var colors = [];
-            var userbyscales = [];
-            $.each(data.scalecompetencyitems, function(index, record) {
-                colors.push(record.color);
-                userbyscales.push(record.nbusers);
-            });
-            new Chart($('#canvas-graph-' + competencyid), {
-                type: 'doughnut',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        data: userbyscales,
-                        backgroundColor: colors,
-                        hoverBackgroundColor: []
-                    }]
-                },
-                options: options
-            });
-
         };
 
         /**

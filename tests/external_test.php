@@ -981,6 +981,109 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
     }
 
     /**
+     * Test get competency statistics in course for lpmonitoring report.
+     */
+    public function test_get_lp_monitoring_competency_statistics_incourse() {
+        $this->resetAfterTest(true);
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        // Create some users.
+        $u1 = $dg->create_user();
+        $u2 = $dg->create_user();
+        // Create some courses.
+        $course1 = $dg->create_course();
+        $course2 = $dg->create_course();
+        $course3 = $dg->create_course();
+        $course4 = $dg->create_course();
+
+        // Create scale.
+        $scale = $dg->create_scale(array('scale' => 'A,B,C,D'));
+
+        // Create framework with the scale configuration.
+        $scaleconfig = array(array('scaleid' => $scale->id));
+        $scaleconfig[] = array('name' => 'A', 'id' => 1, 'scaledefault' => 0, 'proficient' => 1);
+        $scaleconfig[] = array('name' => 'B', 'id' => 2, 'scaledefault' => 1, 'proficient' => 1);
+        $framework = $lpg->create_framework(array('scaleid' => $scale->id, 'scaleconfiguration' => $scaleconfig));
+
+        // Associate competencies to framework.
+        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
+        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
+
+        // Create template with competencies.
+        $template = $lpg->create_template();
+        $lpg->create_template_competency(array('templateid' => $template->get_id(),
+            'competencyid' => $comp1->get_id()));
+        $lpg->create_template_competency(array('templateid' => $template->get_id(),
+            'competencyid' => $comp2->get_id()));
+
+        // Create plan from template for all users.
+        $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
+        $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
+
+        // Link some courses.
+        // Associated competencies to courses.
+        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $course1->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $course3->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $course2->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $course4->id));
+        $lpg->create_course_competency(array('competencyid' => $comp2->get_id(), 'courseid' => $course1->id));
+        $lpg->create_course_competency(array('competencyid' => $comp2->get_id(), 'courseid' => $course3->id));
+        $lpg->create_course_competency(array('competencyid' => $comp2->get_id(), 'courseid' => $course2->id));
+        $lpg->create_course_competency(array('competencyid' => $comp2->get_id(), 'courseid' => $course4->id));
+
+        // Enrol all users in course 1, 2, 3 and 4.
+        $dg->enrol_user($u1->id, $course1->id);
+        $dg->enrol_user($u1->id, $course2->id);
+        $dg->enrol_user($u1->id, $course3->id);
+        $dg->enrol_user($u1->id, $course4->id);
+        $dg->enrol_user($u2->id, $course1->id);
+        $dg->enrol_user($u2->id, $course2->id);
+        $dg->enrol_user($u2->id, $course3->id);
+        $dg->enrol_user($u2->id, $course4->id);
+
+        // Rate some competencies in courses.
+        // Some ratings in courses for user1 and user2.
+        $lpg->create_user_competency_course(array('userid' => $u1->id, 'competencyid' => $comp1->get_id(),
+            'grade' => 1, 'courseid' => $course1->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $u1->id, 'competencyid' => $comp1->get_id(),
+            'grade' => 1, 'courseid' => $course2->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $u1->id, 'competencyid' => $comp1->get_id(),
+            'grade' => 1, 'courseid' => $course3->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $u1->id, 'competencyid' => $comp1->get_id(),
+            'grade' => 2, 'courseid' => $course4->id, 'proficiency' => 1));
+        // User2.
+        $lpg->create_user_competency_course(array('userid' => $u2->id, 'competencyid' => $comp1->get_id(),
+            'grade' => 1, 'courseid' => $course1->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $u2->id, 'competencyid' => $comp1->get_id(),
+            'grade' => 1, 'courseid' => $course2->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $u2->id, 'competencyid' => $comp1->get_id(),
+            'grade' => 2, 'courseid' => $course3->id, 'proficiency' => 1));
+
+        $result = external::get_competency_statistics_incourse($comp1->get_id(), $template->get_id());
+        $result = external::clean_returnvalue(external::get_competency_statistics_incourse_returns(), $result);
+
+        // Check info returned.
+        $this->assertEquals($comp1->get_id(), $result['competencyid']);
+        $this->assertEquals(8, $result['nbratingtotal']);
+        $this->assertEquals(7, $result['nbratings']);
+        $this->assertEquals(1, $result['scalecompetencyitems'][0]['value']);
+        $this->assertEquals(2, $result['scalecompetencyitems'][1]['value']);
+        $this->assertEquals(3, $result['scalecompetencyitems'][2]['value']);
+        $this->assertEquals(4, $result['scalecompetencyitems'][3]['value']);
+        // Test we have 5 rating for the scale value 1 (A).
+        $this->assertEquals(5, $result['scalecompetencyitems'][0]['nbratings']);
+        // Test we have 2 rating for the scale value 2 (B).
+        $this->assertEquals(2, $result['scalecompetencyitems'][1]['nbratings']);
+
+        // Test no rating for the competency 2.
+        $result = external::get_competency_statistics_incourse($comp2->get_id(), $template->get_id());
+        $result = external::clean_returnvalue(external::get_competency_statistics_incourse_returns(), $result);
+        $this->assertEquals($comp2->get_id(), $result['competencyid']);
+        $this->assertEquals(8, $result['nbratingtotal']);
+        $this->assertEquals(0, $result['nbratings']);
+    }
+
+    /**
      * Search templates.
      */
     public function test_search_templates() {

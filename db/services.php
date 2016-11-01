@@ -123,6 +123,15 @@ $functions = array(
         'capabilities' => 'moodle/competency:planview',
         'ajax'         => true
     ),
+    'report_lpmonitoring_get_competency_statistics_incourse' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'get_competency_statistics_incourse',
+        'classpath'    => '',
+        'description'  => 'Get the competency statistics in courses',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:planview',
+        'ajax'         => true
+    ),
     'report_lpmonitoring_search_templates' => array(
         'classname'    => 'report_lpmonitoring\external',
         'methodname'   => 'search_templates',

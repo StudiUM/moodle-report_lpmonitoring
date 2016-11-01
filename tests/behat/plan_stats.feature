@@ -45,3 +45,18 @@ Feature: Display learning plan template statistics
     And I should not see "Frederic Simson" in the "Linked users" "dialogue"
     And I should not see "Robert Smith" in the "Linked users" "dialogue"
     And I should see "William Presley" in the "Linked users" "dialogue"
+
+  Scenario: Read template competencies statistics in course
+    Given I click on ".templatelist .form-autocomplete-downarrow" "css_element"
+    And I should see "Medicine Year 1" item in the autocomplete list
+    And I click on "Medicine Year 1" item in the autocomplete list
+    And I click on "//label[contains(., 'Rating in course')]" "xpath_element"
+    When I press "Apply"
+    Then I should see "Competency A"
+    And I should see "Competency B"
+    And I should see "11/26" in "incourse" of the competency "Competency A"
+    And I should see "7" for "not good" in the row "2" of "Competency A" rating
+    And I should see "4" for "good" in the row "3" of "Competency A" rating
+    And I should see "5/26" in "incourse" of the competency "Competency B"
+    And I should see "3" for "not qualified" in the row "2" of "Competency B" rating
+    And I should see "2" for "qualified" in the row "3" of "Competency B" rating

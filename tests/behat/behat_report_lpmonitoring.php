@@ -96,6 +96,9 @@ class behat_report_lpmonitoring extends behat_base {
                  $xpath = "//div[contains(., '$competencyname')]/div/div/div/"
                     . "table/tbody/tr/td/div[contains(@class, '$targetclass')]";
                 break;
+            case 'incourse':
+                $xpath = "//div[contains(@class, '$targetclass') and ancestor-or-self::div/div/h4/a[contains(., '$competencyname')]]";
+                break;
         }
 
         $this->execute("behat_general::assert_element_contains_text",

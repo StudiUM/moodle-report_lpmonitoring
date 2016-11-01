@@ -253,6 +253,21 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     margin: 0;
     width: 90px;
 }
+
+@media (min-width: 1350px){
+    .competencyreport .compstats .competency-detail {
+        flex: 0 1 315px;
+        margin-right: 20px;
+        min-width: 315px;
+    }
+}
+@media (min-width: 380px) and (max-width: 1350px) {
+    .competencyreport .compstats .competency-detail {
+        flex: 0 1 400px;
+        margin-right: 20px;
+        min-width: 400px;
+    }
+}
 @media (max-width: 998px) {
     .competencyreport .widget_profile_box {
         flex-flow : row wrap;
@@ -855,11 +870,6 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     display: flex;
     flex-flow: row wrap;
 }
-.competencyreport .compstats .competency-detail {
-    flex: 0 1 315px;
-    margin-right: 20px;
-    min-width: 315px;
-}
 .competencyreport div.stats .x_title {
     border-bottom-color: #cfd1d5;
 }
@@ -1102,4 +1112,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .competencyreport .form-autocomplete-suggestions .nbratinguser {
     float:right;
     margin-left: 40px;
+}
+.competencyreport .compstats .tile_count .tile_stats_count .incourse {
+    font-size: 1.6em;
 }
