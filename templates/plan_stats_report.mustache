@@ -28,14 +28,53 @@
       
 }}
 <div class="report-stats-competencies">
-    <div class="plan-status"><span>{{#str}}status, tool_lp{{/str}}:  </span><span style="font-weight: bold">{{plan.statusname}}</span></div>
+    <div class="space-block-stats"></div>
+    <div>
+        <div class="status-icon blue">
+            {{#plan.isdraft}}
+                <span class="draft fa-stack fa-lg fa-lg">
+                    <i class="fa fa-square fa-stack-2x"></i>
+                    <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                </span>
+            {{/plan.isdraft}}
+            {{#plan.isactive}}
+                <span class="active fa-stack fa-lg fa-lg">
+                    <i class="fa fa-square fa-stack-2x"></i>
+                    <i class="fa fa-power-off fa-stack-1x fa-inverse"></i>
+                </span>
+            {{/plan.isactive}}
+            {{#plan.iscompleted}}
+                <span class="complete fa-stack fa-lg fa-lg">
+                    <i class="fa fa-square fa-stack-2x"></i>
+                    <i class="fa fa-check fa-stack-1x fa-inverse"></i>
+                </span>
+            {{/plan.iscompleted}}
+            {{#plan.iswaitingforreview}}
+                <span class="waiting fa-stack fa-lg fa-lg">
+                    <i class="fa fa-square fa-stack-2x"></i>
+                    <i class="fa fa-clock-o fa-stack-1x fa-inverse"></i>
+                </span>
+            {{/plan.iswaitingforreview}}
+            {{#plan.isinreview}}
+                <span class="review fa-stack fa-lg fa-lg">
+                    <i class="fa fa-square fa-stack-2x"></i>
+                    <i class="fa fa-search fa-stack-1x fa-inverse"></i>
+                </span>
+            {{/plan.isinreview}}
+            
+        </div>
+        <div class="stats-cmp-proficient plan-status"><span>{{#str}}status, tool_lp{{/str}}:  </span><span style="font-weight: bold">{{plan.statusname}}</span></div>
+    </div>
+</div>
+<div class="report-stats-competencies">
+    <div class="space-block-stats"></div>
     <div>
         <div class="count-stats blue proficient-stats">{{plan.stats.nbcompetenciesproficient}}/{{plan.stats.nbcompetenciestotal}}</div>
         <div class="stats-cmp-proficient">{{#str}}proficientcompetencies, report_lpmonitoring{{/str}}</div>
     </div>
 </div>
 <div class="report-stats-competencies">
-    <div class="plan-status"></div>
+    <div class="space-block-stats"></div>
     <div>
         <div class="count-stats 
 
@@ -50,7 +89,7 @@
     </div>
 </div>
 <div class="report-stats-competencies">
-    <div class="plan-status"><span></div>
+    <div class="space-block-stats"><span></div>
     <div>
         <div class="count-stats 
              {{#plan.stats.nbcompetenciesnotrated}}

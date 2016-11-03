@@ -894,27 +894,27 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 }
 
 .competencyreport .plan-info-report {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -moz-flex;
     display: -webkit-flex;
     display: flex;
-    -webkit-flex-flow: row wrap;
-    display: flex;
     flex-flow: row wrap;
-    padding: 5px;
+    justify-content: space-around;
 }
 .competencyreport .plan-info-report:empty {
     border-bottom: none;
 }
 .competencyreport .report-stats-competencies {
     background: #fff none repeat scroll 0 0;
-    border: 1px solid #cfd1d5;
-    border-radius: 8px;
     display: flex;
     flex-direction: column;
-    margin: 0.5em auto;
     padding: 1em 1.5em;
     text-align: center;
+    margin-bottom: 0.5em;
 }
-.competencyreport .report-stats-competencies .plan-status {
+.competencyreport .report-stats-competencies .space-block-stats {
     padding-bottom: 0.5em;
     flex: 1 0 auto;
 }
@@ -932,12 +932,14 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .competencyreport .plan-info-report .report-stats-competencies .empty-value {
     color: #cfd1d5;
 }
-.competencyreport .plan-info-report .collapsible-actions {
+.competencyreport .collapsible-actions {
     text-align: right;
     position: relative;
     color:#555;
     align-self: end;
     min-width: 120px;
+    margin-bottom: 7px;
+    margin-top: 7px;
 }
 .competencyreport .compstats .competency-detail .totalnbusers {
     font-size: 0.8em;
@@ -969,6 +971,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 }
 .competencyreport .borderbottom {
     border-bottom: 1px solid #cfd1d5;
+    margin-top: 1.5em;
 }
 .lpmonitoringdialogue .stats-rated-column {
     min-width: 20%;
@@ -1115,4 +1118,22 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 }
 .competencyreport .compstats .tile_count .tile_stats_count .incourse {
     font-size: 1.6em;
+}
+.competencyreport .status-icon {
+    font-size: 1.5em;
+}
+.competencyreport .status-icon .draft {
+  color: #ff7200;
+}
+.competencyreport .status-icon .waiting {
+  color: #00cce4;
+}
+.competencyreport .status-icon .review {
+  color: #833fff;
+}
+.competencyreport .status-icon .active {
+  color: #00d30f;
+}
+.competencyreport .status-icon .complete {
+  color: #0078ff;
 }

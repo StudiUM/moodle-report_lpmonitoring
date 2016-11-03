@@ -659,6 +659,8 @@ class external extends external_api {
         $planexport->isactive = $status == plan::STATUS_ACTIVE;
         $planexport->isdraft = $status == plan::STATUS_DRAFT;
         $planexport->iscompleted = $status == plan::STATUS_COMPLETE;
+        $planexport->iswaitingforreview = $status == plan::STATUS_WAITING_FOR_REVIEW;
+        $planexport->isinreview = $status == plan::STATUS_IN_REVIEW;
         $planexport->statusname = $plans->current->get_statusname();
         // Set learning plan url.
         $planexport->url = url::plan($plans->current->get_id())->out(false);
@@ -713,6 +715,8 @@ class external extends external_api {
             'isactive' => new external_value(PARAM_BOOL, 'Is plan active'),
             'isdraft' => new external_value(PARAM_BOOL, 'Is plan draft'),
             'iscompleted' => new external_value(PARAM_BOOL, 'Is plan completed'),
+            'iswaitingforreview' => new external_value(PARAM_BOOL, 'Is plan completed'),
+            'isinreview' => new external_value(PARAM_BOOL, 'Is plan completed'),
             'statusname' => new external_value(PARAM_TEXT, 'The plan status name'),
             'url' => new external_value(PARAM_TEXT, 'The plan url'),
             'stats' => stats_plan_exporter::get_read_structure()
