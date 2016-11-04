@@ -189,19 +189,22 @@ define(['jquery',
                         };
                         var colors = [];
                         var datascales = [];
+                        var applygraph = false;
                         if (ratingincourse === false && context.nbuserrated !== 0) {
                             $.each(context.scalecompetencyitems, function(index, record) {
                                 colors.push(record.color);
                                 datascales.push(record.nbusers);
                             });
+                            applygraph = true;
                         }
                         if (ratingincourse === true && context.nbratings !== 0) {
                             $.each(context.scalecompetencyitems, function(index, record) {
                                 colors.push(record.color);
                                 datascales.push(record.nbratings);
                             });
+                            applygraph = true;
                         }
-                        if (context.nbratings !== 0 || context.nbuserrated !== 0) {
+                        if (applygraph === true) {
                             new Chart($('#canvas-graph-' + compid), {
                                 type: 'doughnut',
                                 data: {
