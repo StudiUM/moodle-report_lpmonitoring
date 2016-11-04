@@ -154,9 +154,9 @@ define(['jquery',
             if (selection.length) {
                 selection.remove();
                 $(self.learningplanSelector + ' option').remove();
-                str.get_string('nostudentselected', 'report_lpmonitoring').done(
-                    function(nostudentselected) {
-                        autocomplete.append($('<span>').text(nostudentselected));
+                str.get_string('nouserselected', 'report_lpmonitoring').done(
+                    function(nouserselected) {
+                        autocomplete.append($('<span>').text(nouserselected));
                     }
                 );
             }
@@ -841,8 +841,8 @@ define(['jquery',
         LearningplanReport.prototype.initPage = function() {
             var self = this;
             str.get_strings([
-                { key: 'selectstudent', component: 'report_lpmonitoring' },
-                { key: 'nostudentselected', component: 'report_lpmonitoring' }]
+                { key: 'selectuser', component: 'report_lpmonitoring' },
+                { key: 'nouserselected', component: 'report_lpmonitoring' }]
             ).done(
                 function (strings) {
                     // Autocomplete users in templates.
