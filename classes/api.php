@@ -398,7 +398,7 @@ class api {
                     $userplan[$field] = $user->$field;
                 }
             }
-            $users[$key] = $userplan;
+            $users[] = $userplan;
         }
         $result->close();
         return $users;

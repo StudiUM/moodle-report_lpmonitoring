@@ -950,51 +950,51 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         set_config('showuseridentity', 'email');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
-        $this->assertFalse(isset($users[$this->user1->id]['phone1']));
-        $this->assertFalse(isset($users[$this->user1->id]['phone2']));
-        $this->assertFalse(isset($users[$this->user1->id]['institution']));
-        $this->assertFalse(isset($users[$this->user1->id]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
+        $this->assertFalse(isset($users[0]['phone1']));
+        $this->assertFalse(isset($users[0]['phone2']));
+        $this->assertFalse(isset($users[0]['institution']));
+        $this->assertFalse(isset($users[0]['department']));
 
         // Add phone1 to show user identity.
         set_config('showuseridentity', 'email,phone1');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
-        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
-        $this->assertFalse(isset($users[$this->user1->id]['phone2']));
-        $this->assertFalse(isset($users[$this->user1->id]['institution']));
-        $this->assertFalse(isset($users[$this->user1->id]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
+        $this->assertEquals(1111111111, $users[0]['phone1']);
+        $this->assertFalse(isset($users[0]['phone2']));
+        $this->assertFalse(isset($users[0]['institution']));
+        $this->assertFalse(isset($users[0]['department']));
 
         // Add phone2 to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
-        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
-        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
-        $this->assertFalse(isset($users[$this->user1->id]['institution']));
-        $this->assertFalse(isset($users[$this->user1->id]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
+        $this->assertEquals(1111111111, $users[0]['phone1']);
+        $this->assertEquals(2222222222, $users[0]['phone2']);
+        $this->assertFalse(isset($users[0]['institution']));
+        $this->assertFalse(isset($users[0]['department']));
 
         // Add institution to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2,institution');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
-        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
-        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
-        $this->assertEquals('Institution Name', $users[$this->user1->id]['institution']);
-        $this->assertFalse(isset($users[$this->user1->id]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
+        $this->assertEquals(1111111111, $users[0]['phone1']);
+        $this->assertEquals(2222222222, $users[0]['phone2']);
+        $this->assertEquals('Institution Name', $users[0]['institution']);
+        $this->assertFalse(isset($users[0]['department']));
 
         // Add department to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2,institution,department');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
-        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
-        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
-        $this->assertEquals('Institution Name', $users[$this->user1->id]['institution']);
-        $this->assertEquals('Dep Name', $users[$this->user1->id]['department']);
+        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
+        $this->assertEquals(1111111111, $users[0]['phone1']);
+        $this->assertEquals(2222222222, $users[0]['phone2']);
+        $this->assertEquals('Institution Name', $users[0]['institution']);
+        $this->assertEquals('Dep Name', $users[0]['department']);
     }
 
     /**
