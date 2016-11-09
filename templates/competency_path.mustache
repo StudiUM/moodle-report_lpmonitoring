@@ -40,9 +40,9 @@
 {{#competencypath}}
 <div class="tile_count">
     <ol class="breadcrumb tile_stats_count">
-        <li> <a href="{{pluginbaseurl}}/competencies.php?competencyframeworkid={{framework.id}}&pagecontextid={{pagecontextid}}" ><i class="fa fa-sitemap"></i> {{{framework.name}}}</a></li>
+        <li> <a title="{{{framework.name}}}" href="{{pluginbaseurl}}/competencies.php?competencyframeworkid={{framework.id}}&pagecontextid={{pagecontextid}}" target="_blank"><i class="fa fa-sitemap"></i> {{{framework.name}}}</a></li>
         {{#ancestors}}
-        <li><a data-action="competency-dialogue" href="#" data-id="{{id}}">{{{name}}}</a>
+        <li><a role="button" title="{{{name}}}" data-action="competency-dialogue" href="#" data-id="{{id}}">{{{name}}}</a>
                 {{^last}}<span> / </span>{{/last}}
         </li>
         {{/ancestors}}

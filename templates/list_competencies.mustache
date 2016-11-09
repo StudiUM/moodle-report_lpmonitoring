@@ -45,7 +45,7 @@
         {{ > report_lpmonitoring/plan_stats_report }}
     </div>
     <div class="collapsible-actions">
-        <a href="#" class="collapseexpand expand-all">{{#str}}expandall{{/str}}</a>
+        <a role="button" href="#" class="collapseexpand expand-all" title="{{#str}}clicktohideshow{{/str}}">{{#str}}expandall{{/str}}</a>
     </div>
 </div>
 {{/hascompetencies}}
@@ -54,13 +54,15 @@
 <div class="competency-detail" id="comp-{{competency.id}}">
     <div class="x_panel tile panel-collapsed">
         <div class="x_title">
-            <a class="collapse-link"><i class="fa fa-chevron-right"></i></a>
+            <a role="button" class="collapse-link" href="#" title="{{#str}}clicktohideshow{{/str}}"><i class="fa fa-chevron-right"></i></a>
             <h4 class="truncate">
                 <a href="#"
                    data-user-competency="true"
                    data-userid="{{plan.user.id}}"
                    data-competencyid="{{competency.id}}"
-                   data-planid="{{plan.id}}">
+                   data-planid="{{plan.id}}"
+                   title="{{competency.shortname}}"
+                   role="button">
                     {{competency.shortname}} <em>
                         <small>{{competency.idnumber}}</small>
                     </em>

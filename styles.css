@@ -385,11 +385,11 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .competencyreport .tile_count .tile_stats_count table {
     width: 100%;
 }
-.competencyreport .tile_count #rating {
+.competencyreport .tile_count .rating {
     -webkit-flex-grow: 2;
     flex-grow: 2;
 }
-.competencyreport .tile_count #finalrating {
+.competencyreport .tile_count .finalrating {
     min-width: 250px;
 }
 @media (min-width: 992px) {
@@ -844,7 +844,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     text-shadow: none;
     vertical-align: middle;
 }
-#finalrating .label.cr-scalename.truncate {
+.finalrating .label.cr-scalename.truncate {
     max-width: calc(100% - 100px);
 }
 .label.cr-scalename.light-color {
@@ -962,7 +962,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .competencyreport .compstats .competency-detail td.scalevalues {
     vertical-align: top;
 }
-.competencyreport .compstats .competency-detail .tile_count #rating {
+.competencyreport .compstats .competency-detail .tile_count .rating {
     flex-grow: unset;
     width: 100%;
 }
@@ -1136,4 +1136,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 }
 .competencyreport .status-icon .complete {
   color: #0078ff;
+}
+.competencyreport .x_title small {
+    color: #333;
 }

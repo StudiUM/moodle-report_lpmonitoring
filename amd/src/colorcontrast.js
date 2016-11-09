@@ -55,6 +55,24 @@ define(['jquery'],
         ColorContrast.prototype.lightColorClassName = 'light-color';
 
         /**
+         * Calculate luminance ratio.
+         *
+         * @name   luminance
+         * @param {Number} red
+         * @param {Number} green
+         * @param {Number} blue
+         * @return {Number}
+         * @function
+         */
+        ColorContrast.prototype.luminance = function (r, g, b) {
+            var a = [r,g,b].map(function(v) {
+                v /= 255;
+                return (v <= 0.03928) ? v / 12.92 : Math.pow( ((v + 0.055) / 1.055), 2.4 );
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+        };
+
+        /**
          * Apply the color contrast to desired selector.
          *
          * @name   apply
@@ -87,8 +105,11 @@ define(['jquery'],
 
                 // Extract RGB and convert it into luminance from the YIQ equation from https://www.w3.org/TR/AERT#color-contrast.
                 var rgb = bgc.replace(/^(rgb|rgba)\(/,'').replace(/\)$/,'').replace(/\s/g,'').split(',');
-                var luminance = ((rgb[0] * 299) + (rgb[1] * 587) + (rgb[2] * 114)) / 1000;
-                if(luminance >= 128) {
+                var luminancebackground = self.luminance(rgb[0], rgb[1], rgb[2]);
+                var luminanceforeground = self.luminance(0, 0, 0);
+                var ratio = (luminancebackground + 0.05) / (luminanceforeground + 0.05);
+
+                if(ratio >= 4.5) {
                     $(this).removeClass(self.lightColorClassName);
                 } else {
                     $(this).addClass(self.lightColorClassName);

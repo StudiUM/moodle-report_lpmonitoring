@@ -883,7 +883,8 @@ define(['jquery',
             fieldsettoggler.init();
 
             // Collapse block panels.
-            $(".competencyreport").on('click', '.collapse-link', function() {
+            $(".competencyreport").on('click', '.collapse-link', function(event) {
+                event.preventDefault();
                 var e = $(this).closest(".x_panel"),
                 t = $(this).find("i"),
                 n = e.find(".x_content");
@@ -893,7 +894,8 @@ define(['jquery',
             });
 
             // Handle click on scale number courses.
-            $(".competencyreport").on('click', 'a.scaleinfo', function() {
+            $(".competencyreport").on('click', 'a.scaleinfo', function(event) {
+                event.preventDefault();
                 var competencyid = $(this).data("competencyid");
                 var scalevalue = $(this).data("scalevalue");
 

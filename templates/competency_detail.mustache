@@ -44,20 +44,20 @@
 
 }}
 <div class="tile_count">
-    <div class="tile_stats_count" id="totalnumberrating">
+    <div class="tile_stats_count">
         <h5 class="count_top truncate" ><i class="fa fa-book"></i> {{#str}}totalnumberrating, report_lpmonitoring{{/str}}</h5>
         <div class="count blue">
-            <a class="blue totalnbcourses" href="#/chevron-right"  data-competencyid="{{competencyid}}">{{nbcoursesrated}}/{{nbcoursestotal}}</a>
+            <a class="blue totalnbcourses" role="button" title="{{#str}}totalnumberrating, tool_lp{{/str}}" href="#"  data-competencyid="{{competencyid}}">{{nbcoursesrated}}/{{nbcoursestotal}}</a>
         </div>
         {{#hasevidence}}
         <span class="count_top"><i class="fa fa-certificate"></i> {{#str}}userevidence, tool_lp{{/str}}</span>
         <div class="blue preuve">
-            <a class="blue listevidence" data-competencyid="{{competencyid}}" href="#/chevron-right">{{nbevidence}}</a>
+            <a class="blue listevidence" role="button" title="{{#str}}userevidence, tool_lp{{/str}}" data-competencyid="{{competencyid}}" href="#/chevron-right">{{nbevidence}}</a>
         </div>
         {{/hasevidence}}
         
     </div>
-    <div class="tile_stats_count" id="rating">
+    <div class="tile_stats_count rating">
         <h5 class="count_top"><i class="fa fa-bar-chart-o"></i> {{#str}}rating, tool_lp{{/str}}</h5>
         <table>
             <tr>
@@ -85,6 +85,7 @@
                                     data-scalevalue ="{{value}}"
                                     data-competencyid = "{{competencyid}}"
                                     title="{{#str}}linkedcourses, tool_lp{{/str}}"
+                                    href="#"
                                     >
                                 <span class="nbcourses">{{nbcourse}}</span>
                                 </a>
@@ -102,7 +103,7 @@
             </tr>
         </table>
     </div>
-    <div class="tile_stats_count" id="finalrating">
+    <div class="tile_stats_count finalrating">
         <h5 class="count_top"><i class="fa fa-gavel"></i> {{#str}}finalrating, report_lpmonitoring{{/str}}</h5>
         <div class="tile-stats">
             {{#isnotrated}}

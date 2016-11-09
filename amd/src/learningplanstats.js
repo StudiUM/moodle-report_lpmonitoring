@@ -339,7 +339,8 @@ define(['jquery',
             });
 
             // Handle click on scale number users.
-            $(".competencyreport").on('click', 'a.scaleinfo', function() {
+            $(".competencyreport").on('click', 'a.scaleinfo', function(event) {
+                event.preventDefault();
                 var competencyid = $(this).data("competencyid");
                 var scalevalue = $(this).data("scalevalue");
 

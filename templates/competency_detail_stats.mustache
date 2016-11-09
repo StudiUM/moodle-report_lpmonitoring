@@ -35,7 +35,7 @@
 
 }}
 <div class="tile_count">
-    <div class="tile_stats_count" id="rating">
+    <div class="tile_stats_count rating">
         <table>
             <tr>
                 <td class="convaschart">
@@ -49,7 +49,7 @@
                     {{/nbuserrated}}
                     <h5>{{#str}}totalusers, report_lpmonitoring{{/str}}</h5>
                     <div class="count">
-                        <a class="blue totalnbusers" href="#" data-competencyid="{{competencyid}}">{{nbuserrated}}/{{nbusertotal}}</a>
+                        <a role="button" title="{{#str}}totalusers, report_lpmonitoring{{/str}}" class="blue totalnbusers" href="#" data-competencyid="{{competencyid}}">{{nbuserrated}}/{{nbusertotal}}</a>
                     </div>
                 </td>
                 <td class="scalevalues">
@@ -70,6 +70,7 @@
                                     data-scalevalue ="{{value}}"
                                     data-competencyid = "{{competencyid}}"
                                     title="{{#str}}linkedusers, report_lpmonitoring{{/str}}"
+                                    href="#"
                                     >
                                 <span class="nbusers">{{nbusers}}</span>
                                 </a>

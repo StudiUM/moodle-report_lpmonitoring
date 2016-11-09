@@ -18,14 +18,14 @@
 {{#scaleconfiguration}}
 <div class="fitem fitem_fcolor">
     <div class="fitemtitle{{#proficient}} proficient{{/proficient}}">
-        <label for="{{name}}">{{name}}
+        <label for="{{name}}-{{id}}">{{name}}
             {{#proficient}}
             <small><i>{{#str}}proficient, tool_lp{{/str}}</i></small>
             {{/proficient}}
         </label>
     </div>
     <div class="felement fcolor scalevalue">
-        <input type="text" value="{{color}}" class="form-control" name="{{name}}"/>
+        <input type="text" value="{{color}}" class="form-control" name="{{name}}" id="{{name}}-{{id}}"  aria-labelledby="scalevalues"/>
         <span class="input-group-addon"><i></i></span>
     </div>
 </div>

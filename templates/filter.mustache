@@ -28,16 +28,16 @@
 <form class="mform" id="reportFilter" accept-charset="utf-8" method="post" autocomplete="off">
     <fieldset id="id_displayinfo" class="clearfix collapsible">
         <legend class="ftoggler">
-            <a href="#" class="fheader" role="button" aria-controls="id_displayinfo" aria-expanded="true">{{#str}}filter, report_lpmonitoring{{/str}}</a>
+            <a role="button" title="{{#str}}clicktohideshow{{/str}}" href="#" class="fheader" aria-controls="id_displayinfo" aria-expanded="true">{{#str}}filter, report_lpmonitoring{{/str}}</a>
         </legend>
         <div class="fcontainer clearfix">
             <div class="fitem fitem_fradio fitem_fradiogroup">
-                <div class="fitemtitle">
-                    <label for="template">{{#str}}filterby, report_lpmonitoring{{/str}}</label>
+                <div class="fitemtitle" id="optionfilter">
+                    <label>{{#str}}filterby, report_lpmonitoring{{/str}}</label>
                 </div>
                 <div class="felement fradio radio radio-primary">
                     <span>
-                        <input type="radio" name="optionfilter" id="template" value="template" checked disabled="disabled">
+                        <input type="radio" name="optionfilter" id="template" value="template" checked disabled="disabled" aria-labelledby="optionfilter">
                         <label for="template">{{#str}}template, tool_lp{{/str}}</label>
                     </span>
                 </div>
@@ -45,7 +45,7 @@
             <div class="fitem fitem_fradio femptylabel">
                 <div class="felement fradio radio radio-primary">
                     <span>
-                        <input type="radio" name="optionfilter" id="student" value="student" disabled="disabled">
+                        <input type="radio" name="optionfilter" id="student" value="student" disabled="disabled" aria-labelledby="optionfilter">
                         <label for="student">{{#str}}user{{/str}}</label>
                     </span>
                 </div>
@@ -95,8 +95,8 @@
                 </div>
                 <div class="fitem moreless-actions hidden">
                     <div class="felement">
-                        <a href="#" class="moreless-toggler show-toggler" role="button">{{#str}}showmore, form{{/str}}</a>
-                        <a href="#" class="moreless-toggler less-toggler hidden" role="button">{{#str}}showless, form{{/str}}</a>
+                        <a href="#" title="{{#str}}showmore, form{{/str}}" class="moreless-toggler show-toggler" role="button">{{#str}}showmore, form{{/str}}</a>
+                        <a href="#" title="{{#str}}showless, form{{/str}}" class="moreless-toggler less-toggler hidden" role="button">{{#str}}showless, form{{/str}}</a>
                     </div>
                 </div>
             </div>

@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="fitem fitem_fselect">
-                    <div class="fitemtitle">
+                    <div class="fitemtitle" id="ratingtargetbytemplate">
                         <label>{{#str}}ratings, rating{{/str}}</label>
                     </div>
                     <div class="felement fselect scalefilteroptions">
@@ -48,7 +48,7 @@
                             <div class="fitem fitem_fradio femptylabel">
                                 <div class="fradio radio radio-primary">
                                     <span>
-                                        <input checked="true" type="radio" name="ratingoptions" id="ratinginplanoption" value="0">
+                                        <input checked="true" type="radio" name="ratingoptions" id="ratinginplanoption" value="0" aria-labelledby="ratingtargetbytemplate">
                                         <label for="ratinginplanoption">{{#str}}finalrating, report_lpmonitoring{{/str}}</label>
                                     </span>
                                 </div>
@@ -56,7 +56,7 @@
                             <div class="fitem fitem_fradio fitem_fradiogroup">
                                 <div class="fradio radio radio-primary">
                                     <span>
-                                        <input type="radio" name="ratingoptions" id="ratingincourseoption" value="1">
+                                        <input type="radio" name="ratingoptions" id="ratingincourseoption" value="1" aria-labelledby="ratingtargetbytemplate">
                                         <label for="ratingincourseoption">{{#str}}finalratingcourse, report_lpmonitoring{{/str}}</label>
                                     </span>
                                 </div>
