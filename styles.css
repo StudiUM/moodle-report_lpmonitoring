@@ -524,7 +524,10 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     padding: 0;
     font-size: 15px;
 }
-.competencyreport table.tile_info tr:not(:first-child):hover {
+.competencyreport #listPlanCompetencies table.tile_info tr:hover {
+    background: #f5f5f5;
+}
+.competencyreport .compstats table.tile_info tr:not(:first-child):hover {
     background: #f5f5f5;
 }
 .competencyreport table.tile_info td:first-child {

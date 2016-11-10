@@ -319,46 +319,72 @@ class api {
         if ($sqlfilterin != '') {
             // Depending in filterbycourse param, we choose which table to use.
             if ($scalefilterbycourse) {
-                $usercompetencytablename = \core_competency\user_competency_course::TABLE;
-            } else {
-                $usercompetencytablename = \core_competency\user_competency::TABLE;
-            }
-            // SQL for usercomp or usercompcourse.
-            $sqlscalefilter = "SELECT useridentifier,
-                                      gradecount,
-                                      tempid,
-                                      $fields,
-                                      p.id AS planid
-                                FROM  (
-                                        (SELECT ucc.userid AS useridentifier, Count(ucc.grade) gradecount, tc.templateid AS tempid
-                                          FROM {" . \core_competency\template_competency::TABLE . "} tc
-                                          JOIN {" . $usercompetencytablename . "} ucc
-                                               ON ucc.competencyid = tc.competencyid
-                                          JOIN {" . \core_competency\competency::TABLE . "} c
-                                               ON c.id = ucc.competencyid
-                                          JOIN {" . \core_competency\competency_framework::TABLE . "} cf
-                                               ON cf.id = c.competencyframeworkid
-                                         WHERE ($sqlfilterin)
-                                               AND tc.templateid = :templateid
-                                      GROUP BY useridentifier)
-                                      ";
+                // We have to check if users are enroled in course and competency is linked to the course.
+                $sqlscalefilter = "SELECT useridentifier,
+                                          gradecount,
+                                          tempid,
+                                          $fields,
+                                          p.id AS planid
+                                    FROM  (
+                                            (SELECT ucc.userid AS useridentifier, Count(ucc.grade) gradecount,
+                                                    tc.templateid AS tempid
+                                               FROM {" . \core_competency\template_competency::TABLE . "} tc
+                                               JOIN {" . \core_competency\course_competency::TABLE . "} cc
+                                                    ON tc.competencyid = cc.competencyid AND tc.templateid = :templateid
+                                               JOIN {" . \core_competency\user_competency_course::TABLE . "} ucc
+                                                    ON ucc.competencyid = tc.competencyid AND cc.courseid = ucc.courseid
+                                               JOIN {user_enrolments} ue
+						    ON ue.userid = ucc.userid
+                                                    AND ue.status = :active
+					       JOIN {enrol} e
+						    ON ue.enrolid = e.id AND e.courseid = ucc.courseid
+                                                    AND e.status = :enabled
+                                               JOIN {" . \core_competency\competency::TABLE . "} c
+                                                    ON c.id = ucc.competencyid
+                                               JOIN {" . \core_competency\competency_framework::TABLE . "} cf
+                                                    ON cf.id = c.competencyframeworkid
+                                             WHERE ($sqlfilterin)
+                                          GROUP BY useridentifier)
+                                        ) usergrade";
 
-            if ($sqlfilterinforplan != '') {
-                // Additional SQL for completed plans.
-                $sqlscalefilter .= " UNION
-                                       (SELECT ucp.userid AS useridentifier, Count(ucp.grade) gradecount, tc.templateid AS tempid
-                                          FROM {" . \core_competency\template_competency::TABLE . "} tc
-                                          JOIN {" . \core_competency\user_competency_plan::TABLE . "} ucp
-                                               ON ucp.competencyid = tc.competencyid
-                                          JOIN {" . \core_competency\competency::TABLE . "} c
-                                               ON c.id = ucp.competencyid
-                                          JOIN {" . \core_competency\competency_framework::TABLE . "} cf
-                                               ON cf.id = c.competencyframeworkid
-                                         WHERE ($sqlfilterinforplan)
-                                               AND tc.templateid = :templateid2
-                                      GROUP BY useridentifier)";
+                $paramsfilter += array('active' => ENROL_USER_ACTIVE);
+                $paramsfilter += array('enabled' => ENROL_INSTANCE_ENABLED);
+            } else {
+                // SQL for usercomp and completed plans.
+                $sqlscalefilter = "SELECT useridentifier,
+                                          gradecount,
+                                          tempid,
+                                          $fields,
+                                          p.id AS planid,
+                                          planstatus
+                                    FROM  (
+                                            (SELECT ucc.userid AS useridentifier, Count(ucc.grade) gradecount,
+                                                    tc.templateid AS tempid, 'notcompleted' AS planstatus
+                                               FROM {" . \core_competency\template_competency::TABLE . "} tc
+                                               JOIN {" . \core_competency\user_competency::TABLE . "} ucc
+                                                    ON ucc.competencyid = tc.competencyid AND tc.templateid = :templateid
+                                               JOIN {" . \core_competency\competency::TABLE . "} c
+                                                    ON c.id = ucc.competencyid
+                                               JOIN {" . \core_competency\competency_framework::TABLE . "} cf
+                                                    ON cf.id = c.competencyframeworkid
+                                             WHERE ($sqlfilterin)
+                                          GROUP BY useridentifier)
+                                          UNION
+                                           (SELECT ucp.userid AS useridentifier, Count(ucp.grade) gradecount,
+                                                   tc.templateid AS tempid, 'completed' AS planstatus
+                                              FROM {" . \core_competency\template_competency::TABLE . "} tc
+                                              JOIN {" . \core_competency\plan::TABLE . "} p
+                                                   ON p.templateid = tc.templateid AND tc.templateid = :templateid2
+                                              JOIN {" . \core_competency\user_competency_plan::TABLE . "} ucp
+                                                   ON ucp.competencyid = tc.competencyid AND p.id = ucp.planid
+                                              JOIN {" . \core_competency\competency::TABLE . "} c
+                                                   ON c.id = ucp.competencyid
+                                              JOIN {" . \core_competency\competency_framework::TABLE . "} cf
+                                                   ON cf.id = c.competencyframeworkid
+                                             WHERE ($sqlfilterinforplan)
+                                          GROUP BY useridentifier)
+                                        ) usergrade";
             }
-            $sqlscalefilter .= ") usergrade";
             // We sort by rating number.
             $sort = "gradecount $scalesortorder,$sortsql";
             $sql = "$sqlscalefilter
@@ -398,7 +424,15 @@ class api {
                     $userplan[$field] = $user->$field;
                 }
             }
-            $users[] = $userplan;
+
+            if (isset($users[$user->id]) && isset($user->planstatus)) {
+                if ($user->planstatus == 'notcompleted') {
+                    continue;
+                } else {
+                    unset($users[$user->id]);
+                }
+            }
+            $users[$user->id] = $userplan;
         }
         $result->close();
         return $users;

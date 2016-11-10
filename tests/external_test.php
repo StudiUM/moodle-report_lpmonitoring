@@ -1355,7 +1355,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $record2->grade = 3;
         $record2->timecreated = 10;
         $record2->timemodified = 10;
-        $record2->usermodified = $user1->id;;
+        $record2->usermodified = $user1->id;
         $DB->insert_records('competency_usercompcourse', array($record1, $record2));
 
         // Specify one scale value as filter.
@@ -1369,9 +1369,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($result->plan['id'], $plan1->get_id());
         $this->assertEquals($result->plan['user']['id'], $user1->id);
 
-        // Check next plan selected is user 3.
-        $this->assertEquals($result->navnext['userid'], $user2->id);
-        $this->assertEquals($result->navnext['planid'], $plan2->get_id());
+        // Check that there is no next plan because comp 2 is not associated to course 3.
+        $this->assertFalse(isset($result->navnext));
 
         // Specify 2 scale values as filter.
         $scalevalues = '[{"scalevalue" : 1, "scaleid" :' . $framework->get_scaleid() . '}, '
@@ -1385,9 +1384,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($result->plan['id'], $plan1->get_id());
         $this->assertEquals($result->plan['user']['id'], $user1->id);
 
-        // Check next plan selected is for user 3.
-        $this->assertEquals($result->navnext['userid'], $user3->id);
-        $this->assertEquals($result->navnext['planid'], $plan3->get_id());
+        // Check that there is no next plan because comp 2 is not associated to course 3.
+        $this->assertFalse(isset($result->navnext));
 
     }
 

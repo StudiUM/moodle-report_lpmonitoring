@@ -950,57 +950,58 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         set_config('showuseridentity', 'email');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
-        $this->assertFalse(isset($users[0]['phone1']));
-        $this->assertFalse(isset($users[0]['phone2']));
-        $this->assertFalse(isset($users[0]['institution']));
-        $this->assertFalse(isset($users[0]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertFalse(isset($users[$this->user1->id]['phone1']));
+        $this->assertFalse(isset($users[$this->user1->id]['phone2']));
+        $this->assertFalse(isset($users[$this->user1->id]['institution']));
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add phone1 to show user identity.
         set_config('showuseridentity', 'email,phone1');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
-        $this->assertEquals(1111111111, $users[0]['phone1']);
-        $this->assertFalse(isset($users[0]['phone2']));
-        $this->assertFalse(isset($users[0]['institution']));
-        $this->assertFalse(isset($users[0]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
+        $this->assertFalse(isset($users[$this->user1->id]['phone2']));
+        $this->assertFalse(isset($users[$this->user1->id]['institution']));
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add phone2 to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
-        $this->assertEquals(1111111111, $users[0]['phone1']);
-        $this->assertEquals(2222222222, $users[0]['phone2']);
-        $this->assertFalse(isset($users[0]['institution']));
-        $this->assertFalse(isset($users[0]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
+        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
+        $this->assertFalse(isset($users[$this->user1->id]['institution']));
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add institution to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2,institution');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
-        $this->assertEquals(1111111111, $users[0]['phone1']);
-        $this->assertEquals(2222222222, $users[0]['phone2']);
-        $this->assertEquals('Institution Name', $users[0]['institution']);
-        $this->assertFalse(isset($users[0]['department']));
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
+        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
+        $this->assertEquals('Institution Name', $users[$this->user1->id]['institution']);
+        $this->assertFalse(isset($users[$this->user1->id]['department']));
 
         // Add department to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2,institution,department');
         $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
         $this->assertCount(1, $users);
-        $this->assertEquals('user11test@nomail.com', $users[0]['email']);
-        $this->assertEquals(1111111111, $users[0]['phone1']);
-        $this->assertEquals(2222222222, $users[0]['phone2']);
-        $this->assertEquals('Institution Name', $users[0]['institution']);
-        $this->assertEquals('Dep Name', $users[0]['department']);
+        $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
+        $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
+        $this->assertEquals(2222222222, $users[$this->user1->id]['phone2']);
+        $this->assertEquals('Institution Name', $users[$this->user1->id]['institution']);
+        $this->assertEquals('Dep Name', $users[$this->user1->id]['department']);
     }
 
     /**
      * Test get learning plans from templateid with scale filter.
      */
     public function test_search_users_by_templateid_and_scalefilter() {
+        global $DB;
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
@@ -1175,6 +1176,80 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 6),
         );
         $users = api::search_users_by_templateid($template->get_id(), '', $scalevalues);
+        $this->assertCount(0, $users);
+
+        // Test search users in completed plans.
+        $this->setAdminUser();
+        core_competency_api::complete_plan($plan1);
+        $scalevalues = array(
+            array('scaleid' => $scale2->id, 'scalevalue' => 1),
+            array('scaleid' => $scale1->id, 'scalevalue' => 2)
+        );
+        // Create new plan for the same user and template and make some ratings.
+        $c3 = $cpg->create_competency(array('competencyframeworkid' => $framework->get_id(), 'shortname' => 'c3'));
+        $tc1 = $cpg->create_template_competency(array(
+            'templateid' => $template->get_id(),
+            'competencyid' => $c3->get_id()
+        ));
+        $plan1 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user1->id));
+        core_competency_api::grade_competency_in_plan($plan1, $c1->get_id(), 1);
+        core_competency_api::grade_competency_in_plan($plan1, $c2->get_id(), 2);
+        core_competency_api::grade_competency_in_plan($plan1, $c3->get_id(), 2);
+        // Now we have 3 rating for user1 in active plan.
+
+        $this->setUser($appreciator);
+        $users = api::search_users_by_templateid($template->get_id(), 'User11', $scalevalues, false, 'DESC');
+        $this->assertCount(1, $users);
+        $this->assertEquals('User11 Lastname1', $users[$user1->id]['fullname']);
+        // The completed plan with 2 rating should be returned.
+        $this->assertEquals(2, $users[$user1->id]['nbrating']);
+
+        // Test when user is unsubscribed from course 1.
+        $this->setAdminUser();
+        $enrol = enrol_get_plugin('manual');
+        $instance = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'manual'));
+        $enrol->unenrol_user($instance, $user3->id);
+
+        $this->setUser($appreciator);
+        $scalevalues = array(
+            array('scaleid' => $scale2->id, 'scalevalue' => 3),
+            array('scaleid' => $scale1->id, 'scalevalue' => 4)
+        );
+        $users = api::search_users_by_templateid($template->get_id(), 'User3', $scalevalues, true, 'DESC');
+        $this->assertCount(1, $users);
+        $this->assertEquals('User3 Lastname3', $users[$user3->id]['fullname']);
+        $this->assertEquals(1, $users[$user3->id]['nbrating']);
+
+        // Test when user is unsubscribed from course 2.
+        $this->setAdminUser();
+        $enrol = enrol_get_plugin('manual');
+        $instance = $DB->get_record('enrol', array('courseid' => $course2->id, 'enrol' => 'manual'));
+        $enrol->unenrol_user($instance, $user3->id);
+
+        $this->setUser($appreciator);
+        $users = api::search_users_by_templateid($template->get_id(), 'User3', $scalevalues, true, 'DESC');
+        $this->assertCount(0, $users);
+
+        // Test when competency 1 removed from course 1.
+        $this->setAdminUser();
+        core_competency_api::remove_competency_from_course($course1->id, $c1->get_id());
+
+        $this->setUser($appreciator);
+        $scalevalues = array(
+            array('scaleid' => $scale2->id, 'scalevalue' => 1),
+            array('scaleid' => $scale2->id, 'scalevalue' => 2)
+        );
+        $users = api::search_users_by_templateid($template->get_id(), 'User12', $scalevalues, true, 'DESC');
+        $this->assertCount(1, $users);
+        $this->assertEquals('User12 Lastname2', $users[$user2->id]['fullname']);
+        $this->assertEquals(1, $users[$user2->id]['nbrating']);
+
+        // Test when competency 1 removed from course 2.
+        $this->setAdminUser();
+        core_competency_api::remove_competency_from_course($course2->id, $c1->get_id());
+
+        $this->setUser($appreciator);
+        $users = api::search_users_by_templateid($template->get_id(), 'User12', $scalevalues, true, 'DESC');
         $this->assertCount(0, $users);
 
     }
