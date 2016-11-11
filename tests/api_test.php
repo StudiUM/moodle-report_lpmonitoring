@@ -1185,24 +1185,30 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 1),
             array('scaleid' => $scale1->id, 'scalevalue' => 2)
         );
-        // Create new plan for the same user and template and make some ratings.
-        $c3 = $cpg->create_competency(array('competencyframeworkid' => $framework->get_id(), 'shortname' => 'c3'));
-        $tc1 = $cpg->create_template_competency(array(
-            'templateid' => $template->get_id(),
-            'competencyid' => $c3->get_id()
-        ));
-        $plan1 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user1->id));
-        core_competency_api::grade_competency_in_plan($plan1, $c1->get_id(), 1);
-        core_competency_api::grade_competency_in_plan($plan1, $c2->get_id(), 2);
-        core_competency_api::grade_competency_in_plan($plan1, $c3->get_id(), 2);
-        // Now we have 3 rating for user1 in active plan.
+        // Create new plan for the same user/comptencies and make some different ratings.
+        $manualplan = $cpg->create_plan(array('userid' => $user1->id, 'status' => plan::STATUS_ACTIVE));
+        $cpg->create_plan_competency(array('planid' => $manualplan->get_id(), 'competencyid' => $c1->get_id()));
+        $cpg->create_plan_competency(array('planid' => $manualplan->get_id(), 'competencyid' => $c2->get_id()));
 
+        core_competency_api::grade_competency_in_plan($manualplan, $c1->get_id(), 3);
+        core_competency_api::grade_competency_in_plan($manualplan, $c2->get_id(), 4);
+
+        // Now we have 2 different ratings for user1/competencies in active plan.
         $this->setUser($appreciator);
         $users = api::search_users_by_templateid($template->get_id(), 'User11', $scalevalues, false, 'DESC');
         $this->assertCount(1, $users);
         $this->assertEquals('User11 Lastname1', $users[$user1->id]['fullname']);
-        // The completed plan with 2 rating should be returned.
+        // The 2 ratings from completed plan should be returned.
         $this->assertEquals(2, $users[$user1->id]['nbrating']);
+
+        // Assert that the user is not returned if we search with the scale values from ratings
+        // in the user_competency table.
+        $scalevalues = array(
+            array('scaleid' => $scale2->id, 'scalevalue' => 3),
+            array('scaleid' => $scale1->id, 'scalevalue' => 4)
+        );
+        $users = api::search_users_by_templateid($template->get_id(), 'User11', $scalevalues, false, 'DESC');
+        $this->assertCount(0, $users);
 
         // Test when user is unsubscribed from course 1.
         $this->setAdminUser();

@@ -356,10 +356,11 @@ class api {
                                           tempid,
                                           $fields,
                                           p.id AS planid,
-                                          planstatus
+                                          p.status as planstatus,
+                                          tableusercomp
                                     FROM  (
                                             (SELECT ucc.userid AS useridentifier, Count(ucc.grade) gradecount,
-                                                    tc.templateid AS tempid, 'notcompleted' AS planstatus
+                                                    tc.templateid AS tempid, 'user_competency' AS tableusercomp
                                                FROM {" . \core_competency\template_competency::TABLE . "} tc
                                                JOIN {" . \core_competency\user_competency::TABLE . "} ucc
                                                     ON ucc.competencyid = tc.competencyid AND tc.templateid = :templateid
@@ -371,7 +372,7 @@ class api {
                                           GROUP BY useridentifier)
                                           UNION
                                            (SELECT ucp.userid AS useridentifier, Count(ucp.grade) gradecount,
-                                                   tc.templateid AS tempid, 'completed' AS planstatus
+                                                   tc.templateid AS tempid, 'user_competency_plan' AS tableusercomp
                                               FROM {" . \core_competency\template_competency::TABLE . "} tc
                                               JOIN {" . \core_competency\plan::TABLE . "} p
                                                    ON p.templateid = tc.templateid AND tc.templateid = :templateid2
@@ -410,6 +411,14 @@ class api {
 
         $users = array();
         foreach ($result as $key => $user) {
+            // Make sure the ratings from user_competency table are not returned
+            // if the plan is completed.
+            if (isset($user->planstatus) && $user->planstatus == \core_competency\plan::STATUS_COMPLETE) {
+                if ($user->tableusercomp == 'user_competency') {
+                    continue;
+                }
+            }
+
             // Add user picture.
             $userplan = array();
             $userplan['profileimage'] = new \user_picture($user);
@@ -422,14 +431,6 @@ class api {
             if (!empty($extrasearchfields) && has_capability('moodle/site:viewuseridentity', $usercontext)) {
                 foreach ($extrasearchfields as $field) {
                     $userplan[$field] = $user->$field;
-                }
-            }
-
-            if (isset($users[$user->id]) && isset($user->planstatus)) {
-                if ($user->planstatus == 'notcompleted') {
-                    continue;
-                } else {
-                    unset($users[$user->id]);
                 }
             }
             $users[$user->id] = $userplan;
