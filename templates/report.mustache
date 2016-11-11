@@ -27,21 +27,15 @@
 }}
 <div class="competencyreport">
     <div class="main_container">
+        <!-- filter -->
+        {{> report_lpmonitoring/filter }}
 
-        <!-- page content -->
-        <div role="main">
+        <!-- User navigation -->
+        <div id="userInfoContainer"></div>
 
-            <!-- filter -->
-            {{> report_lpmonitoring/filter }}
-            
-            <!-- User navigation -->
-            <div id="userInfoContainer"></div>
+        <div data-region="list-competencies-section" id="listPlanCompetencies">
 
-            <div data-region="list-competencies-section" id="listPlanCompetencies">
-                
-            </div>
         </div>
-        <!-- /page content -->
     </div>
 </div>
 {{#js}}

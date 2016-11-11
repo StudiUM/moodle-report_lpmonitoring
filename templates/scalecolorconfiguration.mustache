@@ -23,19 +23,19 @@
     Context variables required for this template:
     * competencyframeworks - array of objects containing id, shortname, idnumber, visible
 }}
-<div class="container-fluid competencyreport">
+<div class="container-fluid competencyreport {{config.theme}}">
     <form class="mform" id="savecolor" accept-charset="utf-8" method="post" autocomplete="off">
         <fieldset id="id_settings" class="clearfix collapsible">
             <legend class="ftoggler">
                 <a href="#" class="fheader" role="button" aria-controls="id_settings" aria-expanded="true">{{#str}}settings{{/str}}</a>
             </legend>
             <div class="fcontainer clearfix">
-                <div class="fitem fitem_fselect">
-                    <div class="fitemtitle">
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
                         <label for="templateselector">{{#str}}competencyframeworks, tool_lp{{/str}}</label>
                     </div>
-                    <div class="felement fselect">
-                        <select  id="templateselector" class="form-control">
+                    <div class="felement col-md-9 form-inline">
+                        <select  id="templateselector" class="form-control custom-select">
                             <option value="">{{#str}}selectframework, report_lpmonitoring{{/str}}</option>
                             {{#competencyframeworks}}
                             <option value="{{{id}}}">{{{shortname}}} ({{contextnamenoprefix}})</option>
@@ -43,15 +43,15 @@
                         </select>
                     </div>
                 </div>
-                <div class="fitem fitem_fselect">
-                    <div class="fitemtitle">
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
                         <label for="scaleselector">
                             <i id="loaderscale" class="fa fa-refresh fa-spin" style="display:none"></i>
                             {{#str}}scales{{/str}}
                         </label>
                     </div>
-                    <div class="felement fselect">
-                        <select  id="scaleselector" class="form-control" disabled>
+                    <div class="felement col-md-9 form-inline">
+                        <select  id="scaleselector" class="form-control custom-select" disabled>
                             <option value="">{{#str}}noscaleavailable, report_lpmonitoring{{/str}}</option>
                         </select>
                     </div>
@@ -70,12 +70,13 @@
                 </div>
                 <div id="scalevalues">
                 </div>
-                <div class="fitem fitem_fgroup femptylabel">
-                    <fieldset class="felement fgroup">
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3"></div>
+                    <div class="felement col-md-9 form-inline">
                         <button id="submitScaleColorButton" data-action="save" type="submit" class="btn btn-primary">
                             {{#str}}save, admin{{/str}}
                         </button>
-                    </fieldset>
+                    </div>
                 </div>
             </div>
         </fieldset>

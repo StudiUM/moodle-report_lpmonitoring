@@ -32,12 +32,12 @@
         </legend>
         <div class="fcontainer clearfix">
             <div class="studentfilter">
-                <div class="fitem fitem_fselect">
-                    <div class="fitemtitle">
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
                         <label for="studentPlansSelectorReport">{{#str}}learningplans, tool_lp{{/str}}</label>
                     </div>
-                    <div class="felement fselect">
-                        <select id="studentPlansSelectorReport" class="form-control">
+                    <div class="felement fselect col-md-9">
+                        <select id="studentPlansSelectorReport" class="custom-select">
                             <option value="">{{#str}}selectlearningplan, report_lpmonitoring{{/str}}</option>
                             {{#plans}}
                             <option value="{{id}}">{{name}}</option>
@@ -46,13 +46,14 @@
                     </div>
                 </div>
             </div>
-            <div class="fitem fitem_fgroup femptylabel">
-                <fieldset class="felement fgroup">
+            <div class="fitem form-group row">
+                <div class="fitemtitle col-md-3"></div>
+                <div class="felement col-md-9">
                     <button id="submitFilterReportButton" type="submit" class="btn btn-primary" disabled>
                         {{#str}}apply, report_lpmonitoring{{/str}}
                         <i class="fa fa-refresh fa-spin"></i>
                     </button>
-                </fieldset>
+                </div>
             </div>
         </div>
     </fieldset>

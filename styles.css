@@ -5,17 +5,9 @@
 .competencyreport .form-group {
     margin-bottom: 10px;
 }
-.competencyreport .mform .fitem.fitem_fradiogroup {
-    margin-bottom: 0;
-}
-body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .felement.radio {
-    padding-top: 0;
-    margin-top : 0;
-}
 .competencyreport .scaleitem > label {
     font-weight: bold;
 }
-
 .competencyreport .mform .fitem .fgroup button:first-child {
     margin-left : 0;
 }
@@ -109,7 +101,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     clear: both;
     content: ".";
     display: block;
-    height: 0;
+    height: auto;
     visibility: hidden;
 }
 .competencyreport ul.to_do {
@@ -266,6 +258,12 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
         flex: 0 1 400px;
         margin-right: 20px;
         min-width: 400px;
+    }
+}
+@media (min-width: 100px) and (max-width: 370px) {
+    .competencyreport .compstats .competency-detail {
+        flex: 0 1 235px;
+        min-width: 235px;
     }
 }
 @media (max-width: 998px) {
@@ -444,7 +442,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
   background: #1453c7;
 }
 .competencyreport .tile-stats {
-    min-height: 90px;
+    min-height: 95px;
     position: relative;
     display: block;
     overflow: hidden;
@@ -554,6 +552,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     display: inline-block;
     text-align: center;
     width: 100%;
+    vertical-align: middle;
 }
 .competencyreport table.tile_info td span {
     line-height: 28px;
@@ -621,119 +620,13 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .competencyreport .fautocomplete .label-info span {
     padding: 2px 4px;
 }
-.competencyreport .input-group {
-    margin-left: 5px;
-    border-collapse: separate;
-    display: table;
-    position: relative;
-}
-.competencyreport  .input-group-addon, .input-group-btn {
-    vertical-align: middle;
-    white-space: nowrap;
-    width: 1%;
-}
-.competencyreport .input-group-addon {
-    background-color: #eee;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    color: #555;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1;
-    padding: 8px 18px;
-    text-align: center;
-}
-.competencyreport .input-group-addon.input-sm {
-    border-radius: 3px;
-    font-size: 12px;
-    padding: 5px 10px;
-}
-.competencyreport .input-group-addon.input-lg {
-    border-radius: 6px;
-    font-size: 18px;
-    padding: 10px 16px;
-}
-.competencyreport .input-group-addon input[type="checkbox"],
-.input-group-addon input[type="radio"] {
-    margin-top: 0;
-}
-.competencyreport .input-group .form-control:first-child,
-.competencyreport .input-group-addon:first-child,
-.competencyreport .input-group-btn:first-child > .btn,
-.competencyreport .input-group-btn:first-child > .btn-group > .btn,
-.competencyreport .input-group-btn:first-child > .dropdown-toggle,
-.competencyreport .input-group-btn:last-child > .btn-group:not(:last-child) > .btn,
-.competencyreport .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
-}
-.competencyreport .input-group-addon:first-child {
-    border-right: 0 none;
-}
-.competencyreport .input-group .form-control:last-child,
-.competencyreport .input-group-addon:last-child,
-.input-group-btn:first-child > .btn-group:not(:first-child) > .btn,
-.input-group-btn:first-child > .btn:not(:first-child),
-.input-group-btn:last-child > .btn,
-.input-group-btn:last-child > .btn-group > .btn,
-.input-group-btn:last-child > .dropdown-toggle {
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
-}
-.competencyreport .input-group-addon:last-child {
-    border-left: 0 none;
-}
-.competencyreport .input-group-btn {
-    font-size: 0;
-    position: relative;
-    white-space: nowrap;
-}
-.competencyreport .input-group-btn > .btn {
-    position: relative;
-}
-.competencyreport .input-group-btn > .btn + .btn {
-    margin-left: -1px;
-}
-.competencyreport .input-group-btn > .btn:active,
-.input-group-btn > .btn:focus,
-.competencyreport .input-group-btn > .btn:hover {
-    z-index: 2;
-}
-.competencyreport .input-group-btn:first-child > .btn,
-.competencyreport .input-group-btn:first-child > .btn-group {
-    margin-right: -1px;
-}
-.competencyreport .input-group-btn:last-child > .btn,
-.competencyreport .input-group-btn:last-child > .btn-group {
-    margin-left: -1px;
-    z-index: 2;
-}
+
 .competencyreport #loaderscalevalues {
     width: 197px;
     text-align: center;
 }
-.competencyreport #scalevalues .form-group {
-    clear: both;
-    display: table;
-    margin-bottom: 10px;
-}
-.competencyreport #scalevalues span.input-group-addon,
-.competencyreport #scalevalues input[type="text"] {
-    float: left;
-}
-.competencyreport #scalevalues span.input-group-addon {
-    padding: 8px;
-    width: 16px;
-    height: 16px;
-}
-.competencyreport #scalevalues input[type="text"] {
-    height: 24px;
-    width: 150px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
+
 .competencyreport #scalevalues .fitemtitle.proficient label small {
-    display: block;
     color: #666;
 }
 .competencyreport .disabled-option {
@@ -749,7 +642,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     display: none;
 }
 .competencyreport #learningplanSelectorReport {
-    margin-top: 29px;
+    //margin-top: 29px;
 }
 .competencyreport #studentselectorreport {
     margin-top: 25px;
@@ -930,7 +823,7 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     line-height: 47px;
 }
 .competencyreport .plan-info-report > div.report-stats-competencies {
-    min-width: 145px;
+    width: 250px;
 }
 .competencyreport .plan-info-report .report-stats-competencies .empty-value {
     color: #cfd1d5;
@@ -979,6 +872,160 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .lpmonitoringdialogue .stats-rated-column {
     min-width: 20%;
 }
+.lpmonitoringdialogue div.dataTables_paginate a.paginate_button.first:not(.page-item),
+.lpmonitoringdialogue div.dataTables_paginate a.paginate_button.previous:not(.page-item) {
+    position: relative;
+    padding-left: 24px;
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.paginate_button.next:not(.page-item),
+.lpmonitoringdialogue div.dataTables_paginate a.paginate_button.last:not(.page-item) {
+    position: relative;
+    padding-right: 24px;
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.first:not(.page-item):before,
+.lpmonitoringdialogue div.dataTables_paginate a.previous:not(.page-item):before {
+    display: block;
+    font-family: FontAwesome;
+    font-size: 1.5em;
+    left: 10px;
+    position: absolute;
+    top: 2px;
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.next:not(.page-item):after,
+.lpmonitoringdialogue div.dataTables_paginate a.last:not(.page-item):after {
+    display: block;
+    font-family: FontAwesome;
+    font-size: 1.5em;
+    position: absolute;
+    right: 10px;
+    top: 2px;
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.first:not(.page-item):before {
+    content: "\f100";
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.previous:not(.page-item):before {
+    content: "\f104";
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.next:not(.page-item):after {
+    content: "\f105";
+}
+
+.lpmonitoringdialogue div.dataTables_paginate a.last:not(.page-item):after {
+    content: "\f101";
+}
+.lpmonitoringdialogue .dataTables_wrapper {
+    position: relative;
+    clear: both;
+    *zoom: 1;
+    zoom: 1;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_length {
+    float: left;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: right;
+}
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_filter input {
+    margin-left: 0.5em;
+}
+.lpmonitoringdialogue table.dataTable thead th {
+    position: relative;
+    background-image: none !important;
+}
+
+.lpmonitoringdialogue table.dataTable thead th.sorting:after,
+.lpmonitoringdialogue table.dataTable thead th.sorting_asc:after,
+.lpmonitoringdialogue table.dataTable thead th.sorting_desc:after {
+    position: absolute;
+    top: 10px;
+    right: 8px;
+    display: block;
+    font-family: FontAwesome;
+}
+
+.lpmonitoringdialogue table.dataTable thead th.sorting:after {
+    content: "\f0dc";
+    color: #ddd;
+    font-size: 0.8em;
+    padding-top: 0.12em;
+}
+.lpmonitoringdialogue table.dataTable thead th.sorting_asc:after {
+    content: "\f0de";
+}
+.lpmonitoringdialogue table.dataTable thead th.sorting_desc:after {
+    content: "\f0dd";
+}
+
+.lpmonitoringdialogue div.dataTables_scrollBody table.dataTable thead th.sorting:after,
+.lpmonitoringdialogue div.dataTables_scrollBody table.dataTable thead th.sorting_asc:after,
+.lpmonitoringdialogue div.dataTables_scrollBody table.dataTable thead th.sorting_desc:after {
+    content: "";
+}
+.lpmonitoringdialogue table.dataTable thead .sorting_asc,
+.lpmonitoringdialogue table.dataTable thead .sorting_desc,
+.lpmonitoringdialogue table.dataTable thead .sorting {
+    cursor: pointer;
+}
+.lpmonitoringdialogue .dataTables_paginate {
+    text-align: center;
+}
+.competencyreport .form-autocomplete-suggestions .nbratinguser {
+    float:right;
+    margin-left: 40px;
+}
+.competencyreport .compstats .tile_count .tile_stats_count .incourse {
+    font-size: 1.6em;
+}
+.competencyreport .status-icon {
+    font-size: 1.5em;
+}
+.competencyreport .status-icon .draft {
+  color: #ff7200;
+}
+.competencyreport .status-icon .waiting {
+  color: #00cce4;
+}
+.competencyreport .status-icon .review {
+  color: #833fff;
+}
+.competencyreport .status-icon .active {
+  color: #00d30f;
+}
+.competencyreport .status-icon .complete {
+  color: #0078ff;
+}
+.competencyreport .x_title small {
+    color: #333;
+}
+.competencyreport .mform .fitem_fradiogroup {
+    margin-bottom: 0px;
+}
+.lpmonitoringdialogue .dataTables_filter input {
+    background-clip: padding-box;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    line-height: 1.25;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    display: inline-block;
+    vertical-align: middle;
+    width: auto;
+}
+.lpmonitoringdialogue table caption {
+    caption-side: top;
+    color: unset;
+}
+/** default pagination for datatables plugin**/
 .lpmonitoringdialogue div.dataTables_paginate a.paginate_button.first,
 .lpmonitoringdialogue div.dataTables_paginate a.paginate_button.previous {
     position: relative;
@@ -1000,7 +1047,6 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     position: absolute;
     top: 2px;
 }
-
 .lpmonitoringdialogue div.dataTables_paginate a.next:after,
 .lpmonitoringdialogue div.dataTables_paginate a.last:after {
     display: block;
@@ -1010,19 +1056,15 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     right: 10px;
     top: 2px;
 }
-
 .lpmonitoringdialogue div.dataTables_paginate a.first:before {
     content: "\f100";
 }
-
 .lpmonitoringdialogue div.dataTables_paginate a.previous:before {
     content: "\f104";
 }
-
 .lpmonitoringdialogue div.dataTables_paginate a.next:after {
     content: "\f105";
 }
-
 .lpmonitoringdialogue div.dataTables_paginate a.last:after {
     content: "\f101";
 }
@@ -1080,16 +1122,16 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .lpmonitoringdialogue table.dataTable thead .sorting {
     cursor: pointer;
 }
-.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
-.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
-.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:not(.page-item),
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:not(.page-item):hover,
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:not(.page-item):active {
     background: transparent none repeat scroll 0 0;
     border: 1px solid transparent;
     box-shadow: none;
     color: #666 !important;
     cursor: default;
 }
-.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button {
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item) {
     box-sizing: border-box;
     color: #333333 !important;
     cursor: pointer;
@@ -1102,8 +1144,8 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
     text-decoration: none !important;
     border-radius: 3px;
 }
-.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.current:not(.page-item),
+.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.current:not(.page-item):hover {
     background: rgba(0, 0, 0, 0) linear-gradient(to bottom, white 0%, gainsboro 100%) repeat scroll 0 0;
     border: 1px solid #cacaca;
     color: #333333 !important;
@@ -1111,35 +1153,49 @@ body #region-main .competencyreport .mform:not(.unresponsive) .femptylabel .fele
 .lpmonitoringdialogue .dataTables_paginate {
     text-align: center;
 }
-.lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    color: white !important;
-    background-color: #0d70c4;
+.competencyreport .scalefiltercontainer .radio,
+.competencyreport .scalesortordercontainer .radio
+{
+    margin-bottom: 8px;
 }
-.competencyreport .form-autocomplete-suggestions .nbratinguser {
-    float:right;
-    margin-left: 40px;
+.competencyreport .radio input {
+    display: inline;
+    width: 1%;
 }
-.competencyreport .compstats .tile_count .tile_stats_count .incourse {
-    font-size: 1.6em;
+.competencyreport:not(.boost) .input-group-addon {
+    background-color: #eceeef;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    color: #55595c;
+    display: table-cell;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: 0;
+    padding: 0.2rem 0.5rem;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
 }
-.competencyreport .status-icon {
-    font-size: 1.5em;
+.competencyreport:not(.boost) .form-inline .input-group {
+    display: inline-table;
+    vertical-align: middle;
+    width: auto;
 }
-.competencyreport .status-icon .draft {
-  color: #ff7200;
+.competencyreport:not(.boost) .input-group {
+    border-collapse: separate;
+    display: table;
+    position: relative;
+    width: 100%;
 }
-.competencyreport .status-icon .waiting {
-  color: #00cce4;
+.competencyreport:not(.boost) .input-group input {
+    border-bottom-right-radius: 0;
+    border-right: 0 none;
+    border-top-right-radius: 0;
 }
-.competencyreport .status-icon .review {
-  color: #833fff;
+.competencyreport:not(.boost) .row {
+    margin-left: 0;
 }
-.competencyreport .status-icon .active {
-  color: #00d30f;
-}
-.competencyreport .status-icon .complete {
-  color: #0078ff;
-}
-.competencyreport .x_title small {
-    color: #333;
-}
+ 

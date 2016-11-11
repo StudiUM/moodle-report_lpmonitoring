@@ -31,19 +31,21 @@
             <a role="button" title="{{#str}}clicktohideshow{{/str}}" href="#" class="fheader" aria-controls="id_displayinfo" aria-expanded="true">{{#str}}filter, report_lpmonitoring{{/str}}</a>
         </legend>
         <div class="fcontainer clearfix">
-            <div class="fitem fitem_fradio fitem_fradiogroup">
-                <div class="fitemtitle" id="optionfilter">
-                    <label>{{#str}}filterby, report_lpmonitoring{{/str}}</label>
+            <div class="fitem_fradio fitem fitem_fradiogroup form-group row">
+                <div class="fitemtitle col-md-3" id="optionfilter">
+                    <label class="col-form-label d-inline">{{#str}}filterby, report_lpmonitoring{{/str}}</label>
                 </div>
-                <div class="felement fradio radio radio-primary">
+                <div class="felement col-md-9 form-inline fradio radio radio-primary">
                     <span>
-                        <input type="radio" name="optionfilter" id="template" value="template" checked disabled="disabled" aria-labelledby="optionfilter">
+                        <input class="form-control" type="radio" name="optionfilter" id="template" value="template" checked disabled="disabled" aria-labelledby="optionfilter">
                         <label for="template">{{#str}}template, tool_lp{{/str}}</label>
                     </span>
                 </div>
             </div>
-            <div class="fitem fitem_fradio femptylabel">
-                <div class="felement fradio radio radio-primary">
+            <div class="form-group row fitem fitem_fradio">
+                <div class="fitemtitle col-md-3">
+                </div>
+                <div class="felement col-md-9 form-inline fradio radio radio-primary">
                     <span>
                         <input type="radio" name="optionfilter" id="student" value="student" disabled="disabled" aria-labelledby="optionfilter">
                         <label for="student">{{#str}}user{{/str}}</label>
@@ -51,12 +53,12 @@
                 </div>
             </div>
             <div class="templatefilter">
-                <div class="fitem fitem_fselect">
-                    <div class="fitemtitle">
-                        <label for="templateSelectorReport">{{#str}}template, tool_lp{{/str}}</label>
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
+                        <label class="col-form-label d-inline" for="templateSelectorReport">{{#str}}template, tool_lp{{/str}}</label>
                     </div>
-                    <div class="felement fselect">
-                        <select id="templateSelectorReport" class="form-control">
+                    <div class="felement fautocomplete col-md-9 form-inline">
+                        <select id="templateSelectorReport" class="form-control custom-select">
                             <option value="">{{#str}}selectlearningplantemplate, report_lpmonitoring{{/str}}</option>
                             {{#templates}}
                             <option value="{{id}}">{{shortname}}</option>
@@ -64,70 +66,80 @@
                         </select>
                     </div>
                 </div>
-                <div class="fitem for-autocomplete fitem_fselect">
-                    <div class="fitemtitle">
-                        <label for="learningplanSelectorReport">{{#str}}usersfromtemplate, report_lpmonitoring{{/str}}</label>
+                <div class="fitem for-autocomplete form-group row">
+                    <div class="fitemtitle col-md-3">
+                        <label class="col-form-label d-inline" for="learningplanSelectorReport">{{#str}}usersfromtemplate, report_lpmonitoring{{/str}}</label>
                     </div>
-                    <div class="felement fautocomplete">
+                    <div class="felement fautocomplete col-md-9 form-inline  ">
                         <select style="display: none" data-scalesortorder="" data-scalefilter="" id="learningplanSelectorReport" data-templateid="" data-scalefilterapply="" class="form-control">
                         </select>
                     </div>
                 </div>
-                <div class="fitem advanced fitem_scales" style="display: none">
-                    <div class="fitemtitle">
-                        <label>{{#str}}scalesfortemplate, report_lpmonitoring{{/str}}</label>
+                <div class="advanced" style="display: none">
+                    <div class="fitem form-group row">
+                        <div class="fitemtitle col-md-3">
+                            <label>{{#str}}scalesfortemplate, report_lpmonitoring{{/str}}</label>
+                        </div>
+                        <div class="felement col-md-9 form-inline">
+                            <div id="scale"></div>
+                        </div>
                     </div>
-                    <div class="felement fscales">
-                        <div id="scale"></div>
+                    <div class="fitem form-group row">
+                        <div class="fitemtitle col-md-3" id="scalefilterapply">
+                            <label>{{#str}}scalefilterby, report_lpmonitoring{{/str}}</label>
+                        </div>
+                        <div class="felement fscalefilter col-md-9 form-inline">
+                            <div id="scalefilter"></div>
+                        </div>
                     </div>
-                    <div class="fitemtitle" id="scalefilterapply">
-                        <label>{{#str}}scalefilterby, report_lpmonitoring{{/str}}</label>
-                    </div>
-                    <div class="felement fscalefilter">
-                        <div id="scalefilter"></div>
-                    </div>
-                    <div class="fitemtitle" id="scalesortorderlabel">
-                        <label >{{#str}}sort{{/str}}</label>
-                    </div>
-                    <div class="felement fscalesortorder">
-                        <div id="scalesortorder"></div>
+                    <div class="fitem form-group row">
+                        <div class="fitemtitle col-md-3" id="scalesortorderlabel">
+                            <label >{{#str}}sort{{/str}}</label>
+                        </div>
+                        <div class="felement col-md-9 form-inline">
+                            <div id="scalesortorder"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="fitem moreless-actions hidden">
-                    <div class="felement">
-                        <a href="#" title="{{#str}}showmore, form{{/str}}" class="moreless-toggler show-toggler" role="button">{{#str}}showmore, form{{/str}}</a>
-                        <a href="#" title="{{#str}}showless, form{{/str}}" class="moreless-toggler less-toggler hidden" role="button">{{#str}}showless, form{{/str}}</a>
+                <div class="moreless-actions hidden">
+                    <div class="fitem form-group row">
+                        <div class="fitemtitle col-md-3"></div>
+                        <div class="felement col-md-9 form-inline">
+                            <a href="#" title="{{#str}}showmore, form{{/str}}" class="moreless-toggler show-toggler" role="button">{{#str}}showmore, form{{/str}}</a>
+                            <a href="#" title="{{#str}}showless, form{{/str}}" class="moreless-toggler less-toggler hidden" role="button">{{#str}}showless, form{{/str}}</a>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="studentfilter disabled-option">
-                <div class="fitem for-autocomplete fitem_fselect">
-                    <div class="fitemtitle">
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
                         <label for="studentSelectorReport">{{#str}}user{{/str}}</label>
                     </div>
-                    <div class="felement fautocomplete">
+                    <div class="felement fautocomplete col-md-9">
                         <select data-capability="moodle/competency:planview" id="studentSelectorReport" class="form-control" disabled="disabled">
                         </select>
                     </div>
                 </div>
-                <div class="fitem fitem_fselect">
-                    <div class="fitemtitle">
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
                         <label for="studentPlansSelectorReport">{{#str}}learningplans, tool_lp{{/str}}</label>
                     </div>
-                    <div class="felement fselect">
-                        <select id="studentPlansSelectorReport" class="form-control" disabled="disabled">
+                    <div class="felement col-md-9 form-inline">
+                        <select id="studentPlansSelectorReport" class="form-control custom-select" disabled="disabled">
                             <option>{{#str}}nolearningplanavailable, report_lpmonitoring{{/str}}</option>
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="fitem fitem_fgroup femptylabel">
-                <fieldset class="felement fgroup">
-                    <button id="submitFilterReportButton" type="submit" class="btn btn-primary" disabled>
-                        {{#str}}apply, report_lpmonitoring{{/str}}
-                        <i class="fa fa-refresh fa-spin"></i>
-                    </button>
-                </fieldset>
+            <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3"></div>
+                    <div class="felement col-md-9">
+                        <button id="submitFilterReportButton" type="submit" class="btn btn-primary" disabled>
+                            {{#str}}apply, report_lpmonitoring{{/str}}
+                            <i class="fa fa-refresh fa-spin"></i>
+                        </button>
+                    </div>
             </div>
         </div>
     </fieldset>

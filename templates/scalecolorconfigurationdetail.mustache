@@ -16,17 +16,19 @@
 }}
 <input type="hidden" value="{{id}}" name="configid"/>
 {{#scaleconfiguration}}
-<div class="fitem fitem_fcolor">
-    <div class="fitemtitle{{#proficient}} proficient{{/proficient}}">
-        <label for="{{name}}-{{id}}">{{name}}
-            {{#proficient}}
-            <small><i>{{#str}}proficient, tool_lp{{/str}}</i></small>
-            {{/proficient}}
-        </label>
+<div class="fitem row form-group">
+<div class="fitemtitle col-md-3{{#proficient}} proficient{{/proficient}}">
+    <label for="{{name}}-{{id}}">{{name}}
+        {{#proficient}}<br>
+        <small><i>{{#str}}proficient, tool_lp{{/str}}</i></small>
+        {{/proficient}}
+    </label>
+</div>
+<div class="felement col-md-3 col-xs-10 col-sm-4 form-inline scalevalue">
+    <div class="input-group">
+        <input type="text" name="{{name}}" value="{{color}}" class="form-control" id="{{name}}-{{id}}"  aria-labelledby="scalevalues">
+        <span class="input-group-addon" id="scalevalues-{{id}}"><i></i></span>
     </div>
-    <div class="felement fcolor scalevalue">
-        <input type="text" value="{{color}}" class="form-control" name="{{name}}" id="{{name}}-{{id}}"  aria-labelledby="scalevalues"/>
-        <span class="input-group-addon"><i></i></span>
-    </div>
+</div>
 </div>
 {{/scaleconfiguration}}

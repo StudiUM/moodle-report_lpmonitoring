@@ -26,7 +26,7 @@ define(['jquery',
     'core/ajax',
     'core/notification',
     'core/str',
-    'report_lpmonitoring/Chart',
+    'core/chartjs',
     'core/form-autocomplete',
     'tool_lp/dialogue',
     'report_lpmonitoring/user_competency_popup',
@@ -128,12 +128,12 @@ define(['jquery',
             if (self.templateId !== '') {
                 $('.competencyreport .moreless-actions').removeClass('hidden');
                 if ($('.competencyreport .show-toggler').hasClass('hidden')) {
-                    $('.competencyreport .fitem_scales').show();
+                    $('.competencyreport .advanced').show();
                 }
                 self.loadScalesFromTemplate(self.templateId);
             } else {
                 $('.competencyreport .moreless-actions').addClass('hidden');
-                $('.competencyreport .fitem_scales').hide();
+                $('.competencyreport .advanced').hide();
                 $('.competencyreport #scale').empty();
             }
             self.checkDataFormReady();
@@ -875,8 +875,8 @@ define(['jquery',
             ).fail(notification.exception);
             $(".competencyreport").on('click', '.moreless-toggler', function(event) {
                 event.preventDefault();
+                $(".advanced").toggle();
                 $(this).toggleClass("hidden").siblings().removeClass('hidden');
-                $(".fitem_scales").slideToggle("slow");
             });
 
             // Allow collapse of block panels.
