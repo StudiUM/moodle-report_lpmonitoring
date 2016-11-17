@@ -123,7 +123,7 @@ define(['jquery',
                         $("#list-competencies-template").html(html);
                         templates.runTemplateJS(js);
                         elementloading.removeClass('loading');
-                        self.loadCompetencyDetail(results, templateid, ratingincourse);
+                        self.loadCompetenciesDetails(results, templateid, ratingincourse);
                     });
                 } else {
                     elementloading.removeClass('loading');
@@ -141,40 +141,22 @@ define(['jquery',
         };
 
         /**
-         * Load competency detail.
+         * Get competency detail.
          *
-         * @name  loadCompetencyDetail
-         * @param {Object[]} competencies
+         * @name  getCompetencyDetailDeferred
+         * @param {Object} request
          * @param {Number} templateid
          * @param {Boolean} ratingincourse
-         * @return {Void}
+         * @return {Object} promise
          * @function
          */
-        LearningplanStats.prototype.loadCompetencyDetail = function(competencies, templateid, ratingincourse) {
-            var requests = [];
+        LearningplanStats.prototype.getCompetencyDetailDeferred = function(request, templatename, ratingincourse) {
             var self = this;
-            var servicename = 'report_lpmonitoring_get_competency_statistics';
-            var templatename = 'report_lpmonitoring/competency_detail_stats';
-            if (ratingincourse) {
-                servicename = 'report_lpmonitoring_get_competency_statistics_incourse';
-                templatename = 'report_lpmonitoring/competency_detail_stats_incourse';
-            }
-
-            $.each(competencies, function(index, record) {
-                // Locally store competency information.
-                self.competencies[record.id] = {infocompetency: record};
-                requests.push({
-                    methodname: servicename,
-                    args: {
-                        competencyid: record.id,
-                        templateid: templateid
-                    }
-                });
-            });
-            $('.competencyreport .competency-detail').addClass('loading');
-            $.when.apply($.when, ajax.call(requests))
-            .then(function() {
-                $.each(arguments, function(index, context) {
+            return function() {
+                // Wrap with a deferred.
+                var defer = $.Deferred();
+                var promiserequest = ajax.call(request);
+                promiserequest[0].done(function(context){
                     var compid = context.competencyid;
                     // Locally store competency statitstics.
                     self.competencies[compid].competencydetail = context;
@@ -221,10 +203,47 @@ define(['jquery',
                         templates.runTemplateJS(js);
                         self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .label.cr-scalename');
                     });
+                    defer.resolve();
+                }).fail(function(exp) {
+                    $("#list-competencies-template").empty();
+                    notification.exception(exp);
                 });
-            }).fail(function(ex) {
-                $("#list-competencies-template").empty();
-                notification.exception(ex);
+                // Return a promise so that we can chain properly in the each.
+                return defer.promise();
+            };
+        };
+
+        /**
+         * Load competencies details.
+         *
+         * @name  loadCompetenciesDetails
+         * @param {Object[]} competencies
+         * @param {Number} templateid
+         * @param {Boolean} ratingincourse
+         * @return {Void}
+         * @function
+         */
+        LearningplanStats.prototype.loadCompetenciesDetails = function(competencies, templateid, ratingincourse) {
+            var self = this;
+            var servicename = 'report_lpmonitoring_get_competency_statistics';
+            var templatename = 'report_lpmonitoring/competency_detail_stats';
+            if (ratingincourse) {
+                servicename = 'report_lpmonitoring_get_competency_statistics_incourse';
+                templatename = 'report_lpmonitoring/competency_detail_stats_incourse';
+            }
+            var base = $.when({});
+            $('.competencyreport .competency-detail').addClass('loading');
+            $.each(competencies, function(index, record) {
+                // Locally store competency information.
+                self.competencies[record.id] = {infocompetency: record};
+                var req = [{
+                    methodname: servicename,
+                    args: {
+                        competencyid: record.id,
+                        templateid: templateid
+                    }
+                }];
+                base = base.then(self.getCompetencyDetailDeferred(req, templatename, ratingincourse));
             });
         };
 
