@@ -826,13 +826,22 @@ class external extends external_api {
      */
     public static function list_plan_competencies($id) {
 
+        $plan =  \core_competency\api::read_plan($id);
         $result = core_competency_external::list_plan_competencies($id);
+        $shoulddisplay = true;
+        if ($plan->get_status() == \core_competency\plan::STATUS_ACTIVE) {
+            $shoulddisplay = \tool_lp\api::has_to_display_rating($plan);
+        }
         foreach ($result as $key => $r) {
             $usercompetency = (isset($r->usercompetency)) ? $r->usercompetency : $r->usercompetencyplan;
             $proficiency = $usercompetency->proficiency;
             $r->isnotrated = false;
             $r->isproficient = false;
             $r->isnotproficient = false;
+            if (!$shoulddisplay) {
+                $r->isnotrated = true;
+                continue;
+            }
             if (!isset($proficiency)) {
                 $r->isnotrated = true;
             } else {
