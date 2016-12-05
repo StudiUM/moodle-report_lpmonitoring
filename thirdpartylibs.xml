@@ -8,7 +8,7 @@
     <licenseversion>2.0</licenseversion>
   </library>
   <library>
-    <location>amd/src/jquery.dataTables</location>
+    <location>amd/src/jquery.dataTables.js</location>
     <name>jQuery Datatables</name>
     <license>MIT</license>
     <version>1.10.13</version>
