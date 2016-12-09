@@ -105,5 +105,5 @@ define(['jquery',
          */
         UserCompetencyPopup.prototype._refresh = function() {};
 
-        return /** @alias module:tool_lp/configurecoursecompetencysettings */ UserCompetencyPopup;
+        return  UserCompetencyPopup;
     });

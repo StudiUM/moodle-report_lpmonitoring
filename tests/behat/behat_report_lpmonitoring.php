@@ -67,37 +67,37 @@ class behat_report_lpmonitoring extends behat_base {
      * @throws ExpectationException
      * @param string $texttoverify
      * @param string $targetclass
-     * @param string $competencyname
+     * @param string $compname
      */
-    public function i_see_text_in_element_of_the_competency_detail($texttoverify, $targetclass, $competencyname) {
+    public function i_see_text_in_element_of_the_competency_detail($texttoverify, $targetclass, $compname) {
 
         // Building xpath.
         $xpath = '';
         switch ($targetclass) {
             case 'totalnbcourses':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
+                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$compname')]]";
                 break;
             case 'totalnbusers':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
+                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$compname')]]";
                 break;
             case 'listevidence':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
+                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$compname')]]";
                 break;
             case 'level-proficiency':
-                $xpath = "//div[contains(., '$competencyname')]/div/div/div/div/div[contains(@class, '$targetclass')]";
+                $xpath = "//div[contains(., '$compname')]/div/div/div/div/div[contains(@class, '$targetclass')]";
                 break;
             case 'finalrate':
-                $xpath = "//div[contains(., '$competencyname')]/div/div/div/div/div/span[contains(@class, 'label')]";
+                $xpath = "//div[contains(., '$compname')]/div/div/div/div/div/span[contains(@class, 'label')]";
                 break;
             case 'level':
-                $xpath = "//span[contains(@class, '$targetclass') and ancestor-or-self::div/h4/a[contains(., '$competencyname')]]";
+                $xpath = "//span[contains(@class, '$targetclass') and ancestor-or-self::div/h4/a[contains(., '$compname')]]";
                 break;
             case 'no-data-available':
-                 $xpath = "//div[contains(., '$competencyname')]/div/div/div/"
+                 $xpath = "//div[contains(., '$compname')]/div/div/div/"
                     . "table/tbody/tr/td/div[contains(@class, '$targetclass')]";
                 break;
             case 'incourse':
-                $xpath = "//div[contains(@class, '$targetclass') and ancestor-or-self::div/div/h4/a[contains(., '$competencyname')]]";
+                $xpath = "//div[contains(@class, '$targetclass') and ancestor-or-self::div/div/h4/a[contains(., '$compname')]]";
                 break;
         }
 

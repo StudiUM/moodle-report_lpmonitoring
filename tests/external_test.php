@@ -1144,7 +1144,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
      * @param string $description
      * @param int $contextid
      * @param boolean $visible
-     * @return type
+     * @return boolean
      */
     protected function create_template($shortname, $description, $contextid, $visible) {
         $template = array(

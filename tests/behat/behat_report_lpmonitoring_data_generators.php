@@ -50,8 +50,6 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
      *
      * @throws Exception
      * @throws PendingException
-     * @param string    $elementname The name of the entity to add
-     * @param TableNode $data
      */
     public function the_lpmonitoring_fixtures_exist() {
 

@@ -2036,7 +2036,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
      * @param string $description
      * @param int $contextid
      * @param boolean $visible
-     * @return type
+     * @return boolean
      */
     protected function create_template($shortname, $description, $contextid, $visible) {
         $template = array(
