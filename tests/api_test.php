@@ -831,6 +831,8 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
     /**
      * Test read current plan and get previous and next user plans.
+     *
+     * @expectedException moodle_exception
      */
     public function test_get_plans() {
         $this->resetAfterTest(true);
@@ -914,7 +916,6 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertEquals($plan2->get_id(), $result->next->planid);
 
         // Test template with no plan.
-        $this->setExpectedException('moodle_exception');
         $result = api::read_plan(0, $tpl2->get_id());
     }
 
