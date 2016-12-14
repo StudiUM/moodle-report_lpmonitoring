@@ -48,7 +48,6 @@ if ($context->contextlevel == CONTEXT_SYSTEM) {
 }
 
 // Set the cess.
-$PAGE->requires->css('/report/lpmonitoring/style/font-awesome-import.css');
 $PAGE->requires->css('/report/lpmonitoring/style/bootstrap-colorpicker.min.css');
 $PAGE->set_context($context);
 $PAGE->set_url($url);

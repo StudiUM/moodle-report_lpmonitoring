@@ -105,11 +105,11 @@ class api {
                 $scaleid = $scale->id;
                 $scalename = $scale->name;
             } else {
-                $scaleid = $framework->get_scaleid();
+                $scaleid = $framework->get('scaleid');
                 $scalename = $framework->get_scale()->name;
             }
 
-            $scales[$scaleid] = array('frameworkid' => $framework->get_id(), 'scalename' => $scalename);
+            $scales[$scaleid] = array('frameworkid' => $framework->get('id'), 'scalename' => $scalename);
         }
 
         return $scales;
@@ -406,7 +406,7 @@ class api {
         }
 
         $params = $paramsfilter + $whereparams + $sortparams;
-        $params += array('templateid' => $template->get_id()) + array('templateid2' => $template->get_id());
+        $params += array('templateid' => $template->get('id')) + array('templateid2' => $template->get('id'));
         $result = $DB->get_recordset_sql($sql, $params);
 
         $users = array();
@@ -467,7 +467,7 @@ class api {
         if (empty($scaleconfigurations)) {
             // Read the framework.
             $framework = core_competency_api::read_framework($frameworkid);
-            $scaleconfigurations = $framework->get_scaleconfiguration();
+            $scaleconfigurations = $framework->get('scaleconfiguration');
         }
 
         $scaleconfigurations = json_decode($scaleconfigurations);
@@ -593,7 +593,7 @@ class api {
         $competency = $plancompetency->competency;
 
         // User has necessary capapbility if he can read the framework.
-        $framework = core_competency_api::read_framework($competency->get_competencyframeworkid());
+        $framework = core_competency_api::read_framework($competency->get('competencyframeworkid'));
 
         $competencydetails->userid = $userid;
         $competencydetails->planid = $planid;
@@ -601,11 +601,11 @@ class api {
         $competencydetails->framework = $framework;
 
         // Find de scale configuration associated to the competency.
-        $scaleid = $competency->get_scaleid();
-        $scaleconfig = $competency->get_scaleconfiguration();
+        $scaleid = $competency->get('scaleid');
+        $scaleconfig = $competency->get('scaleconfiguration');
         if ($scaleid === null) {
-            $scaleid = $framework->get_scaleid();
-            $scaleconfig = $framework->get_scaleconfiguration();
+            $scaleid = $framework->get('scaleid');
+            $scaleconfig = $framework->get('scaleconfiguration');
         }
 
         // Remove the scale ID from the config.
@@ -626,8 +626,8 @@ class api {
         $competencydetails->scale = $newscale;
 
         // Find de scale configuration for the report.
-        $reportscaleconfig = self::read_report_competency_config($framework->get_id(), $scaleid);
-        $reportscaleconfig = json_decode($reportscaleconfig->get_scaleconfiguration());
+        $reportscaleconfig = self::read_report_competency_config($framework->get('id'), $scaleid);
+        $reportscaleconfig = json_decode($reportscaleconfig->get('scaleconfiguration'));
         if (!is_array($reportscaleconfig)) {
             throw new coding_exception('Unexpected report scale configuration.');
         }
@@ -693,18 +693,18 @@ class api {
         $competencystatistics->listusers = array();
         foreach ($userplans as $userplan) {
             $user = new stdClass();
-            $user->userinfo = core_user::get_user($userplan->get_userid(), '*', \MUST_EXIST);
+            $user->userinfo = core_user::get_user($userplan->get('userid'), '*', \MUST_EXIST);
             // Throw an exception if user can not read the user competency.
-            if (!user_competency::can_read_user($userplan->get_userid())) {
+            if (!user_competency::can_read_user($userplan->get('userid'))) {
                 $userfullname = fullname($user->userinfo);
                 throw new moodle_exception('nopermissionsusercompetencyview', 'report_lpmonitoring', '', $userfullname);
             }
-            if ($userplan->get_status() == plan::STATUS_COMPLETE &&
-                    !self::has_records_for_competency_user_in_plan($userplan->get_id(), $competencyid)) {
+            if ($userplan->get('status') == plan::STATUS_COMPLETE &&
+                    !self::has_records_for_competency_user_in_plan($userplan->get('id'), $competencyid)) {
                 continue;
             }
 
-            $plancompetency = core_competency_api::get_plan_competency($userplan->get_id(), $competencyid);
+            $plancompetency = core_competency_api::get_plan_competency($userplan->get('id'), $competencyid);
             $user->usercompetency = $plancompetency->usercompetency;
             $user->usercompetencyplan = $plancompetency->usercompetencyplan;
             $competencystatistics->listusers[] = $user;
@@ -730,7 +730,7 @@ class api {
         // Find rate for each user in the plan for the the competency.
         $competencystatistics->listratings = array();
         foreach ($userplans as $plan) {
-            $userid = $plan->get_userid();
+            $userid = $plan->get('userid');
             $courses = course_competency::get_courses_with_competency_and_user($competencyid, $userid);
 
             foreach ($courses as $course) {
@@ -760,17 +760,17 @@ class api {
         $competency = template_competency::get_competency($templateid, $competencyid);
 
         // User has necessary capapbility if he can read the framework.
-        $framework = core_competency_api::read_framework($competency->get_competencyframeworkid());
+        $framework = core_competency_api::read_framework($competency->get('competencyframeworkid'));
 
         $competencystatistics->competency = $competency;
         $competencystatistics->framework = $framework;
 
         // Find de scale configuration associated to the competency.
-        $scaleid = $competency->get_scaleid();
-        $scaleconfig = $competency->get_scaleconfiguration();
+        $scaleid = $competency->get('scaleid');
+        $scaleconfig = $competency->get('scaleconfiguration');
         if ($scaleid === null) {
-            $scaleid = $framework->get_scaleid();
-            $scaleconfig = $framework->get_scaleconfiguration();
+            $scaleid = $framework->get('scaleid');
+            $scaleconfig = $framework->get('scaleconfiguration');
         }
 
         // Remove the scale ID from the config.
@@ -791,8 +791,8 @@ class api {
         $competencystatistics->scale = $newscale;
 
         // Find de scale configuration for the report.
-        $reportscaleconfig = self::read_report_competency_config($framework->get_id(), $scaleid);
-        $reportscaleconfig = json_decode($reportscaleconfig->get_scaleconfiguration());
+        $reportscaleconfig = self::read_report_competency_config($framework->get('id'), $scaleid);
+        $reportscaleconfig = json_decode($reportscaleconfig->get('scaleconfiguration'));
         if (!is_array($reportscaleconfig)) {
             throw new coding_exception('Unexpected report scale configuration.');
         }

@@ -25,7 +25,6 @@
 namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 
-use core_competency\persistent;
 use core_competency\competency_framework;
 use lang_string;
 
@@ -38,13 +37,32 @@ require_once($CFG->libdir . '/grade/grade_scale.php');
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report_competency_config extends persistent {
+class report_competency_config extends \core\persistent {
 
     /** Table name. */
     const TABLE = 'report_competency_config';
 
     /** Default color. */
     const DEFAULT_COLOR = '#C1C7C9';
+
+    /**
+     * Magic method to capture getters and setters.
+     * This is only available for competency persistents for backwards compatibility.
+     * It is recommended to use get('propertyname') and set('propertyname', 'value') directly.
+     *
+     * @param  string $method Callee.
+     * @param  array $arguments List of arguments.
+     * @return mixed
+     */
+    final public function __call($method, $arguments) {
+        debugging('deprecated magic method in report_competency_config', DEBUG_DEVELOPER);
+        if (strpos($method, 'get_') === 0) {
+            return $this->get(substr($method, 4));
+        } else if (strpos($method, 'set_') === 0) {
+            return $this->set(substr($method, 4), $arguments[0]);
+        }
+        throw new \coding_exception('Unexpected method call: ' . $method);
+    }
 
     /**
      * Return the definition of the properties of this model.
@@ -72,7 +90,7 @@ class report_competency_config extends persistent {
      * @return \grade_scale
      */
     public function get_scale() {
-        $scale = \grade_scale::fetch(array('id' => $this->get_scaleid()));
+        $scale = \grade_scale::fetch(array('id' => $this->get('scaleid')));
         if ($scale) {
             $scale->load_items();
         }
@@ -129,7 +147,7 @@ class report_competency_config extends persistent {
         }
 
         $scaleitems = $scale->scale_items;
-        $scaleconfiguration = json_decode($this->get_scaleconfiguration());
+        $scaleconfiguration = json_decode($this->get('scaleconfiguration'));
         foreach ($scaleitems as $key => $value) {
             if (empty($scaleconfiguration) || !array_key_exists($key, $scaleconfiguration)) {
                 return new lang_string('invalidscaleconfiguration', 'report_lpmonitoring');
@@ -145,13 +163,13 @@ class report_competency_config extends persistent {
     public function set_default_scaleconfiguration() {
         $scale = self::get_scale();
         $scaleitems = $scale->scale_items;
-        $scaleconfiguration = json_decode($this->get_scaleconfiguration());
+        $scaleconfiguration = json_decode($this->get('scaleconfiguration'));
         foreach ($scaleitems as $key => $value) {
             if (empty($scaleconfiguration) || !array_key_exists($key, $scaleconfiguration)) {
                 $scaleconfiguration[$key] = ['id' => $key + 1, 'color' => self::DEFAULT_COLOR];
             }
         }
-        $this->set_scaleconfiguration(json_encode($scaleconfiguration));
+        $this->set('scaleconfiguration', json_encode($scaleconfiguration));
     }
 
     /**

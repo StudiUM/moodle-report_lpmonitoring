@@ -25,8 +25,8 @@
 namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
-use core_competency\external\exporter;
-use core_competency\external\user_summary_exporter;
+use core\external\exporter;
+use core_user\external\user_summary_exporter;
 use renderer_base;
 
 /**
@@ -41,7 +41,7 @@ class competency_stats_user_exporter extends exporter {
     protected static function define_properties() {
         return array(
             'email' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             )
         );
     }
@@ -49,16 +49,16 @@ class competency_stats_user_exporter extends exporter {
     protected static function define_other_properties() {
         return array(
             'fullname' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'userid' => array(
                 'type' => PARAM_INT
             ),
             'profileimagesmall' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'profileurl' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'rated' => array(
                 'type' => PARAM_BOOL

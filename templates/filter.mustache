@@ -35,21 +35,20 @@
                 <div class="fitemtitle col-md-3" id="optionfilter">
                     <label class="col-form-label d-inline">{{#str}}filterby, report_lpmonitoring{{/str}}</label>
                 </div>
-                <div class="felement col-md-9 form-inline fradio radio radio-primary">
-                    <span>
-                        <input class="form-control" type="radio" name="optionfilter" id="template" value="template" checked disabled="disabled" aria-labelledby="optionfilter">
-                        <label for="template">{{#str}}template, tool_lp{{/str}}</label>
-                    </span>
-                </div>
-            </div>
-            <div class="form-group row fitem fitem_fradio">
-                <div class="fitemtitle col-md-3">
-                </div>
-                <div class="felement col-md-9 form-inline fradio radio radio-primary">
-                    <span>
-                        <input type="radio" name="optionfilter" id="student" value="student" disabled="disabled" aria-labelledby="optionfilter">
-                        <label for="student">{{#str}}user{{/str}}</label>
-                    </span>
+                <div class="felement col-md-9 form-inline">
+
+                    <div class="radio radio-primary">
+                        <span>
+                            <input class="form-control" type="radio" name="optionfilter" id="template" value="template" checked disabled="disabled" aria-labelledby="optionfilter">
+                            <label for="template">{{#str}}template, tool_lp{{/str}}</label>
+                        </span>
+                    </div>
+                    <div class="radio radio-primary">
+                        <span>
+                            <input type="radio" name="optionfilter" id="student" value="student" disabled="disabled" aria-labelledby="optionfilter">
+                            <label for="student">{{#str}}user{{/str}}</label>
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="templatefilter">

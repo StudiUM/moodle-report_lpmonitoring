@@ -35,7 +35,7 @@ use renderer_base;
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class scale_competency_item_exporter extends \core_competency\external\exporter {
+class scale_competency_item_exporter extends \core\external\exporter {
 
     protected static function define_related() {
         return array('courses' => '\\stdClass[]',
@@ -48,10 +48,10 @@ class scale_competency_item_exporter extends \core_competency\external\exporter 
                 'type' => PARAM_INT
             ),
             'name' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'color' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             )
         );
     }
@@ -76,7 +76,7 @@ class scale_competency_item_exporter extends \core_competency\external\exporter 
         $result->listcourses = array();
 
         foreach ($this->related['courses'] as $course) {
-            if ($this->data->value == $course->usecompetencyincourse->get_grade()) {
+            if ($this->data->value == $course->usecompetencyincourse->get('grade')) {
                 $courseexporter = new scale_value_course_exporter($course, array('relatedinfo' => $this->related['relatedinfo']));
                 $result->listcourses[] = $courseexporter->export($output);
                 $result->nbcourse++;

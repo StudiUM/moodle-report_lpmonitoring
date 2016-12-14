@@ -41,7 +41,7 @@ use report_lpmonitoring\external\report_user_evidence_summary_exporter;
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lpmonitoring_competency_detail_exporter extends \core_competency\external\exporter {
+class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
 
     public static function define_other_properties() {
         return array(
@@ -61,12 +61,12 @@ class lpmonitoring_competency_detail_exporter extends \core_competency\external\
                 'type' => PARAM_BOOL
             ),
             'finalgradename' => array(
-                'type' => PARAM_TEXT,
+                'type' => PARAM_RAW,
                 'default' => null,
                 'null' => NULL_ALLOWED,
             ),
             'finalgradecolor' => array(
-                'type' => PARAM_TEXT,
+                'type' => PARAM_RAW,
                 'default' => null,
                 'null' => NULL_ALLOWED,
             ),
@@ -112,12 +112,12 @@ class lpmonitoring_competency_detail_exporter extends \core_competency\external\
         $data = $this->data;
         $result = new \stdClass();
 
-        $result->competencyid = $data->competency->get_id();
+        $result->competencyid = $data->competency->get('id');
         $uc = (isset($data->usercompetency)) ? $data->usercompetency : $data->usercompetencyplan;
         // Set the scaleid.
         $result->scaleid = $data->competency->get_scale()->id;
         // Proficiency and final grade.
-        $proficiency = $uc->get_proficiency();
+        $proficiency = $uc->get('proficiency');
         $result->isnotrated = false;
         $result->isproficient = false;
         $result->isnotproficient = false;
@@ -129,13 +129,13 @@ class lpmonitoring_competency_detail_exporter extends \core_competency\external\
             } else {
                 $result->isnotproficient = true;
             }
-            $grade = $uc->get_grade();
+            $grade = $uc->get('grade');
             $result->finalgradename = $data->scale[$grade];
             $result->finalgradecolor = $data->reportscaleconfig[$grade - 1]->color;
         }
 
         // If user can grade.
-        $result->cangrade = user_competency::can_grade_user($uc->get_userid());
+        $result->cangrade = user_competency::can_grade_user($uc->get('userid'));
 
         // Prior learning evidences.
         $result->nbevidence = count($data->userevidences);
@@ -157,7 +157,7 @@ class lpmonitoring_competency_detail_exporter extends \core_competency\external\
         foreach ($data->courses as $coursedata) {
             $relatedinfo = new \stdClass();
             $relatedinfo->userid = $data->userid;
-            $relatedinfo->competencyid = $data->competency->get_id();
+            $relatedinfo->competencyid = $data->competency->get('id');
             $totalcourseexporter = new linked_course_exporter($coursedata, array('relatedinfo' => $relatedinfo));
             $totalcourse = $totalcourseexporter->export($output);
             if ($totalcourse->rated) {
@@ -178,7 +178,7 @@ class lpmonitoring_competency_detail_exporter extends \core_competency\external\
 
             $relatedinfo = new \stdClass();
             $relatedinfo->userid = $data->userid;
-            $relatedinfo->competencyid = $data->competency->get_id();
+            $relatedinfo->competencyid = $data->competency->get('id');
 
             $scalecompetencyitemexporter = new scale_competency_item_exporter($scaleinfo, array('courses' => $data->courses,
                 'relatedinfo' => $relatedinfo));

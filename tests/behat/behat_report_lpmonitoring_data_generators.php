@@ -50,8 +50,6 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
      *
      * @throws Exception
      * @throws PendingException
-     * @param string    $elementname The name of the entity to add
-     * @param TableNode $data
      */
     public function the_lpmonitoring_fixtures_exist() {
 
@@ -69,12 +67,12 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $cat1ctx = context_coursecat::instance($cat1->id);
 
         // Create course.
-        $course1 = $datagenerator->create_course(array('shortname' => 'Anatomy', 'category' => $cat1->id));
-        $course2 = $datagenerator->create_course(array('shortname' => 'Genetic', 'category' => $cat1->id));
-        $course3 = $datagenerator->create_course(array('shortname' => 'Psychology', 'category' => $cat1->id));
-        $course4 = $datagenerator->create_course(array('shortname' => 'Pharmacology', 'category' => $cat1->id));
-        $course5 = $datagenerator->create_course(array('shortname' => 'Pathology', 'category' => $cat1->id));
-        $course6 = $datagenerator->create_course(array('shortname' => 'Neuroscience', 'category' => $cat1->id));
+        $course1 = $datagenerator->create_course(array('shortname' => 'Anatomy', 'fullname' => 'Anatomy', 'category' => $cat1->id));
+        $course2 = $datagenerator->create_course(array('shortname' => 'Genetic', 'fullname' => 'Genetic', 'category' => $cat1->id));
+        $course3 = $datagenerator->create_course(array('shortname' => 'Psychology', 'fullname' => 'Psychology', 'category' => $cat1->id));
+        $course4 = $datagenerator->create_course(array('shortname' => 'Pharmacology', 'fullname' => 'Pharmacology', 'category' => $cat1->id));
+        $course5 = $datagenerator->create_course(array('shortname' => 'Pathology', 'fullname' => 'Pathology', 'category' => $cat1->id));
+        $course6 = $datagenerator->create_course(array('shortname' => 'Neuroscience', 'fullname' => 'Neuroscience', 'category' => $cat1->id));
 
         // Create templates.
         $template1 = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
@@ -102,12 +100,12 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         );
         $framework = $cpg->create_framework($framework);
         $c1 = $cpg->create_competency(array(
-            'competencyframeworkid' => $framework->get_id(),
+            'competencyframeworkid' => $framework->get('id'),
             'shortname' => 'Competency A')
         );
 
         $c2 = $cpg->create_competency(array(
-            'competencyframeworkid' => $framework->get_id(),
+            'competencyframeworkid' => $framework->get('id'),
             'shortname' => 'Competency B',
             'scaleid' => $scale2->id,
             'scaleconfiguration' => $scaleconfiguration2)
@@ -115,36 +113,36 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
 
         // Create color configuration for the specific scale.
         $lpg->create_report_competency_config(array(
-            'competencyframeworkid' => $framework->get_id(),
+            'competencyframeworkid' => $framework->get('id'),
             'scaleid' => $scale2->id,
             'scaleconfiguration' => '[{"id": 1, "color": "#f30c0c"}, {"id": 1, "color": "#14e610"}]')
         );
 
         // Create course competency.
-        $cpg->create_course_competency(array('courseid' => $course1->id, 'competencyid' => $c1->get_id()));
-        $cpg->create_course_competency(array('courseid' => $course1->id, 'competencyid' => $c2->get_id()));
+        $cpg->create_course_competency(array('courseid' => $course1->id, 'competencyid' => $c1->get('id')));
+        $cpg->create_course_competency(array('courseid' => $course1->id, 'competencyid' => $c2->get('id')));
 
-        $cpg->create_course_competency(array('courseid' => $course2->id, 'competencyid' => $c1->get_id()));
-        $cpg->create_course_competency(array('courseid' => $course2->id, 'competencyid' => $c2->get_id()));
+        $cpg->create_course_competency(array('courseid' => $course2->id, 'competencyid' => $c1->get('id')));
+        $cpg->create_course_competency(array('courseid' => $course2->id, 'competencyid' => $c2->get('id')));
 
-        $cpg->create_course_competency(array('courseid' => $course3->id, 'competencyid' => $c1->get_id()));
-        $cpg->create_course_competency(array('courseid' => $course3->id, 'competencyid' => $c2->get_id()));
+        $cpg->create_course_competency(array('courseid' => $course3->id, 'competencyid' => $c1->get('id')));
+        $cpg->create_course_competency(array('courseid' => $course3->id, 'competencyid' => $c2->get('id')));
 
-        $cpg->create_course_competency(array('courseid' => $course4->id, 'competencyid' => $c1->get_id()));
-        $cpg->create_course_competency(array('courseid' => $course4->id, 'competencyid' => $c2->get_id()));
+        $cpg->create_course_competency(array('courseid' => $course4->id, 'competencyid' => $c1->get('id')));
+        $cpg->create_course_competency(array('courseid' => $course4->id, 'competencyid' => $c2->get('id')));
 
-        $cpg->create_course_competency(array('courseid' => $course5->id, 'competencyid' => $c1->get_id()));
-        $cpg->create_course_competency(array('courseid' => $course5->id, 'competencyid' => $c2->get_id()));
+        $cpg->create_course_competency(array('courseid' => $course5->id, 'competencyid' => $c1->get('id')));
+        $cpg->create_course_competency(array('courseid' => $course5->id, 'competencyid' => $c2->get('id')));
 
-        $cpg->create_course_competency(array('courseid' => $course6->id, 'competencyid' => $c1->get_id()));
-        $cpg->create_course_competency(array('courseid' => $course6->id, 'competencyid' => $c2->get_id()));
+        $cpg->create_course_competency(array('courseid' => $course6->id, 'competencyid' => $c1->get('id')));
+        $cpg->create_course_competency(array('courseid' => $course6->id, 'competencyid' => $c2->get('id')));
 
         // Create template competency.
-        $cpg->create_template_competency(array('templateid' => $template1->get_id(), 'competencyid' => $c1->get_id()));
-        $cpg->create_template_competency(array('templateid' => $template1->get_id(), 'competencyid' => $c2->get_id()));
+        $cpg->create_template_competency(array('templateid' => $template1->get('id'), 'competencyid' => $c1->get('id')));
+        $cpg->create_template_competency(array('templateid' => $template1->get('id'), 'competencyid' => $c2->get('id')));
 
-        $cpg->create_template_competency(array('templateid' => $template2->get_id(), 'competencyid' => $c1->get_id()));
-        $cpg->create_template_competency(array('templateid' => $template2->get_id(), 'competencyid' => $c2->get_id()));
+        $cpg->create_template_competency(array('templateid' => $template2->get('id'), 'competencyid' => $c1->get('id')));
+        $cpg->create_template_competency(array('templateid' => $template2->get('id'), 'competencyid' => $c2->get('id')));
 
         $user1 = $datagenerator->create_user(array(
             'firstname' => 'Rebecca',
@@ -194,7 +192,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
             'name' => 'My custom learing plan',
             'status' => \core_competency\plan::STATUS_ACTIVE)
         );
-        $cpg->create_plan_competency(array('planid' => $p->get_id(), 'competencyid' => $c1->get_id()));
+        $cpg->create_plan_competency(array('planid' => $p->get('id'), 'competencyid' => $c1->get('id')));
 
         $cpg->create_plan(array(
             'userid' => $user3->id,
@@ -224,15 +222,15 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
             'status' => \core_competency\plan::STATUS_ACTIVE)
         );
 
-        $cpg->create_plan_competency(array('planid' => $p->get_id(), 'competencyid' => $c1->get_id()));
-        $cpg->create_plan_competency(array('planid' => $pactive->get_id(), 'competencyid' => $c1->get_id()));
-        $cpg->create_plan_competency(array('planid' => $pdraft->get_id(), 'competencyid' => $c1->get_id()));
-        $cpg->create_plan_competency(array('planid' => $pcomplete->get_id(), 'competencyid' => $c1->get_id()));
+        $cpg->create_plan_competency(array('planid' => $p->get('id'), 'competencyid' => $c1->get('id')));
+        $cpg->create_plan_competency(array('planid' => $pactive->get('id'), 'competencyid' => $c1->get('id')));
+        $cpg->create_plan_competency(array('planid' => $pdraft->get('id'), 'competencyid' => $c1->get('id')));
+        $cpg->create_plan_competency(array('planid' => $pcomplete->get('id'), 'competencyid' => $c1->get('id')));
 
         // Make draft.
-        core_competency_api::unapprove_plan($pdraft->get_id());
+        core_competency_api::unapprove_plan($pdraft->get('id'));
         // Make complete.
-        core_competency_api::complete_plan($pcomplete->get_id());
+        core_competency_api::complete_plan($pcomplete->get('id'));
 
         $cpg->create_plan(array(
             'userid' => $user4->id,
@@ -288,7 +286,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         cohort_add_member($cohort->id, $user4->id);
         cohort_add_member($cohort->id, $user5->id);
         // Generate plans for cohort.
-        core_competency_api::create_plans_from_template_cohort($template1->get_id(), $cohort->id);
+        core_competency_api::create_plans_from_template_cohort($template1->get('id'), $cohort->id);
         $syscontext = context_system::instance();
 
         $roleid = create_role('Appreciator role', 'roleappreciator', 'learning plan appreciator role description');
@@ -313,33 +311,33 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $roles = tool_cohortroles_api::sync_all_cohort_roles();
 
         // Rate some comptencies in course for Pablo.
-        core_competency_api::grade_competency_in_course($course1->id, $user4->id, $c1->get_id(), 1, "My note");
-        core_competency_api::grade_competency_in_course($course1->id, $user4->id, $c2->get_id(), 2);
+        core_competency_api::grade_competency_in_course($course1->id, $user4->id, $c1->get('id'), 1, "My note");
+        core_competency_api::grade_competency_in_course($course1->id, $user4->id, $c2->get('id'), 2);
 
-        core_competency_api::grade_competency_in_course($course2->id, $user4->id, $c1->get_id(), 1);
-        core_competency_api::grade_competency_in_course($course2->id, $user4->id, $c2->get_id(), 1);
+        core_competency_api::grade_competency_in_course($course2->id, $user4->id, $c1->get('id'), 1);
+        core_competency_api::grade_competency_in_course($course2->id, $user4->id, $c2->get('id'), 1);
 
-        core_competency_api::grade_competency_in_course($course3->id, $user4->id, $c1->get_id(), 2);
-        core_competency_api::grade_competency_in_course($course3->id, $user4->id, $c2->get_id(), 2);
+        core_competency_api::grade_competency_in_course($course3->id, $user4->id, $c1->get('id'), 2);
+        core_competency_api::grade_competency_in_course($course3->id, $user4->id, $c2->get('id'), 2);
 
-        core_competency_api::grade_competency_in_course($course4->id, $user4->id, $c1->get_id(), 2);
-        core_competency_api::grade_competency_in_course($course4->id, $user4->id, $c2->get_id(), 1);
+        core_competency_api::grade_competency_in_course($course4->id, $user4->id, $c1->get('id'), 2);
+        core_competency_api::grade_competency_in_course($course4->id, $user4->id, $c2->get('id'), 1);
 
-        core_competency_api::grade_competency_in_course($course5->id, $user4->id, $c1->get_id(), 1);
-        core_competency_api::grade_competency_in_course($course5->id, $user4->id, $c2->get_id(), 1);
+        core_competency_api::grade_competency_in_course($course5->id, $user4->id, $c1->get('id'), 1);
+        core_competency_api::grade_competency_in_course($course5->id, $user4->id, $c2->get('id'), 1);
 
-        core_competency_api::grade_competency_in_course($course6->id, $user4->id, $c1->get_id(), 1);
+        core_competency_api::grade_competency_in_course($course6->id, $user4->id, $c1->get('id'), 1);
 
         // Create user evidence for pablo.
         $e = $cpg->create_user_evidence(array('userid' => $user4->id, 'name' => 'My evidence'));
-        $cpg->create_user_evidence_competency(array('competencyid' => $c1->get_id(), 'userevidenceid' => $e->get_id()));
+        $cpg->create_user_evidence_competency(array('competencyid' => $c1->get('id'), 'userevidenceid' => $e->get('id')));
 
         // Rate some comptency c1 in course for Donald.
-        core_competency_api::grade_competency_in_course($course1->id, $user2->id, $c1->get_id(), 1);
-        core_competency_api::grade_competency_in_course($course2->id, $user2->id, $c1->get_id(), 2);
-        core_competency_api::grade_competency_in_course($course3->id, $user2->id, $c1->get_id(), 2);
-        core_competency_api::grade_competency_in_course($course4->id, $user2->id, $c1->get_id(), 1);
-        core_competency_api::grade_competency_in_course($course5->id, $user2->id, $c1->get_id(), 1);
+        core_competency_api::grade_competency_in_course($course1->id, $user2->id, $c1->get('id'), 1);
+        core_competency_api::grade_competency_in_course($course2->id, $user2->id, $c1->get('id'), 2);
+        core_competency_api::grade_competency_in_course($course3->id, $user2->id, $c1->get('id'), 2);
+        core_competency_api::grade_competency_in_course($course4->id, $user2->id, $c1->get('id'), 1);
+        core_competency_api::grade_competency_in_course($course5->id, $user2->id, $c1->get('id'), 1);
 
         // Grade some course.
         // Create modules.
@@ -380,24 +378,24 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $roles = tool_cohortroles_api::sync_all_cohort_roles();
 
         // Create learning plan.
-        $probert = core_competency_api::create_plan_from_template($template2->get_id(), $user6->id);
-        $pwilliam = core_competency_api::create_plan_from_template($template2->get_id(), $user7->id);
-        $pfred = core_competency_api::create_plan_from_template($template2->get_id(), $user8->id);
+        $probert = core_competency_api::create_plan_from_template($template2->get('id'), $user6->id);
+        $pwilliam = core_competency_api::create_plan_from_template($template2->get('id'), $user7->id);
+        $pfred = core_competency_api::create_plan_from_template($template2->get('id'), $user8->id);
 
         // Rate some competencies for Robert.
-        core_competency_api::grade_competency($user6->id, $c1->get_id(), 1);
-        core_competency_api::grade_competency($user6->id, $c2->get_id(), 1);
+        core_competency_api::grade_competency($user6->id, $c1->get('id'), 1);
+        core_competency_api::grade_competency($user6->id, $c2->get('id'), 1);
 
         // Rate some competencies for William.
-        core_competency_api::grade_competency($user7->id, $c1->get_id(), 2);
-        core_competency_api::grade_competency($user7->id, $c2->get_id(), 2);
+        core_competency_api::grade_competency($user7->id, $c1->get('id'), 2);
+        core_competency_api::grade_competency($user7->id, $c2->get('id'), 2);
 
         // Rate some competencies for Fred.
-        core_competency_api::grade_competency($user8->id, $c1->get_id(), 1);
-        core_competency_api::grade_competency($user8->id, $c2->get_id(), 2);
+        core_competency_api::grade_competency($user8->id, $c1->get('id'), 1);
+        core_competency_api::grade_competency($user8->id, $c2->get('id'), 2);
 
          // Make Fred plan complete.
-        core_competency_api::complete_plan($pfred->get_id());
+        core_competency_api::complete_plan($pfred->get('id'));
 
     }
 }

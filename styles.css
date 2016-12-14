@@ -823,7 +823,7 @@
     line-height: 47px;
 }
 .competencyreport .plan-info-report > div.report-stats-competencies {
-    width: 250px;
+    width: 180px;
 }
 .competencyreport .plan-info-report .report-stats-competencies .empty-value {
     color: #cfd1d5;
@@ -1153,8 +1153,7 @@
 .lpmonitoringdialogue .dataTables_paginate {
     text-align: center;
 }
-.competencyreport .scalefiltercontainer .radio,
-.competencyreport .scalesortordercontainer .radio
+.competencyreport .form-inline .radio
 {
     margin-bottom: 8px;
 }
@@ -1198,4 +1197,3 @@
 .competencyreport:not(.boost) .row {
     margin-left: 0;
 }
- 

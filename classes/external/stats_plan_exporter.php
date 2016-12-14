@@ -25,7 +25,7 @@
 namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
-use core_competency\external\exporter;
+use core\external\exporter;
 use renderer_base;
 
 /**
@@ -64,7 +64,7 @@ class stats_plan_exporter extends exporter {
         $nbcompetenciesnotrated = 0;
         foreach ($usercompetencies as $r) {
             $usercompetency = (isset($r->usercompetency)) ? $r->usercompetency : $r->usercompetencyplan;
-            $proficiency = $usercompetency->get_proficiency();
+            $proficiency = $usercompetency->get('proficiency');
             if (!isset($proficiency)) {
                 $nbcompetenciesnotrated++;
             } else {
