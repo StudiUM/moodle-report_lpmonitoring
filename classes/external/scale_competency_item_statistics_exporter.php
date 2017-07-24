@@ -26,7 +26,7 @@ namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
 use report_lpmonitoring\external\scale_value_user_exporter;
-use core_competency\external\exporter;
+use core\external\exporter;
 use renderer_base;
 
 /**
@@ -48,10 +48,10 @@ class scale_competency_item_statistics_exporter extends exporter {
                 'type' => PARAM_INT
             ),
             'name' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'color' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             )
         );
     }
@@ -77,7 +77,7 @@ class scale_competency_item_statistics_exporter extends exporter {
 
         foreach ($this->related['users'] as $user) {
             $uc = (isset($user->usercompetency)) ? $user->usercompetency : $user->usercompetencyplan;
-            if ($this->data->value == $uc->get_grade()) {
+            if ($this->data->value == $uc->get('grade')) {
                 $userexporter = new scale_value_user_exporter($user->userinfo);
                 $result->listusers[] = $userexporter->export($output);
                 $result->nbusers++;

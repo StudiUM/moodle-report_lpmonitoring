@@ -49,7 +49,6 @@ if (!$iscurrentuser) {
 }
 
 // Set css.
-$PAGE->requires->css('/report/lpmonitoring/style/font-awesome-import.css');
 $PAGE->requires->css('/report/lpmonitoring/style/checkbox.css');
 $PAGE->requires->css('/report/lpmonitoring/style/datatables.css');
 $PAGE->set_context($context);

@@ -31,7 +31,7 @@ use report_lpmonitoring\api;
 use core_competency\api as core_competency_api;
 use tool_cohortroles\api as tool_cohortroles_api;
 use report_lpmonitoring\report_competency_config;
-use core_competency\invalid_persistent_exception;
+use core\invalid_persistent_exception;
 
 /**
  * API tests.
@@ -145,19 +145,19 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         );
         $this->frameworkincategory = $cpg->create_framework($framework);
         $this->comp1 = $cpg->create_competency(array(
-            'competencyframeworkid' => $this->frameworkincategory->get_id(),
+            'competencyframeworkid' => $this->frameworkincategory->get('id'),
             'shortname' => 'Competency A')
         );
 
         $this->comp2 = $cpg->create_competency(array(
-            'competencyframeworkid' => $this->frameworkincategory->get_id(),
+            'competencyframeworkid' => $this->frameworkincategory->get('id'),
             'shortname' => 'Competency B')
         );
         // Create template competency.
-        $cpg->create_template_competency(array('templateid' => $this->templateincategory->get_id(),
-            'competencyid' => $this->comp1->get_id()));
-        $cpg->create_template_competency(array('templateid' => $this->templateincategory->get_id(),
-            'competencyid' => $this->comp2->get_id()));
+        $cpg->create_template_competency(array('templateid' => $this->templateincategory->get('id'),
+            'competencyid' => $this->comp1->get('id')));
+        $cpg->create_template_competency(array('templateid' => $this->templateincategory->get('id'),
+            'competencyid' => $this->comp2->get('id')));
 
         $this->user1 = $dg->create_user(array(
             'firstname' => 'Rebecca',
@@ -201,7 +201,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         cohort_add_member($cohort->id, $this->user2->id);
 
         // Generate plans for cohort.
-        core_competency_api::create_plans_from_template_cohort($this->templateincategory->get_id(), $cohort->id);
+        core_competency_api::create_plans_from_template_cohort($this->templateincategory->get('id'), $cohort->id);
         // Create plan from template for Stephanie.
         $syscontext = context_system::instance();
 
@@ -313,25 +313,25 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         ));
 
         $lpg->create_competency(array(
-            'competencyframeworkid' => $framework1->get_id(),
+            'competencyframeworkid' => $framework1->get('id'),
             'scaleid' => $scale3->id,
             'scaleconfiguration' => $c3scaleconfig
         ));
         $lpg->create_competency(array(
-            'competencyframeworkid' => $framework2->get_id(),
+            'competencyframeworkid' => $framework2->get('id'),
             'scaleid' => $scale4->id,
             'scaleconfiguration' => $c4scaleconfig
         ));
 
         $this->setAdminUser();
-        $scales = api::get_scales_from_framework($framework1->get_id());
+        $scales = api::get_scales_from_framework($framework1->get('id'));
         $this->assertCount(2, $scales);
         $this->assertEquals(array(
             $scale1->id => array('id' => $scale1->id, 'name' => $scale1->name),
             $scale3->id => array('id' => $scale3->id, 'name' => $scale3->name)
         ), $scales);
 
-        $scales = api::get_scales_from_framework($framework2->get_id());
+        $scales = api::get_scales_from_framework($framework2->get('id'));
         $this->assertCount(2, $scales);
         $this->assertEquals(array(
             $scale2->id => array('id' => $scale2->id, 'name' => $scale2->name),
@@ -351,9 +351,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scale = $dg->create_scale(array('scale' => 'A,B,C,D'));
         $framework = $cpg->create_framework();
 
-        $scaleconfig = api::read_report_competency_config($framework->get_id(), $scale->id);
+        $scaleconfig = api::read_report_competency_config($framework->get('id'), $scale->id);
 
-        $scaleconfig = json_decode($scaleconfig->get_scaleconfiguration());
+        $scaleconfig = json_decode($scaleconfig->get('scaleconfiguration'));
         $this->assertEquals($scaleconfig[0]->color, report_competency_config::DEFAULT_COLOR);
         $this->assertEquals($scaleconfig[1]->color, report_competency_config::DEFAULT_COLOR);
         $this->assertEquals($scaleconfig[2]->color, report_competency_config::DEFAULT_COLOR);
@@ -378,7 +378,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
+        $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
 
@@ -410,15 +410,15 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
+        $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
 
         $reportconfig = api::create_report_competency_config($record);
-        $this->assertEquals($reportconfig->get_competencyframeworkid(), $framework->get_id());
-        $this->assertEquals($reportconfig->get_scaleid(), $scale->id);
+        $this->assertEquals($reportconfig->get('competencyframeworkid'), $framework->get('id'));
+        $this->assertEquals($reportconfig->get('scaleid'), $scale->id);
 
-        $scaleconfig = json_decode($reportconfig->get_scaleconfiguration());
+        $scaleconfig = json_decode($reportconfig->get('scaleconfiguration'));
         $this->assertEquals($scaleconfig[0]->color, '#AAAAA');
         $this->assertEquals($scaleconfig[1]->color, '#BBBBB');
         $this->assertEquals($scaleconfig[2]->color, '#CCCCC');
@@ -442,7 +442,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
+        $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
 
@@ -472,7 +472,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
+        $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id + 10;
         $record->scaleconfiguration = json_encode($scaleconfig);
 
@@ -502,7 +502,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
+        $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id + 10;
         $record->scaleconfiguration = json_encode($scaleconfig);
 
@@ -532,7 +532,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale->id,
                 'scaleconfiguration' => $scaleconfig));
 
@@ -575,7 +575,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale->id,
                 'scaleconfiguration' => $scaleconfig));
 
@@ -593,11 +593,11 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $result = api::update_report_competency_config($record);
         $this->assertTrue($result);
 
-        $reportconfig = api::read_report_competency_config($framework->get_id(), $scale->id);
-        $this->assertEquals($reportconfig->get_competencyframeworkid(), $framework->get_id());
-        $this->assertEquals($reportconfig->get_scaleid(), $scale->id);
+        $reportconfig = api::read_report_competency_config($framework->get('id'), $scale->id);
+        $this->assertEquals($reportconfig->get('competencyframeworkid'), $framework->get('id'));
+        $this->assertEquals($reportconfig->get('scaleid'), $scale->id);
 
-        $scaleconfig = json_decode($reportconfig->get_scaleconfiguration());
+        $scaleconfig = json_decode($reportconfig->get('scaleconfiguration'));
         $this->assertEquals($scaleconfig[0]->color, '#AAAAA');
         $this->assertEquals($scaleconfig[1]->color, '#XXXXX');
         $this->assertEquals($scaleconfig[2]->color, '#CCCCC');
@@ -622,7 +622,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale->id,
                 'scaleconfiguration' => $scaleconfig));
 
@@ -664,7 +664,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale->id,
                 'scaleconfiguration' => $scaleconfig));
 
@@ -705,7 +705,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale->id,
                 'scaleconfiguration' => $scaleconfig));
 
@@ -714,7 +714,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->setUser($this->appreciator);
 
         try {
-            api::delete_report_competency_config($framework->get_id(), $scale->id);
+            api::delete_report_competency_config($framework->get('id'), $scale->id);
             $this->fail('Configuration can not be deleted when user does not have capability');
         } catch (required_capability_exception $e) {
             $this->assertTrue(true);
@@ -742,7 +742,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $reportconfig1 = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig1 = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale1->id,
                 'scaleconfiguration' => $scaleconfig));
 
@@ -752,13 +752,13 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#YYYYY');
         $scaleconfig[] = array('id' => 4, 'color' => '#ZZZZZ');
 
-        $reportconfig2 = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig2 = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale2->id,
                 'scaleconfiguration' => $scaleconfig));
 
         $this->assertEquals(2, $DB->count_records(report_competency_config::TABLE));
 
-        $result = api::delete_report_competency_config($framework->get_id());
+        $result = api::delete_report_competency_config($framework->get('id'));
         // Check all configurations associated to the framework are deleted.
         $this->assertTrue($result);
         $this->assertEquals(0, $DB->count_records(report_competency_config::TABLE));
@@ -785,7 +785,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $reportconfig1 = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig1 = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale1->id,
                 'scaleconfiguration' => $scaleconfig));
 
@@ -795,13 +795,13 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#YYYYY');
         $scaleconfig[] = array('id' => 4, 'color' => '#ZZZZZ');
 
-        $reportconfig2 = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get_id(),
+        $reportconfig2 = $lpg->create_report_competency_config(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scale2->id,
                 'scaleconfiguration' => $scaleconfig));
 
         $this->assertEquals(2, $DB->count_records(report_competency_config::TABLE));
 
-        $result = api::delete_report_competency_config($framework->get_id(), $scale1->id);
+        $result = api::delete_report_competency_config($framework->get('id'), $scale1->id);
 
         // Check specific scale configurations is deleted.
         $this->assertTrue($result);
@@ -814,15 +814,15 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     public function test_read_plan_with_nopermissions() {
         $this->setUser($this->appreciatorforcategory);
         // Test we can read the first plan for the template (Rebecca).
-        $result = api::read_plan(0, $this->templateincategory->get_id());
-        $this->assertEquals($this->user1->id, $result->current->get_userid());
+        $result = api::read_plan(0, $this->templateincategory->get('id'));
+        $this->assertEquals($this->user1->id, $result->current->get('userid'));
         $this->setAdminUser();
-        $planstephanie = core_competency_api::create_plan_from_template($this->templateincategory->get_id(), $this->user3->id);
+        $planstephanie = core_competency_api::create_plan_from_template($this->templateincategory->get('id'), $this->user3->id);
 
         $this->setUser($this->appreciatorforcategory);
         // Test we can not read Stephanie learning plan (do not belong to the cohort).
         try {
-            api::read_plan($planstephanie->get_id(), $this->templateincategory->get_id());
+            api::read_plan($planstephanie->get('id'), $this->templateincategory->get('id'));
             $this->fail("We don't have read plan permission for Stephanie Grant");
         } catch (Exception $ex) {
             $this->assertContains('Stepanie Grant', $ex->getMessage());
@@ -846,77 +846,77 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         $f1 = $lpg->create_framework();
 
-        $c1a = $lpg->create_competency(array('competencyframeworkid' => $f1->get_id()));
-        $c1b = $lpg->create_competency(array('competencyframeworkid' => $f1->get_id()));
-        $c1c = $lpg->create_competency(array('competencyframeworkid' => $f1->get_id()));
+        $c1a = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id')));
+        $c1b = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id')));
+        $c1c = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id')));
 
         $tpl1 = $lpg->create_template();
         $tpl2 = $lpg->create_template();
-        $lpg->create_template_competency(array('templateid' => $tpl1->get_id(), 'competencyid' => $c1a->get_id()));
-        $lpg->create_template_competency(array('templateid' => $tpl1->get_id(), 'competencyid' => $c1c->get_id()));
+        $lpg->create_template_competency(array('templateid' => $tpl1->get('id'), 'competencyid' => $c1a->get('id')));
+        $lpg->create_template_competency(array('templateid' => $tpl1->get('id'), 'competencyid' => $c1c->get('id')));
 
-        $plan1 = $lpg->create_plan(array('userid' => $user1->id, 'templateid' => $tpl1->get_id()));
-        $plan2 = $lpg->create_plan(array('userid' => $user2->id, 'templateid' => $tpl1->get_id()));
-        $plan3 = $lpg->create_plan(array('userid' => $user3->id, 'templateid' => $tpl1->get_id()));
+        $plan1 = $lpg->create_plan(array('userid' => $user1->id, 'templateid' => $tpl1->get('id')));
+        $plan2 = $lpg->create_plan(array('userid' => $user2->id, 'templateid' => $tpl1->get('id')));
+        $plan3 = $lpg->create_plan(array('userid' => $user3->id, 'templateid' => $tpl1->get('id')));
         $plan4 = $lpg->create_plan(array('userid' => $user1->id));
 
         // Test plan not based on a template.
-        $result = api::read_plan($plan4->get_id());
-        $apiplan = core_competency_api::read_plan($plan4->get_id());
+        $result = api::read_plan($plan4->get('id'));
+        $apiplan = core_competency_api::read_plan($plan4->get('id'));
         $this->assertEquals($apiplan, $result->current);
         $this->assertNull($result->previous);
         $this->assertNull($result->next);
 
         // Test plan based on a template that is is the first in the list of plans.
-        $result = api::read_plan($plan1->get_id(), $tpl1->get_id());
-        $apiplan = core_competency_api::read_plan($plan1->get_id());
+        $result = api::read_plan($plan1->get('id'), $tpl1->get('id'));
+        $apiplan = core_competency_api::read_plan($plan1->get('id'));
         $this->assertEquals($apiplan, $result->current);
         $this->assertNull($result->previous);
         $this->assertNotNull($result->next);
         $this->assertEquals($user2->id, $result->next->userid);
         $this->assertEquals('Jonathan Cortez', $result->next->fullname);
         $this->assertEquals($user2->email, $result->next->email);
-        $this->assertEquals($plan2->get_id(), $result->next->planid);
+        $this->assertEquals($plan2->get('id'), $result->next->planid);
 
         // Test plan based on a template that is in the middle in the list of plans.
-        $result = api::read_plan($plan2->get_id(), $tpl1->get_id());
-        $apiplan = core_competency_api::read_plan($plan2->get_id());
+        $result = api::read_plan($plan2->get('id'), $tpl1->get('id'));
+        $apiplan = core_competency_api::read_plan($plan2->get('id'));
         $this->assertEquals($apiplan, $result->current);
         $this->assertNotNull($result->previous);
         $this->assertEquals($user1->id, $result->previous->userid);
         $this->assertEquals('Sharon Austin', $result->previous->fullname);
         $this->assertEquals($user1->email, $result->previous->email);
-        $this->assertEquals($plan1->get_id(), $result->previous->planid);
+        $this->assertEquals($plan1->get('id'), $result->previous->planid);
         $this->assertNotNull($result->next);
         $this->assertEquals($user3->id, $result->next->userid);
         $this->assertEquals('Alicia Underwood', $result->next->fullname);
         $this->assertEquals($user3->email, $result->next->email);
-        $this->assertEquals($plan3->get_id(), $result->next->planid);
+        $this->assertEquals($plan3->get('id'), $result->next->planid);
 
         // Test plan based on a template that is the last in the list of plans.
-        $result = api::read_plan($plan3->get_id(), $tpl1->get_id());
-        $apiplan = core_competency_api::read_plan($plan3->get_id());
+        $result = api::read_plan($plan3->get('id'), $tpl1->get('id'));
+        $apiplan = core_competency_api::read_plan($plan3->get('id'));
         $this->assertEquals($apiplan, $result->current);
         $this->assertNotNull($result->previous);
         $this->assertEquals($user2->id, $result->previous->userid);
         $this->assertEquals('Jonathan Cortez', $result->previous->fullname);
         $this->assertEquals($user2->email, $result->previous->email);
-        $this->assertEquals($plan2->get_id(), $result->previous->planid);
+        $this->assertEquals($plan2->get('id'), $result->previous->planid);
         $this->assertNull($result->next);
 
         // Test reading of plan when passing only the template ID.
-        $result = api::read_plan(0, $tpl1->get_id());
-        $apiplan = core_competency_api::read_plan($plan1->get_id());
+        $result = api::read_plan(0, $tpl1->get('id'));
+        $apiplan = core_competency_api::read_plan($plan1->get('id'));
         $this->assertEquals($apiplan, $result->current);
         $this->assertNull($result->previous);
         $this->assertNotNull($result->next);
         $this->assertEquals($user2->id, $result->next->userid);
         $this->assertEquals('Jonathan Cortez', $result->next->fullname);
         $this->assertEquals($user2->email, $result->next->email);
-        $this->assertEquals($plan2->get_id(), $result->next->planid);
+        $this->assertEquals($plan2->get('id'), $result->next->planid);
 
         // Test template with no plan.
-        $result = api::read_plan(0, $tpl2->get_id());
+        $result = api::read_plan(0, $tpl2->get('id'));
     }
 
     /**
@@ -924,10 +924,10 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
      */
     public function test_search_users_by_templateid() {
         $this->setUser($this->appreciatorforcategory);
-        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Re');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Re');
         $this->assertCount(1, $users);
 
-        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 't');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 't');
         $this->assertCount(2, $users);
     }
 
@@ -939,7 +939,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Test with show user identity disabled.
         set_config('showuseridentity', '');
-        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Rebecca');
         $this->assertCount(1, $users);
         $this->assertEmpty(isset($users[$this->user1->id]['email']));
         $this->assertFalse(isset($users[$this->user1->id]['phone1']));
@@ -949,7 +949,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Add email to show user identity.
         set_config('showuseridentity', 'email');
-        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Rebecca');
         $this->assertCount(1, $users);
         $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
         $this->assertFalse(isset($users[$this->user1->id]['phone1']));
@@ -959,7 +959,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Add phone1 to show user identity.
         set_config('showuseridentity', 'email,phone1');
-        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Rebecca');
         $this->assertCount(1, $users);
         $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
         $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
@@ -969,7 +969,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Add phone2 to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2');
-        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Rebecca');
         $this->assertCount(1, $users);
         $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
         $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
@@ -979,7 +979,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Add institution to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2,institution');
-        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Rebecca');
         $this->assertCount(1, $users);
         $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
         $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
@@ -989,7 +989,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Add department to show user identity.
         set_config('showuseridentity', 'email,phone1,phone2,institution,department');
-        $users = api::search_users_by_templateid($this->templateincategory->get_id(), 'Rebecca');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Rebecca');
         $this->assertCount(1, $users);
         $this->assertEquals('user11test@nomail.com', $users[$this->user1->id]['email']);
         $this->assertEquals(1111111111, $users[$this->user1->id]['phone1']);
@@ -1029,11 +1029,11 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             'scaleconfiguration' => $scaleconfig
         ));
         $c1 = $cpg->create_competency(array(
-                    'competencyframeworkid' => $framework->get_id(),
+                    'competencyframeworkid' => $framework->get('id'),
                     'shortname' => 'c1',
                     'scaleid' => $scale2->id,
                     'scaleconfiguration' => $c2scaleconfig));
-        $c2 = $cpg->create_competency(array('competencyframeworkid' => $framework->get_id(), 'shortname' => 'c2'));
+        $c2 = $cpg->create_competency(array('competencyframeworkid' => $framework->get('id'), 'shortname' => 'c2'));
         $cat1 = $dg->create_category();
         $cat1ctx = context_coursecat::instance($cat1->id);
         $template = $cpg->create_template(array('contextid' => $cat1ctx->id));
@@ -1059,17 +1059,17 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         role_assign($roleprevent, $appreciator->id, $cat1ctx->id);
 
         $tc1 = $cpg->create_template_competency(array(
-            'templateid' => $template->get_id(),
-            'competencyid' => $c1->get_id()
+            'templateid' => $template->get('id'),
+            'competencyid' => $c1->get('id')
         ));
         $tc2 = $cpg->create_template_competency(array(
-            'templateid' => $template->get_id(),
-            'competencyid' => $c2->get_id()
+            'templateid' => $template->get('id'),
+            'competencyid' => $c2->get('id')
         ));
-        $plan1 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user1->id));
-        $plan2 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user2->id));
-        $plan3 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user3->id));
-        $plan4 = $cpg->create_plan(array('templateid' => $template->get_id(), 'userid' => $user4->id));
+        $plan1 = $cpg->create_plan(array('templateid' => $template->get('id'), 'userid' => $user1->id));
+        $plan2 = $cpg->create_plan(array('templateid' => $template->get('id'), 'userid' => $user2->id));
+        $plan3 = $cpg->create_plan(array('templateid' => $template->get('id'), 'userid' => $user3->id));
+        $plan4 = $cpg->create_plan(array('templateid' => $template->get('id'), 'userid' => $user4->id));
 
         $cohort = $this->getDataGenerator()->create_cohort();
         cohort_add_member($cohort->id, $user1->id);
@@ -1078,31 +1078,31 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         cohort_add_member($cohort->id, $user4->id);
 
         // Create some course competencies.
-        $cpg->create_course_competency(array('competencyid' => $c1->get_id(), 'courseid' => $course1->id));
-        $cpg->create_course_competency(array('competencyid' => $c2->get_id(), 'courseid' => $course1->id));
-        $cpg->create_course_competency(array('competencyid' => $c1->get_id(), 'courseid' => $course2->id));
-        $cpg->create_course_competency(array('competencyid' => $c2->get_id(), 'courseid' => $course2->id));
+        $cpg->create_course_competency(array('competencyid' => $c1->get('id'), 'courseid' => $course1->id));
+        $cpg->create_course_competency(array('competencyid' => $c2->get('id'), 'courseid' => $course1->id));
+        $cpg->create_course_competency(array('competencyid' => $c1->get('id'), 'courseid' => $course2->id));
+        $cpg->create_course_competency(array('competencyid' => $c2->get('id'), 'courseid' => $course2->id));
 
         // Rate users in courses.
         // User 1.
-        core_competency_api::grade_competency_in_course($course1, $user1->id, $c1->get_id(), 1);
-        core_competency_api::grade_competency_in_course($course2, $user1->id, $c2->get_id(), 2);
+        core_competency_api::grade_competency_in_course($course1, $user1->id, $c1->get('id'), 1);
+        core_competency_api::grade_competency_in_course($course2, $user1->id, $c2->get('id'), 2);
 
         // User 2.
-        core_competency_api::grade_competency_in_course($course1, $user2->id, $c1->get_id(), 2);
-        core_competency_api::grade_competency_in_course($course2, $user2->id, $c1->get_id(), 1);
-        core_competency_api::grade_competency_in_course($course2, $user2->id, $c2->get_id(), 3);
+        core_competency_api::grade_competency_in_course($course1, $user2->id, $c1->get('id'), 2);
+        core_competency_api::grade_competency_in_course($course2, $user2->id, $c1->get('id'), 1);
+        core_competency_api::grade_competency_in_course($course2, $user2->id, $c2->get('id'), 3);
 
         // User 3.
-        core_competency_api::grade_competency_in_course($course1, $user3->id, $c1->get_id(), 3);
-        core_competency_api::grade_competency_in_course($course2, $user3->id, $c2->get_id(), 4);
+        core_competency_api::grade_competency_in_course($course1, $user3->id, $c1->get('id'), 3);
+        core_competency_api::grade_competency_in_course($course2, $user3->id, $c2->get('id'), 4);
 
         // Rate users in plan.
         // User1.
-        core_competency_api::grade_competency_in_plan($plan1, $c1->get_id(), 1);
-        core_competency_api::grade_competency_in_plan($plan1, $c2->get_id(), 2);
+        core_competency_api::grade_competency_in_plan($plan1, $c1->get('id'), 1);
+        core_competency_api::grade_competency_in_plan($plan1, $c2->get('id'), 2);
         // User2.
-        core_competency_api::grade_competency_in_plan($plan2, $c1->get_id(), 2);
+        core_competency_api::grade_competency_in_plan($plan2, $c1->get('id'), 2);
 
         $roleid = create_role('Role', 'appreciatorrole', 'mmmm');
         $params = (object) array(
@@ -1119,7 +1119,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 2),
             array('scaleid' => $scale2->id, 'scalevalue' => 3),
         );
-        $users = api::search_users_by_templateid($template->get_id(), '', $scalevalues);
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues);
         $this->assertCount(3, $users);
         $userinfo = array_values($users);
         $this->assertEquals(array($userinfo[0]['fullname'], $userinfo[1]['fullname'], $userinfo[2]['fullname']),
@@ -1131,7 +1131,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertEquals(2, $userinfo[2]['nbrating']);
         $this->assertEquals("User12 Lastname2", $userinfo[2]['fullname']);
         // Test with order DESC.
-        $users = api::search_users_by_templateid($template->get_id(), '', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, true, 'DESC');
         $userinfo = array_values($users);
         $this->assertEquals(2, $userinfo[0]['nbrating']);
         $this->assertEquals("User12 Lastname2", $userinfo[0]['fullname']);
@@ -1145,7 +1145,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 1),
             array('scaleid' => $scale2->id, 'scalevalue' => 2),
         );
-        $users = api::search_users_by_templateid($template->get_id(), '', $scalevalues, false, 'ASC');
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, false, 'ASC');
         $this->assertCount(2, $users);
         $userinfo = array_values($users);
         $this->assertEquals(1, $userinfo[0]['nbrating']);
@@ -1153,7 +1153,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertEquals(2, $userinfo[1]['nbrating']);
         $this->assertEquals('User11 Lastname1', $userinfo[1]['fullname']);
         // Test with scales order DESC.
-        $users = api::search_users_by_templateid($template->get_id(), '', $scalevalues, false, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, false, 'DESC');
         $this->assertCount(2, $users);
         $userinfo = array_values($users);
         $this->assertEquals(2, $userinfo[0]['nbrating']);
@@ -1166,7 +1166,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 3),
             array('scaleid' => $scale1->id, 'scalevalue' => 2),
         );
-        $users = api::search_users_by_templateid($template->get_id(), '', $scalevalues);
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues);
         $this->assertCount(3, $users);
         $userinfo = array_values($users);
         $this->assertEquals(array($userinfo[0]['fullname'], $userinfo[1]['fullname'], $userinfo[2]['fullname']),
@@ -1176,7 +1176,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scalevalues = array(
             array('scaleid' => $scale2->id, 'scalevalue' => 6),
         );
-        $users = api::search_users_by_templateid($template->get_id(), '', $scalevalues);
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues);
         $this->assertCount(0, $users);
 
         // Test search users in completed plans.
@@ -1188,15 +1188,15 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         );
         // Create new plan for the same user/comptencies and make some different ratings.
         $manualplan = $cpg->create_plan(array('userid' => $user1->id, 'status' => plan::STATUS_ACTIVE));
-        $cpg->create_plan_competency(array('planid' => $manualplan->get_id(), 'competencyid' => $c1->get_id()));
-        $cpg->create_plan_competency(array('planid' => $manualplan->get_id(), 'competencyid' => $c2->get_id()));
+        $cpg->create_plan_competency(array('planid' => $manualplan->get('id'), 'competencyid' => $c1->get('id')));
+        $cpg->create_plan_competency(array('planid' => $manualplan->get('id'), 'competencyid' => $c2->get('id')));
 
-        core_competency_api::grade_competency_in_plan($manualplan, $c1->get_id(), 3);
-        core_competency_api::grade_competency_in_plan($manualplan, $c2->get_id(), 4);
+        core_competency_api::grade_competency_in_plan($manualplan, $c1->get('id'), 3);
+        core_competency_api::grade_competency_in_plan($manualplan, $c2->get('id'), 4);
 
         // Now we have 2 different ratings for user1/competencies in active plan.
         $this->setUser($appreciator);
-        $users = api::search_users_by_templateid($template->get_id(), 'User11', $scalevalues, false, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User11', $scalevalues, false, 'DESC');
         $this->assertCount(1, $users);
         $this->assertEquals('User11 Lastname1', $users[$user1->id]['fullname']);
         // The 2 ratings from completed plan should be returned.
@@ -1208,7 +1208,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 3),
             array('scaleid' => $scale1->id, 'scalevalue' => 4)
         );
-        $users = api::search_users_by_templateid($template->get_id(), 'User11', $scalevalues, false, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User11', $scalevalues, false, 'DESC');
         $this->assertCount(0, $users);
 
         // Test when user is unsubscribed from course 1.
@@ -1222,7 +1222,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 3),
             array('scaleid' => $scale1->id, 'scalevalue' => 4)
         );
-        $users = api::search_users_by_templateid($template->get_id(), 'User3', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User3', $scalevalues, true, 'DESC');
         $this->assertCount(1, $users);
         $this->assertEquals('User3 Lastname3', $users[$user3->id]['fullname']);
         $this->assertEquals(1, $users[$user3->id]['nbrating']);
@@ -1234,29 +1234,29 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $enrol->unenrol_user($instance, $user3->id);
 
         $this->setUser($appreciator);
-        $users = api::search_users_by_templateid($template->get_id(), 'User3', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User3', $scalevalues, true, 'DESC');
         $this->assertCount(0, $users);
 
         // Test when competency 1 removed from course 1.
         $this->setAdminUser();
-        core_competency_api::remove_competency_from_course($course1->id, $c1->get_id());
+        core_competency_api::remove_competency_from_course($course1->id, $c1->get('id'));
 
         $this->setUser($appreciator);
         $scalevalues = array(
             array('scaleid' => $scale2->id, 'scalevalue' => 1),
             array('scaleid' => $scale2->id, 'scalevalue' => 2)
         );
-        $users = api::search_users_by_templateid($template->get_id(), 'User12', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User12', $scalevalues, true, 'DESC');
         $this->assertCount(1, $users);
         $this->assertEquals('User12 Lastname2', $users[$user2->id]['fullname']);
         $this->assertEquals(1, $users[$user2->id]['nbrating']);
 
         // Test when competency 1 removed from course 2.
         $this->setAdminUser();
-        core_competency_api::remove_competency_from_course($course2->id, $c1->get_id());
+        core_competency_api::remove_competency_from_course($course2->id, $c1->get('id'));
 
         $this->setUser($appreciator);
-        $users = api::search_users_by_templateid($template->get_id(), 'User12', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User12', $scalevalues, true, 'DESC');
         $this->assertCount(0, $users);
 
     }
@@ -1281,23 +1281,23 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Create framework with competencies.
         $framework = $lpg->create_framework();
-        $comp0 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
-        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id(),
-                'parentid' => $comp0->get_id(), 'path' => '0/'. $comp0->get_id()));                 // In C1, and C2.
-        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));   // In C2.
-        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));   // In None.
-        $comp4 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));   // In C4.
+        $comp0 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id'),
+                'parentid' => $comp0->get('id'), 'path' => '0/'. $comp0->get('id')));                 // In C1, and C2.
+        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));   // In C2.
+        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));   // In None.
+        $comp4 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));   // In C4.
 
         // Create plan for user1.
         $plan = $lpg->create_plan(array('userid' => $u1->id, 'status' => plan::STATUS_ACTIVE));
-        $lpg->create_plan_competency(array('planid' => $plan->get_id(), 'competencyid' => $comp1->get_id()));
+        $lpg->create_plan_competency(array('planid' => $plan->get('id'), 'competencyid' => $comp1->get('id')));
 
         // Associated competencies to courses.
-        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $c1->id));
-        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $c3->id));
-        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $c2->id));
-        $lpg->create_course_competency(array('competencyid' => $comp2->get_id(), 'courseid' => $c2->id));
-        $lpg->create_course_competency(array('competencyid' => $comp4->get_id(), 'courseid' => $c4->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get('id'), 'courseid' => $c1->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get('id'), 'courseid' => $c3->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get('id'), 'courseid' => $c2->id));
+        $lpg->create_course_competency(array('competencyid' => $comp2->get('id'), 'courseid' => $c2->id));
+        $lpg->create_course_competency(array('competencyid' => $comp4->get('id'), 'courseid' => $c4->id));
 
         // Create scale report configuration.
         $scaleconfig[] = array('id' => 1, 'name' => 'A',  'color' => '#AAAAA');
@@ -1306,8 +1306,8 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
-        $record->scaleid = $framework->get_scaleid();
+        $record->competencyframeworkid = $framework->get('id');
+        $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
         $mpg->create_report_competency_config($record);
 
@@ -1323,7 +1323,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $record1 = new \stdClass();
         $record1->userid = $u1->id;
         $record1->courseid = $c1->id;
-        $record1->competencyid = $comp1->get_id();
+        $record1->competencyid = $comp1->get('id');
         $record1->proficiency = 1;
         $record1->grade = 1;
         $record1->timecreated = 10;
@@ -1333,7 +1333,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $record2 = new \stdClass();
         $record2->userid = $u1->id;
         $record2->courseid = $c2->id;
-        $record2->competencyid = $comp1->get_id();
+        $record2->competencyid = $comp1->get('id');
         $record2->proficiency = 0;
         $record2->grade = 2;
         $record2->timecreated = 10;
@@ -1342,14 +1342,14 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $DB->insert_records('competency_usercompcourse', array($record1, $record2));
 
         // Create user competency and add an evidence.
-        $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp1->get_id(),
+        $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp1->get('id'),
             'proficiency' => true, 'grade' => 1));
 
         // Add prior learning evidence.
         $ue1 = $lpg->create_user_evidence(array('userid' => $u1->id));
 
         // Associate the prior learning evidence to competency.
-        $lpg->create_user_evidence_competency(array('userevidenceid' => $ue1->get_id(), 'competencyid' => $comp1->get_id()));
+        $lpg->create_user_evidence_competency(array('userevidenceid' => $ue1->get('id'), 'competencyid' => $comp1->get('id')));
 
         // Create modules.
         $data = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c1->id));
@@ -1371,13 +1371,13 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $gradegrade->insert();
 
         // Create an evidence for the user prior learning evidence.
-        $e1 = $lpg->create_evidence(array('usercompetencyid' => $uc->get_id(),
+        $e1 = $lpg->create_evidence(array('usercompetencyid' => $uc->get('id'),
             'contextid' => \context_user::instance($u1->id)->id));
 
         // Add evidences for courses C1, C2.
-        $lpg->create_evidence(array('usercompetencyid' => $uc->get_id(),
+        $lpg->create_evidence(array('usercompetencyid' => $uc->get('id'),
             'contextid' => \context_course::instance($c1->id)->id));
-        $lpg->create_evidence(array('usercompetencyid' => $uc->get_id(),
+        $lpg->create_evidence(array('usercompetencyid' => $uc->get('id'),
             'contextid' => \context_course::instance($c2->id)->id));
 
         // Assign final grade for the course C1.
@@ -1394,14 +1394,14 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $context = context_course::instance($c2->id);
         $this->assign_good_letter_boundary($context->id);
 
-        $result = api::get_competency_detail($u1->id, $comp1->get_id(), $plan->get_id());
+        $result = api::get_competency_detail($u1->id, $comp1->get('id'), $plan->get('id'));
 
         // User competency is found and has the right information.
         $this->assertNotNull($result->usercompetency);
-        $this->assertEquals($uc->get_userid(), $result->usercompetency->get_userid());
-        $this->assertEquals($uc->get_competencyid(), $result->usercompetency->get_competencyid());
-        $this->assertEquals($uc->get_proficiency(), $result->usercompetency->get_proficiency());
-        $this->assertEquals($uc->get_grade(), $result->usercompetency->get_grade());
+        $this->assertEquals($uc->get('userid'), $result->usercompetency->get('userid'));
+        $this->assertEquals($uc->get('competencyid'), $result->usercompetency->get('competencyid'));
+        $this->assertEquals($uc->get('proficiency'), $result->usercompetency->get('proficiency'));
+        $this->assertEquals($uc->get('grade'), $result->usercompetency->get('grade'));
 
         // Check scale configuration of the framework is found.
         $this->assertCount(2, $result->scaleconfig);
@@ -1445,17 +1445,17 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         // Check litteral note: C1 = C+, C2 = A-, C3 not evaluated.
         foreach ($result->courses as $element) {
             if ($element->course->id == $c1->id) {
-                $this->assertEquals(1, $element->usecompetencyincourse->get_grade());
-                $this->assertEquals(1, $element->usecompetencyincourse->get_proficiency());
+                $this->assertEquals(1, $element->usecompetencyincourse->get('grade'));
+                $this->assertEquals(1, $element->usecompetencyincourse->get('proficiency'));
                 $this->assertEquals('C+', $element->gradetxt);
             } else {
                 if ($element->course->id == $c2->id) {
-                    $this->assertEquals(2, $element->usecompetencyincourse->get_grade());
-                    $this->assertEquals(0, $element->usecompetencyincourse->get_proficiency());
+                    $this->assertEquals(2, $element->usecompetencyincourse->get('grade'));
+                    $this->assertEquals(0, $element->usecompetencyincourse->get('proficiency'));
                     $this->assertEquals('A-', $element->gradetxt);
                 } else {
-                    $this->assertNull($element->usecompetencyincourse->get_grade());
-                    $this->assertNull($element->usecompetencyincourse->get_proficiency());
+                    $this->assertNull($element->usecompetencyincourse->get('grade'));
+                    $this->assertNull($element->usecompetencyincourse->get('proficiency'));
                     $this->assertEquals('-', $element->gradetxt);
                 }
             }
@@ -1489,24 +1489,24 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Create framework with competencies.
         $framework = $lpg->create_framework();
-        $comp0 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
-        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id(),
+        $comp0 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id'),
                 'scaleid' => $scalecomp->id, 'scaleconfiguration' => $scaleconfigcomp,
-                'parentid' => $comp0->get_id(), 'path' => '0/'. $comp0->get_id()));                 // In C1, and C2.
-        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));   // In C2.
-        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));   // In None.
-        $comp4 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));   // In C4.
+                'parentid' => $comp0->get('id'), 'path' => '0/'. $comp0->get('id')));                 // In C1, and C2.
+        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));   // In C2.
+        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));   // In None.
+        $comp4 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));   // In C4.
 
         // Create plan for user1.
         $plan = $lpg->create_plan(array('userid' => $u1->id, 'status' => plan::STATUS_ACTIVE));
-        $lpg->create_plan_competency(array('planid' => $plan->get_id(), 'competencyid' => $comp1->get_id()));
+        $lpg->create_plan_competency(array('planid' => $plan->get('id'), 'competencyid' => $comp1->get('id')));
 
         // Associated competencies to courses.
-        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $c1->id));
-        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $c3->id));
-        $lpg->create_course_competency(array('competencyid' => $comp1->get_id(), 'courseid' => $c2->id));
-        $lpg->create_course_competency(array('competencyid' => $comp2->get_id(), 'courseid' => $c2->id));
-        $lpg->create_course_competency(array('competencyid' => $comp4->get_id(), 'courseid' => $c4->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get('id'), 'courseid' => $c1->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get('id'), 'courseid' => $c3->id));
+        $lpg->create_course_competency(array('competencyid' => $comp1->get('id'), 'courseid' => $c2->id));
+        $lpg->create_course_competency(array('competencyid' => $comp2->get('id'), 'courseid' => $c2->id));
+        $lpg->create_course_competency(array('competencyid' => $comp4->get('id'), 'courseid' => $c4->id));
 
         // Create scale report configuration for the scale of framework.
         $scaleconfig = array();
@@ -1516,8 +1516,8 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
-        $record->scaleid = $framework->get_scaleid();
+        $record->competencyframeworkid = $framework->get('id');
+        $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
         $mpg->create_report_competency_config($record);
 
@@ -1529,7 +1529,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'name' => 'Z',  'color' => '#ZZZZZ');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
+        $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scalecomp->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
         $mpg->create_report_competency_config($record);
@@ -1546,7 +1546,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $record1 = new \stdClass();
         $record1->userid = $u1->id;
         $record1->courseid = $c1->id;
-        $record1->competencyid = $comp1->get_id();
+        $record1->competencyid = $comp1->get('id');
         $record1->proficiency = 1;
         $record1->grade = 2;
         $record1->timecreated = 10;
@@ -1556,7 +1556,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $record2 = new \stdClass();
         $record2->userid = $u1->id;
         $record2->courseid = $c2->id;
-        $record2->competencyid = $comp1->get_id();
+        $record2->competencyid = $comp1->get('id');
         $record2->proficiency = 0;
         $record2->grade = 4;
         $record2->timecreated = 10;
@@ -1565,13 +1565,13 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $DB->insert_records('competency_usercompcourse', array($record1, $record2));
 
         // Create user competency and add an evidence.
-        $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp1->get_id()));
+        $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp1->get('id')));
 
         // Add prior learning evidence.
         $ue1 = $lpg->create_user_evidence(array('userid' => $u1->id));
 
         // Associate the prior learning evidence to competency.
-        $lpg->create_user_evidence_competency(array('userevidenceid' => $ue1->get_id(), 'competencyid' => $comp1->get_id()));
+        $lpg->create_user_evidence_competency(array('userevidenceid' => $ue1->get('id'), 'competencyid' => $comp1->get('id')));
 
         // Create modules.
         $data = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c1->id));
@@ -1593,13 +1593,13 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $gradegrade->insert();
 
         // Create an evidence for the user prior learning evidence.
-        $e1 = $lpg->create_evidence(array('usercompetencyid' => $uc->get_id(),
+        $e1 = $lpg->create_evidence(array('usercompetencyid' => $uc->get('id'),
             'contextid' => \context_user::instance($u1->id)->id));
 
         // Add evidences for courses C1, C2.
-        $lpg->create_evidence(array('usercompetencyid' => $uc->get_id(),
+        $lpg->create_evidence(array('usercompetencyid' => $uc->get('id'),
             'contextid' => \context_course::instance($c1->id)->id));
-        $lpg->create_evidence(array('usercompetencyid' => $uc->get_id(),
+        $lpg->create_evidence(array('usercompetencyid' => $uc->get('id'),
             'contextid' => \context_course::instance($c2->id)->id));
 
         // Assign final grade for the course C1.
@@ -1616,14 +1616,14 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $context = context_course::instance($c2->id);
         $this->assign_good_letter_boundary($context->id);
 
-        $result = api::get_competency_detail($u1->id, $comp1->get_id(), $plan->get_id());
+        $result = api::get_competency_detail($u1->id, $comp1->get('id'), $plan->get('id'));
 
         // User competency is found and has the right information.
         $this->assertNotNull($result->usercompetency);
-        $this->assertEquals($uc->get_userid(), $result->usercompetency->get_userid());
-        $this->assertEquals($uc->get_competencyid(), $result->usercompetency->get_competencyid());
-        $this->assertNull($result->usercompetency->get_proficiency());
-        $this->assertNull($result->usercompetency->get_grade());
+        $this->assertEquals($uc->get('userid'), $result->usercompetency->get('userid'));
+        $this->assertEquals($uc->get('competencyid'), $result->usercompetency->get('competencyid'));
+        $this->assertNull($result->usercompetency->get('proficiency'));
+        $this->assertNull($result->usercompetency->get('grade'));
 
         // Check scale configuration of the competency is found.
         $this->assertCount(3, $result->scaleconfig);
@@ -1668,17 +1668,17 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         // Check litteral note: C1 = C+, C2 = A-, C3 not evaluated.
         foreach ($result->courses as $element) {
             if ($element->course->id == $c1->id) {
-                $this->assertEquals(2, $element->usecompetencyincourse->get_grade());
-                $this->assertEquals(1, $element->usecompetencyincourse->get_proficiency());
+                $this->assertEquals(2, $element->usecompetencyincourse->get('grade'));
+                $this->assertEquals(1, $element->usecompetencyincourse->get('proficiency'));
                 $this->assertEquals('B+', $element->gradetxt);
             } else {
                 if ($element->course->id == $c2->id) {
-                    $this->assertEquals(4, $element->usecompetencyincourse->get_grade());
-                    $this->assertEquals(0, $element->usecompetencyincourse->get_proficiency());
+                    $this->assertEquals(4, $element->usecompetencyincourse->get('grade'));
+                    $this->assertEquals(0, $element->usecompetencyincourse->get('proficiency'));
                     $this->assertEquals('D+', $element->gradetxt);
                 } else {
-                    $this->assertNull($element->usecompetencyincourse->get_grade());
-                    $this->assertNull($element->usecompetencyincourse->get_proficiency());
+                    $this->assertNull($element->usecompetencyincourse->get('grade'));
+                    $this->assertNull($element->usecompetencyincourse->get('proficiency'));
                     $this->assertEquals('-', $element->gradetxt);
                 }
             }
@@ -1710,22 +1710,22 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $framework = $lpg->create_framework(array('scaleid' => $scale->id, 'scaleconfiguration' => $scaleconfig));
 
         // Associate competencies to framework.
-        $comp0 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
-        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id(),
-                'parentid' => $comp0->get_id(), 'path' => '0/'. $comp0->get_id()));
-        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
-        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
+        $comp0 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id'),
+                'parentid' => $comp0->get('id'), 'path' => '0/'. $comp0->get('id')));
+        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
 
         // Create template with competencies.
         $template = $lpg->create_template();
-        $tempcomp0 = $lpg->create_template_competency(array('templateid' => $template->get_id(),
-            'competencyid' => $comp0->get_id()));
-        $tempcomp1 = $lpg->create_template_competency(array('templateid' => $template->get_id(),
-            'competencyid' => $comp1->get_id()));
-        $tempcomp2 = $lpg->create_template_competency(array('templateid' => $template->get_id(),
-            'competencyid' => $comp2->get_id()));
-        $tempcomp3 = $lpg->create_template_competency(array('templateid' => $template->get_id(),
-            'competencyid' => $comp3->get_id()));
+        $tempcomp0 = $lpg->create_template_competency(array('templateid' => $template->get('id'),
+            'competencyid' => $comp0->get('id')));
+        $tempcomp1 = $lpg->create_template_competency(array('templateid' => $template->get('id'),
+            'competencyid' => $comp1->get('id')));
+        $tempcomp2 = $lpg->create_template_competency(array('templateid' => $template->get('id'),
+            'competencyid' => $comp2->get('id')));
+        $tempcomp3 = $lpg->create_template_competency(array('templateid' => $template->get('id'),
+            'competencyid' => $comp3->get('id')));
 
         // Create scale report configuration.
         $scaleconfig = array();
@@ -1735,26 +1735,26 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
-        $record->scaleid = $framework->get_scaleid();
+        $record->competencyframeworkid = $framework->get('id');
+        $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
         $mpg->create_report_competency_config($record);
 
         // Create plan from template for all users.
-        $plan = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
 
         // Rate user competency1 for all users.
-        $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp1->get_id(),
+        $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp1->get('id'),
             'proficiency' => true, 'grade' => 1));
-        $uc = $lpg->create_user_competency(array('userid' => $u2->id, 'competencyid' => $comp1->get_id(),
+        $uc = $lpg->create_user_competency(array('userid' => $u2->id, 'competencyid' => $comp1->get('id'),
             'proficiency' => false, 'grade' => 3));
-        $uc = $lpg->create_user_competency(array('userid' => $u3->id, 'competencyid' => $comp1->get_id(),
+        $uc = $lpg->create_user_competency(array('userid' => $u3->id, 'competencyid' => $comp1->get('id'),
             'proficiency' => true, 'grade' => 2));
 
-        $result = api::get_competency_statistics($comp1->get_id(), $template->get_id());
-        $this->assertEquals($comp1->get_id(), $result->competency->get_id());
+        $result = api::get_competency_statistics($comp1->get('id'), $template->get('id'));
+        $this->assertEquals($comp1->get('id'), $result->competency->get('id'));
 
         // Check scale configuration of the framework is found.
         $this->assertCount(2, $result->scaleconfig);
@@ -1790,13 +1790,13 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         // Check grade is found for each users.
         foreach ($result->listusers as $user) {
             if ($user->userinfo->id == $u1->id) {
-                $this->assertEquals(1, $user->usercompetency->get_grade());
+                $this->assertEquals(1, $user->usercompetency->get('grade'));
             } else {
                 if ($user->userinfo->id == $u2->id) {
-                    $this->assertEquals(3, $user->usercompetency->get_grade());
+                    $this->assertEquals(3, $user->usercompetency->get('grade'));
 
                 } else {
-                    $this->assertEquals(2, $user->usercompetency->get_grade());
+                    $this->assertEquals(2, $user->usercompetency->get('grade'));
                 }
             }
         }
@@ -1809,16 +1809,16 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->setAdminUser();
 
         // Create plan from template for Stephanie.
-        $planstephanie = core_competency_api::create_plan_from_template($this->templateincategory->get_id(), $this->user3->id);
+        $planstephanie = core_competency_api::create_plan_from_template($this->templateincategory->get('id'), $this->user3->id);
         $syscontext = context_system::instance();
         $this->setUser($this->appreciatorforcategory);
         // Test we can read the first plan for the template (Rebecca).
-        $result = api::read_plan(0, $this->templateincategory->get_id());
-        $this->assertEquals($this->user1->id, $result->current->get_userid());
+        $result = api::read_plan(0, $this->templateincategory->get('id'));
+        $this->assertEquals($this->user1->id, $result->current->get('userid'));
 
         // Test we can not read competency stats because of permissions for Stephanie user competency.
         try {
-            api::get_competency_statistics($this->comp1->get_id(), $this->templateincategory->get_id());
+            api::get_competency_statistics($this->comp1->get('id'), $this->templateincategory->get('id'));
             $this->fail("We don't have read plan permission for Stephanie Grant");
         } catch (Exception $ex) {
             $this->assertContains('Stepanie Grant', $ex->getMessage());
@@ -1850,9 +1850,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $framework = $lpg->create_framework(array('scaleid' => $scale1->id, 'scaleconfiguration' => $scaleconfig));
 
         // Associate competencies to framework.
-        $comp0 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
-        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id(),
-                'parentid' => $comp0->get_id(), 'path' => '0/'. $comp0->get_id()));
+        $comp0 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id'),
+                'parentid' => $comp0->get('id'), 'path' => '0/'. $comp0->get('id')));
 
         // Create second scale and associate it with a competency.
         $scale2 = $dg->create_scale(array('scale' => 'W,X,Y,Z'));
@@ -1860,17 +1860,17 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig = array(array('scaleid' => $scale2->id));
         $scaleconfig[] = array('name' => 'W', 'id' => 1, 'scaledefault' => 0, 'proficient' => 1);
         $scaleconfig[] = array('name' => 'X', 'id' => 2, 'scaledefault' => 1, 'proficient' => 1);
-        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id(),
+        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id'),
             'scaleid' => $scale2->id, 'scaleconfiguration' => $scaleconfig));
 
         // Create template with competencies.
         $template = $lpg->create_template();
-        $tempcomp0 = $lpg->create_template_competency(array('templateid' => $template->get_id(),
-            'competencyid' => $comp0->get_id()));
-        $tempcomp1 = $lpg->create_template_competency(array('templateid' => $template->get_id(),
-            'competencyid' => $comp1->get_id()));
-        $tempcomp2 = $lpg->create_template_competency(array('templateid' => $template->get_id(),
-            'competencyid' => $comp2->get_id()));
+        $tempcomp0 = $lpg->create_template_competency(array('templateid' => $template->get('id'),
+            'competencyid' => $comp0->get('id')));
+        $tempcomp1 = $lpg->create_template_competency(array('templateid' => $template->get('id'),
+            'competencyid' => $comp1->get('id')));
+        $tempcomp2 = $lpg->create_template_competency(array('templateid' => $template->get('id'),
+            'competencyid' => $comp2->get('id')));
 
         // Create scale report configuration.
         $scaleconfig = array();
@@ -1880,7 +1880,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
+        $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale1->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
         $mpg->create_report_competency_config($record);
@@ -1893,26 +1893,26 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 4, 'name' => 'Z',  'color' => '#ZZZZZ');
 
         $record = new stdclass();
-        $record->competencyframeworkid = $framework->get_id();
+        $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale2->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
         $mpg->create_report_competency_config($record);
 
         // Create plan from template for all users.
-        $p1 = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
-        $p2 = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
-        $p3 = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get_id(), 'status' => plan::STATUS_ACTIVE));
+        $p1 = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
+        $p2 = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
+        $p3 = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
 
         // Rate user competency1 for all users.
-        $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp2->get_id(),
+        $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp2->get('id'),
             'proficiency' => true, 'grade' => 1));
-        $uc = $lpg->create_user_competency(array('userid' => $u2->id, 'competencyid' => $comp2->get_id(),
+        $uc = $lpg->create_user_competency(array('userid' => $u2->id, 'competencyid' => $comp2->get('id'),
             'proficiency' => false, 'grade' => 3));
-        $uc = $lpg->create_user_competency(array('userid' => $u3->id, 'competencyid' => $comp2->get_id(),
+        $uc = $lpg->create_user_competency(array('userid' => $u3->id, 'competencyid' => $comp2->get('id'),
             'proficiency' => true, 'grade' => 2));
 
-        $result = api::get_competency_statistics($comp2->get_id(), $template->get_id());
-        $this->assertEquals($comp2->get_id(), $result->competency->get_id());
+        $result = api::get_competency_statistics($comp2->get('id'), $template->get('id'));
+        $this->assertEquals($comp2->get('id'), $result->competency->get('id'));
 
         // Check scale configuration of the competency is found.
         $this->assertCount(2, $result->scaleconfig);
@@ -1948,22 +1948,22 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         // Check grade is found for each users.
         foreach ($result->listusers as $user) {
             if ($user->userinfo->id == $u1->id) {
-                $this->assertEquals(1, $user->usercompetency->get_grade());
+                $this->assertEquals(1, $user->usercompetency->get('grade'));
             } else {
                 if ($user->userinfo->id == $u2->id) {
-                    $this->assertEquals(3, $user->usercompetency->get_grade());
+                    $this->assertEquals(3, $user->usercompetency->get('grade'));
 
                 } else {
-                    $this->assertEquals(2, $user->usercompetency->get_grade());
+                    $this->assertEquals(2, $user->usercompetency->get('grade'));
                 }
             }
         }
         // Test read competency stats on non existing competency for user plan completed.
         $this->setAdminUser();
-        core_competency_api::complete_plan($p3->get_id());
-        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get_id()));
-        core_competency_api::add_competency_to_template($template->get_id(), $comp3->get_id());
-        $result = api::get_competency_statistics($comp3->get_id(), $template->get_id());
+        core_competency_api::complete_plan($p3->get('id'));
+        $comp3 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        core_competency_api::add_competency_to_template($template->get('id'), $comp3->get('id'));
+        $result = api::get_competency_statistics($comp3->get('id'), $template->get('id'));
         $this->assertCount(2, $result->listusers);
     }
 
@@ -2008,20 +2008,20 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $result = api::search_templates($syscontext, '', 0, 10, 'children', false);
         $result = array_values($result);
         $this->assertCount(2, $result);
-        $this->assertEquals($template2->get_id(), $result[0]->get_id());
-        $this->assertEquals($template1->get_id(), $result[1]->get_id());
+        $this->assertEquals($template2->get('id'), $result[0]->get('id'));
+        $this->assertEquals($template1->get('id'), $result[1]->get('id'));
 
         // Test with limit 1.
         $result = api::search_templates($syscontext, '', 0, 1, 'children', false);
         $result = array_values($result);
         $this->assertCount(1, $result);
-        $this->assertEquals($template2->get_id(), $result[0]->get_id());
+        $this->assertEquals($template2->get('id'), $result[0]->get('id'));
 
         // User with category permissions and query search.
         $result = api::search_templates($syscontext, 'Painting', 0, 10, 'children', false);
         $result = array_values($result);
         $this->assertCount(1, $result);
-        $this->assertEquals($template2->get_id(), $result[0]->get_id());
+        $this->assertEquals($template2->get('id'), $result[0]->get('id'));
 
         // User with category permissions and query search and only visible.
         $result = api::search_templates($syscontext, 'US Independence', 0, 10, 'children', true);

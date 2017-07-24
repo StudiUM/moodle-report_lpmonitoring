@@ -34,7 +34,7 @@ use renderer_base;
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class linked_course_exporter extends \core_competency\external\exporter {
+class linked_course_exporter extends \core\external\exporter {
 
     protected static function define_related() {
         return array('relatedinfo' => '\\stdClass');
@@ -43,13 +43,13 @@ class linked_course_exporter extends \core_competency\external\exporter {
     protected static function define_other_properties() {
         return array(
             'url' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'rated' => array(
                 'type' => PARAM_BOOL
             ),
             'coursename' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             )
         );
     }
@@ -65,7 +65,7 @@ class linked_course_exporter extends \core_competency\external\exporter {
 
         $result->url = $url;
         $result->coursename = $coursedata->course->shortname;
-        $result->rated = !empty($coursedata->usecompetencyincourse->get_grade()) ? true : false;
+        $result->rated = !empty($coursedata->usecompetencyincourse->get('grade')) ? true : false;
 
         return (array) $result;
     }

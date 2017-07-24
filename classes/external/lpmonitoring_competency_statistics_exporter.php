@@ -26,7 +26,7 @@ namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
 use renderer_base;
-use core_competency\external\exporter;
+use core\external\exporter;
 use report_lpmonitoring\external\scale_competency_item_statistics_exporter;
 use report_lpmonitoring\external\competency_stats_user_exporter;
 
@@ -67,7 +67,7 @@ class lpmonitoring_competency_statistics_exporter extends exporter {
         $data = $this->data;
         $result = new \stdClass();
 
-        $result->competencyid = $data->competency->get_id();
+        $result->competencyid = $data->competency->get('id');
         $result->nbusertotal = count($data->listusers);
         $result->nbuserrated = 0;
         $usersrated = [];

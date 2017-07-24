@@ -25,8 +25,7 @@
 namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
-use report_lpmonitoring\external\scale_value_user_exporter;
-use core_competency\external\exporter;
+use core\external\exporter;
 use renderer_base;
 
 /**
@@ -48,10 +47,10 @@ class scale_competency_incourse_statistics_exporter extends exporter {
                 'type' => PARAM_INT
             ),
             'name' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'color' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             )
         );
     }
@@ -69,7 +68,7 @@ class scale_competency_incourse_statistics_exporter extends exporter {
         $result = new \stdClass();
         $result->nbratings = 0;
         foreach ($this->related['ratings'] as $ucc) {
-            if ($this->data->value == $ucc->get_grade()) {
+            if ($this->data->value == $ucc->get('grade')) {
                 $result->nbratings++;
             }
         }

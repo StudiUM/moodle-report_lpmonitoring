@@ -40,12 +40,12 @@ class report_user_evidence_summary_exporter extends user_evidence_summary_export
 
     protected static function define_other_properties() {
         $properties = parent::define_other_properties();
-        $properties['userevidenceurl'] = array('type' => PARAM_TEXT);
+        $properties['userevidenceurl'] = array('type' => PARAM_RAW);
         return $properties;
     }
 
     protected function get_other_values(renderer_base $output) {
-        $id = $this->persistent->get_id();
+        $id = $this->persistent->get('id');
         $othervalues = parent::get_other_values($output);
         $othervalues['userevidenceurl'] = url::user_evidence($id)->out(false);
         return $othervalues;

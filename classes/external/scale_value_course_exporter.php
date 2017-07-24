@@ -35,7 +35,7 @@ use stdClass;
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class scale_value_course_exporter extends \core_competency\external\exporter {
+class scale_value_course_exporter extends \core\external\exporter {
 
     protected static function define_related() {
         return array('relatedinfo' => '\\stdClass');
@@ -44,13 +44,13 @@ class scale_value_course_exporter extends \core_competency\external\exporter {
     protected static function define_other_properties() {
         return array(
             'url' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'shortname' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'grade' => array(
-                'type' => PARAM_TEXT
+                'type' => PARAM_RAW
             ),
             'nbnotes' => array(
                 'type' => PARAM_INT
@@ -70,7 +70,7 @@ class scale_value_course_exporter extends \core_competency\external\exporter {
 
         $nbnotes = 0;
         foreach ($coursedata->courseevidences as $courseevidence) {
-            if ($courseevidence->get_note() != null) {
+            if ($courseevidence->get('note') != null) {
                 $nbnotes++;
             }
         }

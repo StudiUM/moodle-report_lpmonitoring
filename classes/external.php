@@ -39,7 +39,7 @@ use core_competency\plan;
 use core_competency\url;
 use core_competency\external as core_competency_external;
 use core_competency\api as core_competency_api;
-use core_competency\external\user_summary_exporter;
+use core_user\external\user_summary_exporter;
 use core_competency\external\competency_exporter;
 use core_competency\external\template_exporter;
 use core_competency\external\user_competency_exporter;
@@ -427,11 +427,11 @@ class external extends external_api {
         $scaleotherinfo = api::get_scale_configuration_other_info($params['competencyframeworkid'], $params['scaleid']);
 
         $record = new \stdClass();
-        $record->id = $reportcompetencyconfig->get_id();
-        $record->competencyframeworkid = $reportcompetencyconfig->get_competencyframeworkid();
-        $record->scaleid = $reportcompetencyconfig->get_scaleid();
+        $record->id = $reportcompetencyconfig->get('id');
+        $record->competencyframeworkid = $reportcompetencyconfig->get('competencyframeworkid');
+        $record->scaleid = $reportcompetencyconfig->get('scaleid');
         $record->scaleconfiguration = array();
-        $config = json_decode($reportcompetencyconfig->get_scaleconfiguration());
+        $config = json_decode($reportcompetencyconfig->get('scaleconfiguration'));
 
         foreach ($config as $key => $valuescale) {
             $valuescale->proficient = $scaleotherinfo[$key]['proficient'];
@@ -512,13 +512,13 @@ class external extends external_api {
         $params = (object) $params;
         $result = api::create_report_competency_config($params);
         $record = new \stdClass();
-        $record->id = $result->get_id();
-        $record->competencyframeworkid = $result->get_competencyframeworkid();
-        $record->scaleid = $result->get_scaleid();
+        $record->id = $result->get('id');
+        $record->competencyframeworkid = $result->get('competencyframeworkid');
+        $record->scaleid = $result->get('scaleid');
         $record->scaleconfiguration = array();
 
         $scaleotherinfo = api::get_scale_configuration_other_info($params->competencyframeworkid, $params->scaleid);
-        $config = json_decode($result->get_scaleconfiguration());
+        $config = json_decode($result->get('scaleconfiguration'));
         foreach ($config as $key => $valuescale) {
             $valuescale->proficient = $scaleotherinfo[$key]['proficient'];
             $valuescale->name = $scaleotherinfo[$key]['name'];
@@ -652,10 +652,10 @@ class external extends external_api {
         $output = $PAGE->get_renderer('report_lpmonitoring');
 
         $planexport = new \stdClass();
-        $planexport->id = $plans->current->get_id();
-        $planexport->name = $plans->current->get_name();
+        $planexport->id = $plans->current->get('id');
+        $planexport->name = $plans->current->get('name');
 
-        $status = $plans->current->get_status();
+        $status = $plans->current->get('status');
         $planexport->isactive = $status == plan::STATUS_ACTIVE;
         $planexport->isdraft = $status == plan::STATUS_DRAFT;
         $planexport->iscompleted = $status == plan::STATUS_COMPLETE;
@@ -663,7 +663,7 @@ class external extends external_api {
         $planexport->isinreview = $status == plan::STATUS_IN_REVIEW;
         $planexport->statusname = $plans->current->get_statusname();
         // Set learning plan url.
-        $planexport->url = url::plan($plans->current->get_id())->out(false);
+        $planexport->url = url::plan($plans->current->get('id'))->out(false);
         // Get stats for plan.
         $uc = new \stdClass();
         $uc->usercompetencies = core_competency_api::list_plan_competencies($planexport->id);
@@ -672,7 +672,7 @@ class external extends external_api {
 
         $hasnavigation = false;
 
-        $userexporter = new user_summary_exporter(core_user::get_user($plans->current->get_userid(), '*', \MUST_EXIST));
+        $userexporter = new user_summary_exporter(core_user::get_user($plans->current->get('userid'), '*', \MUST_EXIST));
         $planexport->user = $userexporter->export($output);
 
         if (isset($plans->previous) || isset($plans->next)) {

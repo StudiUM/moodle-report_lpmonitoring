@@ -26,7 +26,7 @@ namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
 use renderer_base;
-use core_competency\external\exporter;
+use core\external\exporter;
 use report_lpmonitoring\external\scale_competency_incourse_statistics_exporter;
 
 
@@ -62,7 +62,7 @@ class lpmonitoring_competency_statistics_incourse_exporter extends exporter {
         $data = $this->data;
         $result = new \stdClass();
 
-        $result->competencyid = $data->competency->get_id();
+        $result->competencyid = $data->competency->get('id');
         $result->nbratingtotal = count($data->listratings);
 
         // Information for each scale value.
