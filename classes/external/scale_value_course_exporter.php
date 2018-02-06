@@ -54,6 +54,10 @@ class scale_value_course_exporter extends \core\external\exporter {
             ),
             'nbnotes' => array(
                 'type' => PARAM_INT
+            ),
+            'lastcomment' => array(
+                'type' => PARAM_RAW,
+                'null' => NULL_ALLOWED
             )
         );
     }
@@ -69,9 +73,15 @@ class scale_value_course_exporter extends \core\external\exporter {
         $url = (new \moodle_url('/admin/tool/lp/user_competency_in_course.php', $urlparams))->out();
 
         $nbnotes = 0;
+        $lastcomment = null;
+        $timemodified = null;
         foreach ($coursedata->courseevidences as $courseevidence) {
             if ($courseevidence->get('note') != null) {
                 $nbnotes++;
+                if ($timemodified == null || $timemodified < $courseevidence->get('timemodified')) {
+                    $timemodified = $courseevidence->get('timemodified');
+                    $lastcomment = $courseevidence->get('note');
+                }
             }
         }
 
@@ -79,6 +89,7 @@ class scale_value_course_exporter extends \core\external\exporter {
         $result->shortname = $coursedata->course->shortname;
         $result->grade = $coursedata->gradetxt;
         $result->nbnotes = $nbnotes;
+        $result->lastcomment = $lastcomment;
 
         return (array) $result;
     }
