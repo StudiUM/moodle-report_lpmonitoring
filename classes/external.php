@@ -829,7 +829,7 @@ class external extends external_api {
         $plan =  \core_competency\api::read_plan($id);
         $result = core_competency_external::list_plan_competencies($id);
         $shoulddisplay = true;
-        if ($plan->get_status() == \core_competency\plan::STATUS_ACTIVE) {
+        if ($plan->get('status') == \core_competency\plan::STATUS_ACTIVE) {
             $shoulddisplay = \tool_lp\api::has_to_display_rating($plan);
         }
         foreach ($result as $key => $r) {
