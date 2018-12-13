@@ -54,6 +54,11 @@ class stats_plan_exporter extends exporter {
         );
     }
 
+    protected static function define_related() {
+        // We cache the scale so it does not need to be retrieved from the framework every time.
+        return array('plan' => 'core_competency\\plan');
+    }
+
     protected function get_other_values(renderer_base $output) {
 
         $result = new \stdClass();
@@ -62,19 +67,25 @@ class stats_plan_exporter extends exporter {
         $nbcompetenciesnotproficient = 0;
         $nbcompetenciesproficient = 0;
         $nbcompetenciesnotrated = 0;
-        foreach ($usercompetencies as $r) {
-            $usercompetency = (isset($r->usercompetency)) ? $r->usercompetency : $r->usercompetencyplan;
-            $proficiency = $usercompetency->get('proficiency');
-            if (!isset($proficiency)) {
-                $nbcompetenciesnotrated++;
-            } else {
-                if ($proficiency) {
-                    $nbcompetenciesproficient++;
+        $shoulddisplay = \tool_lp\api::has_to_display_rating($this->related['plan']);
+        if ($shoulddisplay) {
+            foreach ($usercompetencies as $r) {
+                $usercompetency = (isset($r->usercompetency)) ? $r->usercompetency : $r->usercompetencyplan;
+                $proficiency = $usercompetency->get('proficiency');
+                if (!isset($proficiency)) {
+                    $nbcompetenciesnotrated++;
                 } else {
-                    $nbcompetenciesnotproficient++;
+                    if ($proficiency) {
+                        $nbcompetenciesproficient++;
+                    } else {
+                        $nbcompetenciesnotproficient++;
+                    }
                 }
             }
+        } else {
+            $nbcompetenciesnotrated = $nbcompetenciestotal;
         }
+
         $result->nbcompetenciestotal = $nbcompetenciestotal;
         $result->nbcompetenciesnotproficient = $nbcompetenciesnotproficient;
         $result->nbcompetenciesproficient = $nbcompetenciesproficient;

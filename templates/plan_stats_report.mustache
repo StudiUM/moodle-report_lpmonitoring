@@ -21,6 +21,8 @@
     Context variables required for this template:
     * plan
         * statusname
+        * canmanage
+        * displayrating
         * stats
             * nbcompetenciesproficient
             * nbcompetenciesnotproficient
@@ -102,3 +104,24 @@
         <div class="stats-cmp-proficient">{{#str}}notratedcompetencies, report_lpmonitoring{{/str}}</div>
     </div>
 </div>
+{{#plan.canmanage}}
+{{#plan.isactive}}
+<div class="report-stats-competencies displayratings">
+    <div class="space-block-stats"><span></div>
+    <div>
+        <div class="switcher-container">
+            <label class="switch">
+            <input type="checkbox"
+                   data-displayrating-plan="{{plan.id}}"
+                    {{#plan.displayrating}}checked{{/plan.displayrating}} />
+            <div class="slider round">
+                <span class="on">{{#str}}yes{{/str}}{{displayrating}}</span>
+                <span class="off">{{#str}}no{{/str}}{{displayrating}}</span>
+            </div>
+            </label>
+        </div>
+        <div class="stats-cmp-proficient">{{#str}}ratingsdisplay, tool_lp{{/str}}</div>
+    </div>
+</div>
+{{/plan.isactive}}
+{{/plan.canmanage}}

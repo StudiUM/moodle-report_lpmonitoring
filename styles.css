@@ -823,7 +823,7 @@
     line-height: 47px;
 }
 .competencyreport .plan-info-report > div.report-stats-competencies {
-    width: 180px;
+    width: 165px;
 }
 .competencyreport .plan-info-report .report-stats-competencies .empty-value {
     color: #cfd1d5;
@@ -1197,3 +1197,5 @@
 .competencyreport:not(.boost) .row {
     margin-left: 0;
 }
+
+

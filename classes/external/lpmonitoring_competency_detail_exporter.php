@@ -113,6 +113,7 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
         $result = new \stdClass();
 
         $result->competencyid = $data->competency->get('id');
+        $shoulddisplay = $data->displayrating;
         $uc = (isset($data->usercompetency)) ? $data->usercompetency : $data->usercompetencyplan;
         // Set the scaleid.
         $result->scaleid = $data->competency->get_scale()->id;
@@ -121,7 +122,7 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
         $result->isnotrated = false;
         $result->isproficient = false;
         $result->isnotproficient = false;
-        if (!isset($proficiency)) {
+        if (!isset($proficiency) || !$shoulddisplay) {
             $result->isnotrated = true;
         } else {
             if ($proficiency) {

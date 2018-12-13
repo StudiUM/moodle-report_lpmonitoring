@@ -73,6 +73,9 @@ define(['jquery',
             $('.competencyreport').on('change','.scalefiltervalues' ,this.changeScaleHandler.bind(this)).change();
             $('.competencyreport input[name=optionfilter]').prop("disabled", false);
             $('.competencyreport input[name=optionscalesortorder]').prop("disabled", false);
+            // Display rating in user plan.
+            $(".competencyreport").on("change", ".displayratings input[type=checkbox]",
+                this.changeDisplayRating.bind(this)).change();
         };
 
         /** @var {Number} The template ID. */
@@ -137,6 +140,33 @@ define(['jquery',
                 $('.competencyreport #scale').empty();
             }
             self.checkDataFormReady();
+        };
+
+        /**
+         * Set display rating for plan.
+         *
+         * @name   changeDisplayRating
+         * @param  {Event} e
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.changeDisplayRating = function(e) {
+            var displayrating = 0;
+            if ($(e.target).is( ":checked" )) {
+                displayrating = 1;
+            }
+            var planid = $(e.target).data('displayrating-plan');
+            var request = {
+                methodname: 'tool_lp_set_display_rating_for_plan',
+                args: {
+                    planid: planid,
+                    visible: displayrating
+                }
+            };
+
+            ajax.call([request])[0]
+                .done(function() {
+                }).fail(notification.exception);
         };
 
         /**

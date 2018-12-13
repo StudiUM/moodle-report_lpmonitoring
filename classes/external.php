@@ -662,12 +662,14 @@ class external extends external_api {
         $planexport->iswaitingforreview = $status == plan::STATUS_WAITING_FOR_REVIEW;
         $planexport->isinreview = $status == plan::STATUS_IN_REVIEW;
         $planexport->statusname = $plans->current->get_statusname();
+        $planexport->canmanage = $plans->current->can_manage();
+        $planexport->displayrating = \tool_lp\api::has_to_display_rating_for_plan($planexport->id);
         // Set learning plan url.
         $planexport->url = url::plan($plans->current->get('id'))->out(false);
         // Get stats for plan.
         $uc = new \stdClass();
         $uc->usercompetencies = core_competency_api::list_plan_competencies($planexport->id);
-        $statsexporter = new stats_plan_exporter($uc);
+        $statsexporter = new stats_plan_exporter($uc, ['plan' => $plans->current]);
         $planexport->stats = $statsexporter->export($output);
 
         $hasnavigation = false;
@@ -713,6 +715,8 @@ class external extends external_api {
             'name' => new external_value(PARAM_TEXT, 'The plan name'),
             'user' => user_summary_exporter::get_read_structure(),
             'isactive' => new external_value(PARAM_BOOL, 'Is plan active'),
+            'canmanage' => new external_value(PARAM_BOOL, 'Can manage user plan'),
+            'displayrating' => new external_value(PARAM_BOOL, 'Is ratings displayed for user'),
             'isdraft' => new external_value(PARAM_BOOL, 'Is plan draft'),
             'iscompleted' => new external_value(PARAM_BOOL, 'Is plan completed'),
             'iswaitingforreview' => new external_value(PARAM_BOOL, 'Is plan completed'),
@@ -791,6 +795,7 @@ class external extends external_api {
         self::validate_context($context);
 
         $result = api::get_competency_detail($params['userid'], $params['competencyid'], $params['planid']);
+        $result->displayrating = \tool_lp\api::has_to_display_rating($params['planid']);
 
         $output = $PAGE->get_renderer('report_lpmonitoring');
         $exporter = new lpmonitoring_competency_detail_exporter($result);
@@ -826,11 +831,11 @@ class external extends external_api {
      */
     public static function list_plan_competencies($id) {
 
-        $plan =  \core_competency\api::read_plan($id);
+        $plan = \core_competency\api::read_plan($id);
         $result = core_competency_external::list_plan_competencies($id);
-        $shoulddisplay = true;
+        $displayrating = true;
         if ($plan->get('status') == \core_competency\plan::STATUS_ACTIVE) {
-            $shoulddisplay = \tool_lp\api::has_to_display_rating($plan);
+            $displayrating = \tool_lp\api::has_to_display_rating($plan);
         }
         foreach ($result as $key => $r) {
             $usercompetency = (isset($r->usercompetency)) ? $r->usercompetency : $r->usercompetencyplan;
@@ -838,7 +843,7 @@ class external extends external_api {
             $r->isnotrated = false;
             $r->isproficient = false;
             $r->isnotproficient = false;
-            if (!$shoulddisplay) {
+            if (!$displayrating) {
                 $r->isnotrated = true;
                 continue;
             }

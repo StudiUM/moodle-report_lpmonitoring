@@ -240,3 +240,81 @@
 .competencyreport .radio {
     padding-left: 0px;
 }
+.displayratings .switcher-container {
+    line-height: 19px;
+}
+.displayratings .switch input {display:none;}
+.displayratings .switch {
+  position: relative;
+  display: inline-block;
+  width: 45px;
+  height: 20px;
+}
+.displayratings .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d9534f;
+  -webkit-transition: .4s;
+  transition: .4s;
+  padding-left: 18px;
+  font-size: 11px;
+  color: #fff;
+  width: auto;
+  margin: 0;
+}
+
+.displayratings .slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.displayratings input:checked + .slider {
+  background-color: #5cb85c;
+  padding-left: 3px;
+  padding-right: 14px;
+}
+
+.displayratings input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+.displayratings input:checked + .slider:before {
+  -webkit-transform: translateX(11px);
+  -ms-transform: translateX(11px);
+  transform: translateX(11px);
+  left:16px;
+}
+
+/* Rounded sliders */
+.displayratings .slider.round {
+  border-radius: 34px;
+}
+
+.displayratings .slider.round:before {
+  border-radius: 50%;
+}
+
+.displayratings input:not(:checked)+.slider .on {
+  display: none;
+}
+
+.displayratings input:checked+.slider .off {
+  display: none;
+}
+
+.displayratings .paging {
+    margin: 0;
+    padding: 5px;
+    text-align: center;
+}
