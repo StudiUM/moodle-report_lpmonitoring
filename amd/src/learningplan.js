@@ -156,17 +156,83 @@ define(['jquery',
                 displayrating = 1;
             }
             var planid = $(e.target).data('displayrating-plan');
-            var request = {
+
+            var promise = ajax.call([{
                 methodname: 'tool_lp_set_display_rating_for_plan',
                 args: {
                     planid: planid,
                     visible: displayrating
                 }
-            };
+            }, {
+                methodname: 'tool_lp_can_reset_display_rating_for_plan',
+                args: {
+                    planid: planid
+                }
+            }
+            ]);
 
-            ajax.call([request])[0]
-                .done(function() {
-                }).fail(notification.exception);
+            promise[0].then(function() {
+                promise[1].then(function(canresetdisplayrating) {
+                    if (displayrating) {
+                        $('.competencyreport .displayratings input[type=checkbox]').prop("checked", true);
+                    } else {
+                        $('.competencyreport .displayratings input[type=checkbox]').prop("checked", false);
+                    }
+                    if (canresetdisplayrating) {
+                        $('.competencyreport .resetdisplayrating').show();
+                    }
+                }).fail(
+                function(exp) {
+                    notification.exception(exp);
+                }
+                );
+            }).fail(
+                function(exp) {
+                    notification.exception(exp);
+                }
+            );
+        };
+
+        /**
+         * Reset display rating for plan.
+         *
+         * @name   resetDisplayRating
+         * @param  {Number} planid
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.resetDisplayRating = function(planid) {
+            var promise = ajax.call([{
+                methodname: 'tool_lp_reset_display_rating_for_plan',
+                args: {
+                    planid: planid
+                }
+            }, {
+                methodname: 'tool_lp_has_to_display_rating',
+                args: {
+                    planid: planid
+                }
+            }
+            ]);
+
+            promise[0].then(function() {
+                promise[1].then(function(displayrating) {
+                    if (displayrating) {
+                        $('.competencyreport .displayratings input[type=checkbox]').prop("checked", true);
+                    } else {
+                        $('.competencyreport .displayratings input[type=checkbox]').prop("checked", false);
+                    }
+                    $('.competencyreport .resetdisplayrating').hide();
+                }).fail(
+                function(exp) {
+                    notification.exception(exp);
+                }
+                );
+            }).fail(
+                function(exp) {
+                    notification.exception(exp);
+                }
+            );
         };
 
         /**
@@ -990,6 +1056,13 @@ define(['jquery',
                     totallistcourses.competencyid = competencyid;
                     self.displayCourselist(totallistcourses);
                 }
+            });
+
+            // Handle click on reset display rating.
+            $(".competencyreport").on('click', '.resetdisplayrating', function(event) {
+                event.preventDefault();
+                var planid = $(this).data('canresetdisplayrating-plan');
+                self.resetDisplayRating(planid);
             });
 
             // Collapse/Expand all.

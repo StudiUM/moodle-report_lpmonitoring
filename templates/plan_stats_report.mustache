@@ -120,7 +120,12 @@
             </div>
             </label>
         </div>
-        <div class="stats-cmp-proficient">{{#str}}ratingsdisplay, tool_lp{{/str}}</div>
+        <div class="stats-display-rating">
+            <div class="resetdisplayrating {{^plan.canresetdisplayrating}}hidden{{/plan.canresetdisplayrating}}" title="{{#str}}resetoneplandisplayrating, tool_lp{{/str}}" data-canresetdisplayrating-plan="{{plan.id}}">
+                <a href="#" >{{#str}}reset, core{{/str}}</a>
+            </div> 
+            {{#str}}ratingsdisplay, tool_lp{{/str}}
+        </div>
     </div>
 </div>
 {{/plan.isactive}}

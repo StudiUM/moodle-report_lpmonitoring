@@ -664,6 +664,7 @@ class external extends external_api {
         $planexport->statusname = $plans->current->get_statusname();
         $planexport->canmanage = $plans->current->can_manage();
         $planexport->displayrating = \tool_lp\api::has_to_display_rating_for_plan($planexport->id);
+        $planexport->canresetdisplayrating = \tool_lp\api::can_reset_display_rating_for_plan($planexport->id);
         // Set learning plan url.
         $planexport->url = url::plan($plans->current->get('id'))->out(false);
         // Get stats for plan.
@@ -717,6 +718,7 @@ class external extends external_api {
             'isactive' => new external_value(PARAM_BOOL, 'Is plan active'),
             'canmanage' => new external_value(PARAM_BOOL, 'Can manage user plan'),
             'displayrating' => new external_value(PARAM_BOOL, 'Is ratings displayed for user'),
+            'canresetdisplayrating' => new external_value(PARAM_BOOL, 'Plan has a display rating setting'),
             'isdraft' => new external_value(PARAM_BOOL, 'Is plan draft'),
             'iscompleted' => new external_value(PARAM_BOOL, 'Is plan completed'),
             'iswaitingforreview' => new external_value(PARAM_BOOL, 'Is plan completed'),
