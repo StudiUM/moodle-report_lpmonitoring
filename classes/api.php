@@ -43,6 +43,7 @@ use stdClass;
 use Exception;
 use required_capability_exception;
 use moodle_exception;
+use core_tag_area;
 
 /**
  * Class for doing reports for competency.
@@ -896,4 +897,37 @@ class api {
         return $DB->record_exists_sql($sql, array($planid, $competencyid));
     }
 
+    /**
+     * Return the list of tags that are associated to at least one plan that the user can read.
+     *
+     * @return array of tags
+     */
+    public static function search_tags_for_accessible_plans() {
+        global $DB, $CFG;
+
+        // Get all tags in the collection for competency plans.
+        $namefield = empty($CFG->keeptagnamecase) ? 'name' : 'rawname';
+        $collid = core_tag_area::get_collection('report_lpmonitoring', 'competency_plan');
+        $recordstags = $DB->get_records('tag', array('tagcollid' => $collid), $namefield, 'id,' . $namefield . ' AS name ');
+
+        // Loop through all tag instances to check if the user can manage the associated plans.
+        $tagstoreturn = array();
+        foreach ($recordstags as $tag) {
+            $conditions = array('component' => 'report_lpmonitoring',
+                            'itemtype' => 'competency_plan',
+                            'tagid' => $tag->id
+                        );
+            $recordstaginstances = $DB->get_records('tag_instance', $conditions, '', 'itemid');
+            foreach ($recordstaginstances as $taginstance) {
+                // If the user can manage at least a plan with this tag, add it to the list of tags to return.
+                $plan = new plan($taginstance->itemid);
+                if ($plan->can_read()) {
+                    $tagstoreturn[$tag->name] = $tag->name;
+                    break;
+                }
+            }
+        }
+
+        return $tagstoreturn;
+    }
 }

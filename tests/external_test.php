@@ -1524,5 +1524,4 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertFalse(isset($result->navnext));
 
     }
-
 }

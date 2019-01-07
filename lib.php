@@ -115,3 +115,37 @@ function report_lpmonitoring_myprofile_navigation(core_user\output\myprofile\tre
 
     return true;
 }
+
+/**
+ * Serve the manage tags form as a fragment.
+ *
+ * @param array $args List of named arguments for the fragment loader.
+ * @return string
+ */
+function report_lpmonitoring_output_fragment_tags($args) {
+    global $CFG, $DB;
+
+    require_once($CFG->libdir.'/formslib.php');
+    require_once($CFG->dirroot . '/report/lpmonitoring/classes/form/tags.php');
+    $args = (object) $args;
+
+    $planid = $args->planid;
+
+    $plan = new \core_competency\plan($planid);
+    if ($plan->can_manage()) {
+
+        $mform = new \report_lpmonitoring\form\tags(null, array('planid' => $planid));
+        // Used to set the planid.
+        $data = $DB->get_record('competency_plan', array('id' => $planid));
+        $data->tags = core_tag_tag::get_item_tags_array('report_lpmonitoring', 'competency_plan', $planid);
+        $mform->set_data($data);
+
+        if (!empty($args->jsonformdata)) {
+            // If we were passed non-empty form data we want the mform to call validation functions and show errors.
+            $mform->is_validated();
+        }
+
+        return $mform->render();
+    }
+    return "";
+}

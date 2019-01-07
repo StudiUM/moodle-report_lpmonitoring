@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 use core\external\exporter;
 use renderer_base;
+use core_tag_tag;
 
 /**
  * Class for exporting stats data for plan.
@@ -50,6 +51,9 @@ class stats_plan_exporter extends exporter {
             ),
             'nbcompetenciestotal' => array(
                 'type' => PARAM_INT
+            ),
+            'nbtags' => array(
+                'type' => PARAM_INT
             )
         );
     }
@@ -62,6 +66,7 @@ class stats_plan_exporter extends exporter {
     protected function get_other_values(renderer_base $output) {
 
         $result = new \stdClass();
+        $planid = $this->related['plan']->get('id');
         $usercompetencies = $this->data->usercompetencies;
         $nbcompetenciestotal = count($usercompetencies);
         $nbcompetenciesnotproficient = 0;
@@ -90,6 +95,7 @@ class stats_plan_exporter extends exporter {
         $result->nbcompetenciesnotproficient = $nbcompetenciesnotproficient;
         $result->nbcompetenciesproficient = $nbcompetenciesproficient;
         $result->nbcompetenciesnotrated = $nbcompetenciesnotrated;
+        $result->nbtags = count(core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $planid));
         return (array) $result;
     }
 }

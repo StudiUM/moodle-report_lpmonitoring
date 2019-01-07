@@ -34,6 +34,7 @@ use external_function_parameters;
 use external_multiple_structure;
 use external_single_structure;
 use external_value;
+use context;
 use core_user;
 use core_competency\plan;
 use core_competency\url;
@@ -44,11 +45,13 @@ use core_competency\external\competency_exporter;
 use core_competency\external\template_exporter;
 use core_competency\external\user_competency_exporter;
 use core_competency\external\user_competency_plan_exporter;
+use core_tag_tag;
 use report_lpmonitoring\external\stats_plan_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_detail_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_incourse_exporter;
 use context_system;
+use moodle_exception;
 
 
 /**
@@ -662,6 +665,7 @@ class external extends external_api {
         $planexport->iswaitingforreview = $status == plan::STATUS_WAITING_FOR_REVIEW;
         $planexport->isinreview = $status == plan::STATUS_IN_REVIEW;
         $planexport->statusname = $plans->current->get_statusname();
+        $planexport->usercontext = $plans->current->get_context()->id;
         $planexport->canmanage = $plans->current->can_manage();
         $planexport->displayrating = \tool_lp\api::has_to_display_rating_for_plan($planexport->id);
         $planexport->canresetdisplayrating = \tool_lp\api::can_reset_display_rating_for_plan($planexport->id);
@@ -715,6 +719,7 @@ class external extends external_api {
             'id'   => new external_value(PARAM_INT, 'The plan ID'),
             'name' => new external_value(PARAM_TEXT, 'The plan name'),
             'user' => user_summary_exporter::get_read_structure(),
+            'usercontext' => new external_value(PARAM_INT, 'The user context ID value'),
             'isactive' => new external_value(PARAM_BOOL, 'Is plan active'),
             'canmanage' => new external_value(PARAM_BOOL, 'Can manage user plan'),
             'displayrating' => new external_value(PARAM_BOOL, 'Is ratings displayed for user'),
@@ -1006,5 +1011,64 @@ class external extends external_api {
      */
     public static function get_competency_statistics_incourse_returns() {
         return lpmonitoring_competency_statistics_incourse_exporter::get_read_structure();
+    }
+
+    /**
+     * Describes the parameters for submit_manage_tags_form webservice.
+     * @return external_function_parameters
+     */
+    public static function submit_manage_tags_form_parameters() {
+        return new external_function_parameters(
+            array(
+                'contextid' => new external_value(PARAM_INT, 'The context id'),
+                'jsonformdata' => new external_value(PARAM_RAW, 'The data from the manage tags form, encoded as a json array')
+            )
+        );
+    }
+
+    /**
+     * Submit the manage tags form.
+     *
+     * @param int $contextid The context id for the user.
+     * @param string $jsonformdata The data from the form, encoded as a json array.
+     * @return int the new number of tags associated to the learning plan.
+     */
+    public static function submit_manage_tags_form($contextid, $jsonformdata) {
+        // We always must pass webservice params through validate_parameters.
+        $params = self::validate_parameters(self::submit_manage_tags_form_parameters(),
+                                            ['contextid' => $contextid, 'jsonformdata' => $jsonformdata]);
+
+        $context = context::instance_by_id($params['contextid'], MUST_EXIST);
+        self::validate_context($context);
+
+        $serialiseddata = json_decode($params['jsonformdata']);
+
+        $data = array();
+        parse_str($serialiseddata, $data);
+
+        // The last param is the ajax submitted data.
+        $mform = new \report_lpmonitoring\form\tags(null, array('planid' => $data['planid']), 'post', '', null, true, $data);
+
+        $validateddata = $mform->get_data();
+
+        if ($validateddata) {
+            // Save the tags.
+            core_tag_tag::set_item_tags('report_lpmonitoring', 'competency_plan',
+                                        $validateddata->planid, $context, $validateddata->tags);
+        } else {
+            // Generate a warning.
+            throw new moodle_exception('errormanagetags', 'report_lpmonitoring');
+        }
+
+        return count(core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $validateddata->planid));
+    }
+
+    /**
+     * Returns description of submit_manage_tags_form() result value.
+     *
+     * @return \external_description
+     */
+    public static function submit_manage_tags_form_returns() {
+        return new external_value(PARAM_INT, 'The number of tags associated to the learning plan');
     }
 }

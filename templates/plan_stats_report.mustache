@@ -27,6 +27,10 @@
             * nbcompetenciesproficient
             * nbcompetenciesnotproficient
             * nbcompetenciesnotrated
+            * nbtags
+
+    Classes required for JS : 
+    * tags_popup
       
 }}
 <div class="report-stats-competencies">
@@ -105,6 +109,14 @@
     </div>
 </div>
 {{#plan.canmanage}}
+<div class="report-stats-competencies">
+    <div class="space-block-stats"><span></div>
+    <div>
+        <div class="count-stats tags-stats blue" data-tags-plan="{{plan.id}}">{{plan.stats.nbtags}}</div>
+        <div class="stats-cmp-proficient">{{#str}}tags, report_lpmonitoring{{/str}}</div>
+        <a class="stats-cmp-proficient" role="button" data-action="managetagsmodal" title="{{#str}}tagseditshort, report_lpmonitoring{{/str}}" href="#"><i class="fa fa-tags"></i> {{#str}}tagseditshort, report_lpmonitoring{{/str}}</a>
+    </div>
+</div>
 {{#plan.isactive}}
 <div class="report-stats-competencies displayratings">
     <div class="space-block-stats"><span></div>
@@ -137,3 +149,10 @@
 </div>
 {{/plan.isactive}}
 {{/plan.canmanage}}
+
+
+{{#js}}
+    require(['report_lpmonitoring/tags_popup'], function(TagsPopup) {
+        TagsPopup.init('[data-action=managetagsmodal]', '.tags-stats', {{plan.usercontext}}, {{plan.id}});
+    });
+{{/js}}

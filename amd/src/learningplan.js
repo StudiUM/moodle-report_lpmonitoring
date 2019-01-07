@@ -841,7 +841,6 @@ define(['jquery',
          * @function
          */
         LearningplanReport.prototype.displayPlan = function(planid, templateid) {
-
             var elementloading = null,
                     self = this;
             if($('#plan-user-info').length) {
@@ -1093,7 +1092,7 @@ define(['jquery',
              * Main initialisation.
              *
              * @param {Boolean} True if the report is for user view (student).
-             * @return {LearningplanReport} A new instance of ScaleConfig.
+             * @return {LearningplanReport} A new instance of LearningplanReport.
              * @method init
              */
             init: function(userview) {

@@ -2051,4 +2051,115 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         return $lpg->create_template($template);
     }
 
+    /**
+     * Search templates.
+     */
+    public function test_search_tags_for_accessible_plans() {
+        // 1st category, cohort, users and appreciator are created in setup.
+
+        // Creation of 2nd category, users, cohort and appreciator.
+        $this->setUser($this->creator);
+        $dg = $this->getDataGenerator();
+        $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
+        $syscontext = context_system::instance();
+
+        $this->setAdminUser();
+        $category2 = $dg->create_category(array('name' => 'Cat test 2'));
+        $cat2ctx = context_coursecat::instance($category2->id);
+
+        $appreciator2 = $dg->create_user(array('firstname' => 'Appreciator2'));
+        role_assign($this->roleappreciator, $appreciator2->id, $cat2ctx);
+
+        $cohort2user1 = $dg->create_user(array(
+            'firstname' => 'Rebecca',
+            'lastname' => 'Armenta1',
+            'email' => 'user11test@nomail.com',
+            'phone1' => 1111111111,
+            'phone2' => 2222222222,
+            'institution' => 'Institution Name',
+            'department' => 'Dep Name')
+        );
+        $cohort2user2 = $dg->create_user(array(
+            'firstname' => 'Donald',
+            'lastname' => 'Fletcher2',
+            'email' => 'user12test@nomail.com',
+            'phone1' => 1111111111,
+            'phone2' => 2222222222,
+            'institution' => 'Institution Name',
+            'department' => 'Dep Name')
+        );
+
+        $cohort2 = $dg->create_cohort(array('contextid' => $cat2ctx->id));
+        cohort_add_member($cohort2->id, $cohort2user1->id);
+        cohort_add_member($cohort2->id, $cohort2user2->id);
+
+        $params = (object) array(
+            'userid' => $appreciator2->id,
+            'roleid' => $this->roleappreciator,
+            'cohortid' => $cohort2->id
+        );
+        tool_cohortroles_api::create_cohort_role_assignment($params);
+        tool_cohortroles_api::sync_all_cohort_roles();
+
+        // Get learning plans of users from cohort 1.
+        $plans = api::read_plan(0, $this->templateincategory->get('id'));
+        $plancohort1user1 = $plans->current;
+        $plancohort1user2 = api::read_plan($plans->next->planid)->current;
+
+        // Get learning plans of users from cohort 2.
+        $plancohort2user1 = core_competency_api::create_plan_from_template($this->templateincategory->get('id'), $cohort2user1->id);
+        $plancohort2user2 = core_competency_api::create_plan_from_template($this->templateincategory->get('id'), $cohort2user2->id);
+
+        // Add tags to the learning plans of both cohorts.
+        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, 'Tag 1');
+        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, 'Tag 2');
+
+        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, 'Tag 1');
+        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, 'Tag 3');
+
+        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, 'Tag 1');
+        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, 'Tag 4');
+
+        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, 'Tag 4');
+        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, 'Tag 5');
+
+        // Begin tests.
+        $alltags = array('Tag 1' => 'Tag 1', 'Tag 2' => 'Tag 2', 'Tag 3' => 'Tag 3', 'Tag 4' => 'Tag 4', 'Tag 5' => 'Tag 5');
+
+        // Test with the appreciator who see all plans.
+        $this->setUser($this->appreciator);
+        $tags = api::search_tags_for_accessible_plans();
+        $this->assertCount(5, $tags);
+        $this->assertEquals($alltags, $tags);
+
+        // Test with the appreciator for cohort 1.
+        $this->setUser($this->appreciatorforcategory);
+        $tags = api::search_tags_for_accessible_plans();
+        $this->assertCount(3, $tags);
+        $this->assertEquals(array('Tag 1' => 'Tag 1', 'Tag 2' => 'Tag 2', 'Tag 3' => 'Tag 3'), $tags);
+
+        // Test with the appreciator for cohort 2.
+        $this->setUser($appreciator2);
+        $tags = api::search_tags_for_accessible_plans();
+        $this->assertCount(3, $tags);
+        $this->assertEquals(array('Tag 1' => 'Tag 1', 'Tag 4' => 'Tag 4', 'Tag 5' => 'Tag 5'), $tags);
+
+        // Test with admin user.
+        $this->setAdminUser();
+        $tags = api::search_tags_for_accessible_plans();
+        $this->assertCount(5, $tags);
+        $this->assertEquals($alltags, $tags);
+
+        // Test with student user 1, who only sees his own plan.
+        $this->setUser($this->user1);
+        $tags = api::search_tags_for_accessible_plans();
+        $this->assertCount(2, $tags);
+        $this->assertEquals(array('Tag 1' => 'Tag 1', 'Tag 2' => 'Tag 2'), $tags);
+
+        // Test with student user 3, who only sees his own plan.
+        $this->setUser($this->user3);
+        $tags = api::search_tags_for_accessible_plans();
+        $this->assertCount(0, $tags);
+        $this->assertEquals(array(), $tags);
+    }
 }

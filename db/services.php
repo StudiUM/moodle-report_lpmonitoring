@@ -140,6 +140,15 @@ $functions = array(
         'type'         => 'read',
         'capabilities' => 'moodle/competency:templateview',
         'ajax'         => true
+    ),
+    'report_lpmonitoring_submit_manage_tags_form' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'submit_manage_tags_form',
+        'classpath'    => '',
+        'description'  => 'Save the tags submitted by a form',
+        'type'         => 'write',
+        'capabilities' => 'moodle/competency:planmanage',
+        'ajax'         => true
     )
 );
 
