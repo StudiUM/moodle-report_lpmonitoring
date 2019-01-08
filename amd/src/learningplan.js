@@ -1059,7 +1059,7 @@ define(['jquery',
             });
 
             // Handle click on reset display rating.
-            $(".competencyreport").on('click', '.resetdisplayrating', function(event) {
+            $(".competencyreport").on('click', '.resetdisplayrating a', function(event) {
                 event.preventDefault();
                 var planid = $(this).data('canresetdisplayrating-plan');
                 self.resetDisplayRating(planid);

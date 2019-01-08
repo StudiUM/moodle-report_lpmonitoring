@@ -1205,5 +1205,13 @@
 .competencyreport:not(.boost) .row {
     margin-left: 0;
 }
+.button-dispayratinghelp {
+    position: absolute;
+    top: 4px;
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    left: 85px;
+}
 
 
