@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/externallib.php");
 
-
 use external_api;
 use external_function_parameters;
 use external_multiple_structure;
@@ -42,6 +41,7 @@ use core_competency\external as core_competency_external;
 use core_competency\api as core_competency_api;
 use core_user\external\user_summary_exporter;
 use core_competency\external\competency_exporter;
+use core_competency\external\plan_exporter;
 use core_competency\external\template_exporter;
 use core_competency\external\user_competency_exporter;
 use core_competency\external\user_competency_plan_exporter;
@@ -622,7 +622,8 @@ class external extends external_api {
             'templateid' => new external_value(PARAM_INT, 'The template ID'),
             'scalevalues' => new external_value(PARAM_TEXT, 'The scale values filter'),
             'scalefilterbycourse' => new external_value(PARAM_INT, 'Apply the scale filters on grade in course'),
-            'scalesortorder' => new external_value(PARAM_TEXT, 'Scale sort order', VALUE_DEFAULT, 'ASC')
+            'scalesortorder' => new external_value(PARAM_TEXT, 'Scale sort order', VALUE_DEFAULT, 'ASC'),
+            'tagid' => new external_value(PARAM_INT, 'The tag ID')
         ));
     }
 
@@ -635,21 +636,28 @@ class external extends external_api {
      * @param string $scalevalues The scales values filter
      * @param int $scalefilterbycourse Apply the scale filters on grade in course
      * @param string $scalesortorder Scale sort order
+     * @param int $tagid The tag ID
      * @return array
      */
-    public static function read_plan($planid, $templateid, $scalevalues = '', $scalefilterbycourse = true, $scalesortorder= 'ASC') {
+    public static function read_plan($planid, $templateid, $scalevalues = '', $scalefilterbycourse = true,
+            $scalesortorder= 'ASC', $tagid = null) {
         global $PAGE;
+
+        $context = context_system::instance();
+        self::validate_context($context);
 
         $params = self::validate_parameters(self::read_plan_parameters(), array(
                     'planid' => $planid,
                     'templateid' => $templateid,
                     'scalevalues' => $scalevalues,
                     'scalefilterbycourse' => $scalefilterbycourse,
-                    'scalesortorder' => $scalesortorder
+                    'scalesortorder' => $scalesortorder,
+                    'tagid' => $tagid
                 ));
 
         $plans = api::read_plan($params['planid'], $params['templateid'],
-                json_decode($params['scalevalues'], true), $params['scalefilterbycourse'], $params['scalesortorder']);
+                json_decode($params['scalevalues'], true), $params['scalefilterbycourse'],
+                $params['scalesortorder'], $params['tagid']);
         self::validate_context($plans->current->get_context());
 
         $output = $PAGE->get_renderer('report_lpmonitoring');
@@ -739,6 +747,7 @@ class external extends external_api {
             'profileimagesmall' => new external_value(PARAM_TEXT, 'The profile image small size'),
             'userid' => new external_value(PARAM_INT, 'The user ID value'),
             'planid' => new external_value(PARAM_INT, 'The plan ID value'),
+            'tagid' => new external_value(PARAM_INT, 'The tag ID value', VALUE_OPTIONAL)
         ), 'The user and plan ID navigation information', VALUE_OPTIONAL);
 
         return new external_single_structure(array(
@@ -1070,5 +1079,92 @@ class external extends external_api {
      */
     public static function submit_manage_tags_form_returns() {
         return new external_value(PARAM_INT, 'The number of tags associated to the learning plan');
+    }
+
+    /**
+     * Describes the parameters for search_plans_with_tag webservice.
+     * @return external_function_parameters
+     */
+    public static function search_plans_with_tag_parameters() {
+        return new external_function_parameters(
+            array(
+                'tagid' => new external_value(PARAM_INT, 'The tag ID')
+            )
+        );
+    }
+
+    /**
+     * Get the plans with a specific tag (but only plans that the user can view).
+     *
+     * @param int $tagid The tag id.
+     * @return array
+     */
+    public static function search_plans_with_tag($tagid) {
+        global $PAGE;
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $plans = api::search_plans_with_tag($tagid);
+        foreach ($plans as $index => $plan) {
+            // Return profileimage as url instead of object.
+            $plans[$index]['profileimage'] = $plans[$index]['profileimage']->get_url($PAGE)->out(false);
+            $plans[$index]['profileimagesmall'] = $plans[$index]['profileimage'];
+        }
+        return (array) (object) $plans;
+    }
+
+    /**
+     * Returns description of search_plans_with_tag() result value.
+     *
+     * @return \external_description
+     */
+    public static function search_plans_with_tag_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(array(
+                'fullname' => new external_value(PARAM_TEXT, 'The fullname of the user'),
+                'profileimage' => new external_value(PARAM_TEXT, 'The profile image small size'),
+                'profileimagesmall' => new external_value(PARAM_TEXT, 'The profile image small size'),
+                'userid' => new external_value(PARAM_INT, 'The user id value'),
+                'planid' => new external_value(PARAM_INT, 'The plan id value'),
+                'planname' => new external_value(PARAM_TEXT, 'The name of the learning plan template')
+            ))
+        );
+    }
+
+    /**
+     * Describes the parameters for search_tags_for_accessible_plans webservice.
+     * @return external_function_parameters
+     */
+    public static function search_tags_for_accessible_plans_parameters() {
+        return new external_function_parameters(array());
+    }
+
+    /**
+     * Get the plans with a specific tag (but only plans that the user can view).
+     *
+     * @return array
+     */
+    public static function search_tags_for_accessible_plans() {
+        $tags = api::search_tags_for_accessible_plans();
+        $return = array();
+        foreach ($tags as $tagid => $tag) {
+            $return[] = array('id' => $tagid, 'tag' => $tag);
+        }
+        return $return;
+    }
+
+    /**
+     * Returns description of search_tags_for_accessible_plans() result value.
+     *
+     * @return \external_description
+     */
+    public static function search_tags_for_accessible_plans_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(array(
+                'id' => new external_value(PARAM_INT, 'The tag ID'),
+                'tag' => new external_value(PARAM_TEXT, 'The tag')
+            ))
+        );
     }
 }

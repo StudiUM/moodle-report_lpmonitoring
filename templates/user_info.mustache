@@ -30,12 +30,14 @@
     * hasnavigation if the block has navigation
     * navprev
         * fullname
-        * profileimageurl
+        * profileimagesmall
         * planid
+        * tagid
     * navnext
         * fullname
-        * profileimageurl
+        * profileimagesmall
         * planid
+        * tagid
 }}
 {{#plan}}
 <header class="widget_profile_box">
@@ -67,6 +69,7 @@
         class="navigatetoplan prevplan"
         data-planid="{{planid}}"
         data-templateid="{{templateid}}"
+        data-tagid="{{tagid}}"
         href="#">
         <span class="user-profile-small">
             <img alt="{{#str}}imagealt{{/str}}: {{fullname}}" src="{{profileimagesmall}}" >
@@ -81,6 +84,7 @@
        class="navigatetoplan nexplan"
        data-planid="{{planid}}"
        data-templateid="{{templateid}}"
+       data-tagid="{{tagid}}"
        href="#">
         <span class="user-profile-small">
             <img alt="{{#str}}imagealt{{/str}}: {{fullname}}" src="{{profileimagesmall}}">

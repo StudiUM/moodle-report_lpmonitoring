@@ -149,6 +149,24 @@ $functions = array(
         'type'         => 'write',
         'capabilities' => 'moodle/competency:planmanage',
         'ajax'         => true
+    ),
+    'report_lpmonitoring_search_plans_with_tag' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'search_plans_with_tag',
+        'classpath'    => '',
+        'description'  => 'Search all learning plans for a specific tag',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:planview',
+        'ajax'         => true
+    ),
+    'report_lpmonitoring_search_tags_for_accessible_plans' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'search_tags_for_accessible_plans',
+        'classpath'    => '',
+        'description'  => 'Search all tags associated to learning plans the user can view',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:planview',
+        'ajax'         => true
     )
 );
 

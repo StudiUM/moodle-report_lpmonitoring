@@ -26,6 +26,7 @@ namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/gradelib.php');
+require_once($CFG->dirroot.'/user/lib.php');
 
 use core_user;
 use context;
@@ -38,12 +39,14 @@ use core_competency\template_competency;
 use core_competency\competency_framework;
 use core_competency\user_competency;
 use core_competency\user_competency_plan;
+use core_tag_area;
+use core_tag_tag;
 use report_lpmonitoring\report_competency_config;
+use report_lpmonitoring\external;
 use stdClass;
 use Exception;
 use required_capability_exception;
 use moodle_exception;
-use core_tag_area;
 
 /**
  * Class for doing reports for competency.
@@ -509,6 +512,7 @@ class api {
      * @param array $scalesvalues The Scales values filter
      * @param boolean $scalefilterbycourse Apply the scale filters on grade in course
      * @param string $sortorder Scale sort order
+     * @param int $tagid The tag ID
      * @return array((object) array(
      *                            'current' => \core_competency\plan,
      *                            'previous' => \stdClass
@@ -516,10 +520,10 @@ class api {
      *                        ))
      */
     public static function read_plan($planid = null, $templateid = null, $scalesvalues = array(), $scalefilterbycourse = true,
-            $sortorder = 'ASC') {
+            $sortorder = 'ASC', $tagid = null) {
 
-        if (empty($planid) && empty($templateid)) {
-            throw new coding_exception('A plan ID and/or a template ID must be specified');
+        if (empty($planid) && empty($templateid) && empty($tagid)) {
+            throw new coding_exception('A plan ID and/or a template ID and/or a tag ID must be specified');
         }
 
         $currentplan = null;
@@ -527,11 +531,15 @@ class api {
         $nextplan = null;
         // Get the current plan depending on the values passed in parameter.
         $currentplanid = $planid;
-        if (!empty($templateid)) {
-            $userplans = array_values(self::search_users_by_templateid($templateid , '', $scalesvalues, $scalefilterbycourse,
-                    $sortorder));
+        if ( !empty($templateid) || !empty($tagid) ) {
+            if (!empty($tagid)) {
+                $userplans = self::search_plans_with_tag($tagid);
+            } else {
+                $userplans = array_values(self::search_users_by_templateid($templateid , '', $scalesvalues, $scalefilterbycourse,
+                        $sortorder));
+            }
             $currentindex = null;
-            // We throw an exception if the template has no plans.
+            // We throw an exception if no plans are found.
             if (empty($userplans)) {
                 throw new \moodle_exception('emptytemplate', 'report_lpmonitoring');
             } else {
@@ -553,9 +561,11 @@ class api {
                 if (isset($currentindex)) {
                     if (isset($userplans[$currentindex - 1])) {
                         $prevplan = (object) $userplans[$currentindex - 1];
+                        $prevplan->tagid = $tagid;
                     }
                     if (isset($userplans[$currentindex + 1])) {
                         $nextplan = (object) $userplans[$currentindex + 1];
+                        $nextplan->tagid = $tagid;
                     }
                 }
             }
@@ -922,12 +932,56 @@ class api {
                 // If the user can manage at least a plan with this tag, add it to the list of tags to return.
                 $plan = new plan($taginstance->itemid);
                 if ($plan->can_read()) {
-                    $tagstoreturn[$tag->name] = $tag->name;
+                    $tagstoreturn[$tag->id] = $tag->name;
                     break;
                 }
             }
         }
 
         return $tagstoreturn;
+    }
+
+    /**
+     * Get the plans with a specific tag (but only plans that the user can view).
+     *
+     * @param int $tagid The tag id.
+     * @return array( array(
+     *                      'profileimage' => user_picture,
+     *                      'profileimagesmall' => user_picture,
+     *                      'fullname' => string,
+     *                      'userid' => int,
+     *                      'planid' => int,
+     *                      'planname' => string
+     *                      )
+     *              )
+     */
+    public static function search_plans_with_tag($tagid) {
+        $tag = core_tag_tag::get($tagid);
+        $records = array();
+        // Important to check if tag exists and not have just been removed.
+        if ($tag) {
+            $plans = $tag->get_tagged_items('report_lpmonitoring', 'competency_plan');
+
+            foreach ($plans as $index => $planinfos) {
+                $plan = new plan($planinfos->id);
+                if ($plan->can_read()) {
+                    $users = user_get_users_by_id( array($planinfos->userid) );
+                    $user = array_shift($users);
+
+                    $profileimage = new \user_picture($user);
+
+                    $record = array();
+                    $record['profileimage'] = $profileimage;
+                    $record['profileimagesmall'] = $record['profileimage'];
+                    $record['fullname'] = fullname($user);
+                    $record['userid'] = $user->id;
+                    $record['planid'] = $planinfos->id;
+                    $record['planname'] = $planinfos->name;
+
+                    $records[] = $record;
+                }
+            }
+        }
+        return $records;
     }
 }

@@ -29,8 +29,9 @@ use templatable;
 use renderer_base;
 use stdClass;
 use context;
-use core_competency\api;
+use core_competency\api as core_competency_api;
 use core_competency\external\template_exporter;
+use report_lpmonitoring\api as report_lpmonitoring_api;
 
 /**
  * Class containing data for learning plan template competencies page
@@ -55,7 +56,8 @@ class report implements renderable, templatable {
      */
     public function __construct(context $pagecontext) {
         $this->pagecontext = $pagecontext;
-        $this->learningplantemplates = api::list_templates('shortname', 'ASC', 0, 0, $this->pagecontext, 'children', true);
+        $this->learningplantemplates = core_competency_api::list_templates('shortname', 'ASC', 0, 0, $this->pagecontext,
+                'children', true);
     }
 
     /**
@@ -67,6 +69,7 @@ class report implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         $data = new stdClass();
         $data->pagecontextid = $this->pagecontext->id;
+
         $data->templates = array();
         foreach ($this->learningplantemplates as $template) {
             $exporter = new template_exporter($template);

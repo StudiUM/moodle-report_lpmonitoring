@@ -152,7 +152,6 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
             }).fail(function(exp) {
                 Notification.exception(exp);
                 // We should re-display the form with errors but since there is no real validation, it is not necessary.
-                // console.log(ex);
                 // this.modal.setBody(this.getBody(data));
             });
         };

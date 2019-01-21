@@ -63,6 +63,8 @@ define(['jquery',
             $(this.learningplanSelector).on('change', this.learningplanChangeHandler.bind(this)).change();
             $(this.studentSelector).on('change', this.studentChangeHandler.bind(this)).change();
             $(this.studentPlansSelector).on('change', this.studentPlansChangeHandler.bind(this)).change();
+            $(this.tagSelector).on('change', this.tagChangeHandler.bind(this)).change();
+            $(this.learningplanTagSelector).on('change', this.learningplanTagChangeHandler.bind(this)).change();
 
             $('.competencyreport').on('change',
                 '.scalefiltercontainer input[name="optionscalefilter"]',
@@ -76,6 +78,9 @@ define(['jquery',
             // Display rating in user plan.
             $(".competencyreport").on("change", ".displayratings input[type=checkbox]",
                 this.changeDisplayRating.bind(this)).change();
+
+            // When the tags are modified we reload the tags filter.
+            $(".competencyreport").on('DOMSubtreeModified', ".tags-stats", this.reloadTagsIfNeeded.bind(this));
         };
 
         /** @var {Number} The template ID. */
@@ -86,6 +91,10 @@ define(['jquery',
         LearningplanReport.prototype.learningplanId = null;
         /** @var {Number} The learning plan ID from student. */
         LearningplanReport.prototype.studentLearningplanId = null;
+        /** @var {Number} The learning plan ID from tag. */
+        LearningplanReport.prototype.tagLearningplanId = null;
+        /** @var {String} The selected tag ID. */
+        LearningplanReport.prototype.tagId = null;
         /** @var {Number} The user ID. */
         LearningplanReport.prototype.userId = null;
         /** @var {Boolean} If template option is selected. */
@@ -105,12 +114,19 @@ define(['jquery',
 
         /** @var {String} The template select box selector. */
         LearningplanReport.prototype.templateSelector = "#templateSelectorReport";
-        /** @var {String} The learing plan select box selector. */
+        /** @var {String} The learning plan select box selector. */
         LearningplanReport.prototype.learningplanSelector = '#learningplanSelectorReport';
         /** @var {String} The student selector. */
         LearningplanReport.prototype.studentSelector = '#studentSelectorReport';
         /** @var {String} The student plans selector. */
         LearningplanReport.prototype.studentPlansSelector = '#studentPlansSelectorReport';
+        /** @var {String} The tag select box selector. */
+        LearningplanReport.prototype.tagSelector = "#tagSelectorReport";
+        /** @var {String} The learning plan with this tag select box selector. */
+        LearningplanReport.prototype.learningplanTagSelector = '#learningplanTagSelectorReport';
+
+        /** @var {Boolean} Indicate that the tags are currently loading, to prevent loading them twice at the same time. */
+        LearningplanReport.prototype.tagsAreLoading = false;
 
         /**
          * Triggered when a template is selected.
@@ -139,6 +155,151 @@ define(['jquery',
                 $('.competencyreport .advanced').hide();
                 $('.competencyreport #scale').empty();
             }
+            self.checkDataFormReady();
+        };
+
+        /**
+         * Load the tags list from the webservice.
+         *
+         * @name   loadTags
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.loadTags = function() {
+            var self = this;
+            if(self.tagsAreLoading === false) {
+                self.tagsAreLoading = true;
+                $(self.tagSelector + ' option').remove();
+
+                var promise = ajax.call([{
+                    methodname: 'report_lpmonitoring_search_tags_for_accessible_plans',
+                    args: {
+
+                    }
+                }]);
+
+                promise[0].then(function(results) {
+                    str.get_string('selecttag', 'report_lpmonitoring').done(
+                        function(selecttag) {
+                            $(self.tagSelector).append($('<option>').text(selecttag).val(''));
+
+                            $.each(results, function(index, tag) {
+                                $(self.tagSelector).append($('<option>').text(tag.tag).val(tag.id));
+                            });
+
+                            // Select the option that was selected before.
+                            var optionExists = ( $(self.tagSelector + " option[value=" + self.tagId + "]").length > 0 );
+                            if(optionExists === true) {
+                                $(self.tagSelector).val(self.tagId);
+                            } else {
+                                self.tagId = null;
+                                self.tagLearningplanId = null;
+                            }
+
+                            // Simulate a change to reload the learning plans associated to the tag.
+                            $(self.tagSelector).change();
+                            self.tagsAreLoading = false;
+                        }
+                    );
+                }).fail(
+                    function(exp) {
+                        notification.exception(exp);
+                        self.tagsAreLoading = false;
+                    }
+                );
+            }
+        };
+
+        /**
+         * Triggered when the tags are modified in a user plan. Reloads the tags filter, if this filter is currently selected.
+         * @name   reloadTagsIfNeeded
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.reloadTagsIfNeeded = function(event) {
+            event.preventDefault();
+            if ($('.competencyreport #tag').is(':checked')) {
+                this.loadTags();
+            }
+        };
+
+        /**
+         * Triggered when a tag is selected.
+         *
+         * @name   tagChangeHandler
+         * @param  {Event} e
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.tagChangeHandler = function(e) {
+            var self = this;
+            self.tagId = $(e.target).val();
+            if (self.tagId == '') {
+                self.tagId = null;
+            }
+            var promise = ajax.call([{
+                methodname: 'report_lpmonitoring_search_plans_with_tag',
+                args: {
+                    tagid: self.tagId
+                }
+            }]);
+
+            promise[0].then(function(results) {
+                var label = '';
+                // Render the options of the select for learning plans.
+                var oldTagLearningplanId = self.tagLearningplanId;
+                $(self.learningplanTagSelector + ' option').remove();
+                if (results.length > 0) {
+                    str.get_string('selectlearningplan', 'report_lpmonitoring').done(
+                        function(selectlearningplan) {
+                            $(self.learningplanTagSelector).append($('<option>').text(selectlearningplan).val(''));
+
+                            $.each(results, function(index, plan) {
+                                label = plan.fullname + ' - ' + plan.planname;
+                                $(self.learningplanTagSelector).append($('<option>').text(label).val(plan.planid));
+                            });
+                            $(self.learningplanTagSelector).prop("disabled", false);
+
+                            // Select the option that was selected before.
+                            var selectorOption = self.learningplanTagSelector + " option[value=" + oldTagLearningplanId + "]";
+                            var optionExists = ( $(selectorOption).length > 0 );
+                            if(optionExists === true) {
+                                $(self.learningplanTagSelector).val(oldTagLearningplanId);
+                                self.tagLearningplanId = oldTagLearningplanId;
+                            } else {
+                                self.tagLearningplanId = null;
+                            }
+                        }
+                    );
+                } else {
+                    $(self.learningplanTagSelector).prop("disabled", true);
+                    str.get_string('nolearningplanavailable', 'report_lpmonitoring').done(
+                        function(nolearningplanavailable) {
+                            $(self.learningplanTagSelector).append($('<option>').text(nolearningplanavailable).val(''));
+                        }
+                    );
+                }
+                $(self.learningplanTagSelector).trigger('change');
+
+            }).fail(
+                function(exp) {
+                    notification.exception(exp);
+                }
+            );
+            self.checkDataFormReady();
+        };
+
+        /**
+         * Triggered when a student's plan associated to a tag is selected.
+         *
+         * @name   studentPlansChangeHandler
+         * @param  {Event} e
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.learningplanTagChangeHandler = function(e) {
+            var self = this;
+            self.tagLearningplanId = $(e.target).val();
             self.checkDataFormReady();
         };
 
@@ -402,19 +563,21 @@ define(['jquery',
         LearningplanReport.prototype.checkDataFormReady = function() {
             var self = this,
                 conditionByTemplate = false,
-                conditionStudent = false;
+                conditionStudent = false,
+                conditionByTag = false;
 
             if (self.userView === false) {
                 conditionByTemplate = $('#template').is(':checked') && $(self.templateSelector).val() !== '';
                 conditionStudent = $('#student').is(':checked') && $(self.studentSelector).val() !== null &&
                         $(self.studentPlansSelector).val() !== null &&
                         $(self.studentPlansSelector).val() !== '';
+                conditionByTag = $('#tag').is(':checked') && $(self.tagSelector).val() !== '';
             } else {
                 conditionStudent = $(self.studentPlansSelector).val() !== null &&
                         $(self.studentPlansSelector).val() !== '';
             }
 
-            if (conditionByTemplate || conditionStudent) {
+            if (conditionByTemplate || conditionStudent || conditionByTag) {
                 $('#submitFilterReportButton').removeAttr('disabled');
             } else {
                 $('#submitFilterReportButton').attr('disabled', 'disabled');
@@ -585,7 +748,8 @@ define(['jquery',
                     scalevalues: "",
                     templateid: null,
                     planid: planid,
-                    scalefilterbycourse: scalefilterbycourse
+                    scalefilterbycourse: scalefilterbycourse,
+                    tagid: null
                 }
             }
             ]);
@@ -675,16 +839,22 @@ define(['jquery',
         LearningplanReport.prototype.submitFormHandler = function() {
             var self = this;
             var templateSelected = $("#template").is(':checked');
+            var tagSelected = $("#tag").is(':checked');
             var templateid = null;
             var planid = null;
+            var tagid = null;
             if (templateSelected === true) {
                 templateid = self.templateId;
                 planid = self.learningplanId;
+            } else if (tagSelected === true) {
+                tagid = self.tagId;
+                planid = self.tagLearningplanId;
             } else {
+                // Else = "#student" is selected.
                 planid = self.studentLearningplanId;
             }
             self.scalesvaluesSelected = $(self.learningplanSelector).data('scalefilter');
-            self.displayPlan(planid, templateid);
+            self.displayPlan(planid, templateid, tagid);
         };
 
         /**
@@ -840,7 +1010,7 @@ define(['jquery',
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.displayPlan = function(planid, templateid) {
+        LearningplanReport.prototype.displayPlan = function(planid, templateid, tagid) {
             var elementloading = null,
                     self = this;
             if($('#plan-user-info').length) {
@@ -864,7 +1034,8 @@ define(['jquery',
                     templateid: parseInt(templateid),
                     scalevalues: self.scalesvaluesSelected,
                     scalefilterbycourse: scalefilterbycourse,
-                    scalesortorder: self.scalesortorder
+                    scalesortorder: self.scalesortorder,
+                    tagid: parseInt(tagid)
                 }
             }]);
             promise[0].then(function(results) {
@@ -959,10 +1130,15 @@ define(['jquery',
                         true,
                         strings[1]);
                     if (self.userView === false) {
-                        if ($('.competencyreport #student').is(':checked')){
-                            $('.competencyreport .templatefilter').addClass('disabled-option');
+                        if ($('.competencyreport #student').is(':checked')) {
+                            $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
+                            $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
+                        } else if ($('.competencyreport #tag').is(':checked')) {
+                            $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
+                            $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
                         } else {
-                            $('.competencyreport .studentfilter').addClass('disabled-option');
+                            $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
+                            $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
                         }
                     }
                     self.checkDataFormReady();
@@ -1005,16 +1181,28 @@ define(['jquery',
 
             $('.competencyreport #student').on('change', function(){
                 if ($(this).is(':checked')){
-                    $('.competencyreport .studentfilter').toggleClass('disabled-option');
-                    $('.competencyreport .templatefilter').toggleClass('disabled-option');
+                    $('.competencyreport .studentfilter').toggleClass('disabled-option', false);
+                    $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
                 }
                 self.checkDataFormReady();
             });
 
             $('.competencyreport #template').on('change', function(){
                 if ($(this).is(':checked')){
-                    $('.competencyreport .studentfilter').toggleClass('disabled-option');
-                    $('.competencyreport .templatefilter').toggleClass('disabled-option');
+                    $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .templatefilter').toggleClass('disabled-option', false);
+                    $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
+                }
+                self.checkDataFormReady();
+            });
+
+            $('.competencyreport #tag').on('change', function(){
+                if ($(this).is(':checked')){
+                    self.loadTags();
+                    $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .tagfilter').toggleClass('disabled-option', false);
                 }
                 self.checkDataFormReady();
             });
@@ -1030,7 +1218,8 @@ define(['jquery',
                 event.preventDefault();
                 var planid = $(this).data('planid');
                 var templateid = $(this).data('templateid');
-                self.displayPlan(planid, templateid);
+                var tagid = $(this).data('tagid');
+                self.displayPlan(planid, templateid, tagid);
             });
 
             // Handle click on list evidence.

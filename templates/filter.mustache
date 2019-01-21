@@ -24,6 +24,9 @@
     * templates
       * shortname
       * id
+    * tags
+      * id
+      * tag
 }}
 <form class="mform" id="reportFilter" accept-charset="utf-8" method="post" autocomplete="off">
     <fieldset id="id_displayinfo" class="clearfix collapsible">
@@ -47,6 +50,12 @@
                         <span>
                             <input type="radio" name="optionfilter" id="student" value="student" disabled="disabled" aria-labelledby="optionfilter">
                             <label for="student">{{#str}}user{{/str}}</label>
+                        </span>
+                    </div>
+                    <div class="radio radio-primary">
+                        <span>
+                            <input type="radio" name="optionfilter" id="tag" value="tag" disabled="disabled" aria-labelledby="optionfilter">
+                            <label for="tag">{{#str}}tag, report_lpmonitoring{{/str}}</label>
                         </span>
                     </div>
                 </div>
@@ -126,6 +135,28 @@
                     </div>
                     <div class="felement col-md-9 form-inline">
                         <select id="studentPlansSelectorReport" class="form-control custom-select" disabled="disabled">
+                            <option>{{#str}}nolearningplanavailable, report_lpmonitoring{{/str}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="tagfilter disabled-option">
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
+                        <label class="col-form-label d-inline" for="tagSelectorReport">{{#str}}tag, report_lpmonitoring{{/str}}</label>
+                    </div>
+                    <div class="felement fautocomplete col-md-9 form-inline">
+                        <select id="tagSelectorReport" class="form-control custom-select">
+                            <option value="">{{#str}}selecttag, report_lpmonitoring{{/str}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
+                        <label for="learningplanTagSelectorReport">{{#str}}learningplanswithtag, report_lpmonitoring{{/str}}</label>
+                    </div>
+                    <div class="felement col-md-9 form-inline">
+                        <select id="learningplanTagSelectorReport" class="form-control custom-select" disabled="disabled">
                             <option>{{#str}}nolearningplanavailable, report_lpmonitoring{{/str}}</option>
                         </select>
                     </div>
