@@ -7,9 +7,9 @@ Feature: Display plearning plan ratings details
   Background:
     Given the lpmonitoring fixtures exist
     And I log in as "appreciator"
-    And I follow "Courses"
+    And I follow "List of courses"
     When I follow "Medicine"
-    And I expand "Reports" node
+    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
     Then I should see "Monitoring of learning plans"
     And I follow "Monitoring of learning plans"
 
@@ -24,12 +24,8 @@ Feature: Display plearning plan ratings details
 
   Scenario: Read user learning plan filtered by template and user
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
-    And I should see "Rebecca Armenta" item in the autocomplete list
-    And I should see "Stepanie Grant" item in the autocomplete list
+    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"
     And I should see "Pablo Menendez" item in the autocomplete list
-    And I should see "Cynthia Reyes" item in the autocomplete list
-    And I should see "Donald Fletcher" item in the autocomplete list
     And I click on "Pablo Menendez" item in the autocomplete list
     When I press "Apply"
     Then I should see "Competency A"
@@ -41,7 +37,7 @@ Feature: Display plearning plan ratings details
 
   Scenario: Read user learning plan with empty courses rating
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Rebecca"
     And I click on "Rebecca Armenta" item in the autocomplete list
     And I press "Apply"
     And I should see "Competency A"
@@ -50,9 +46,9 @@ Feature: Display plearning plan ratings details
     Then I should see "No data available" in "no-data-available" of the competency "Competency A"
 
   Scenario: Read user learning plan filtered by user
-    Given I click on "//div[contains(@class, 'fradio')]/span/label[contains(@for, 'student')]" "xpath_element"
+    Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
     And the "Apply" "button" should be disabled
-    And I click on ".studentfilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])[last()]" to "Stepanie"
     And I click on "Stepanie Grant" item in the autocomplete list
     And the "studentPlansSelectorReport" select box should contain "Medicine Year 1"
     And the "studentPlansSelectorReport" select box should contain "My custom learing plan"
@@ -69,9 +65,9 @@ Feature: Display plearning plan ratings details
     And ".nexplan" "css_element" should not exist
 
   Scenario: Read own learning plan filtered by user
-    Given I click on "//div[contains(@class, 'fradio')]/span/label[contains(@for, 'student')]" "xpath_element"
+    Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
     And the "Apply" "button" should be disabled
-    And I click on ".studentfilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])[last()]" to "Stepanie"
     And I click on "Stepanie Grant" item in the autocomplete list
     And the "studentPlansSelectorReport" select box should contain "Medicine Year 1"
     And the "studentPlansSelectorReport" select box should contain "My custom learing plan"
@@ -86,7 +82,7 @@ Feature: Display plearning plan ratings details
     And I press "Apply"
     And I should see "Stepanie Grant" in the ".currentplan" "css_element"
     And I should see "No competencies have been linked to this learning plan."
-    And I click on ".studentfilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])[last()]" to "Pablo"
     And I click on "Pablo Menendez" item in the autocomplete list
     And the "studentPlansSelectorReport" select box should contain "Medicine Year 1"
     And the "studentPlansSelectorReport" select box should contain "Pablo learing plan"
@@ -110,14 +106,14 @@ Feature: Display plearning plan ratings details
     And I click on "rate-competency" of the competency "Competency A"
     And "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "not good"
-    And I click on "//input[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "0/1" in the ".proficient-stats" "css_element"
     And I should see "1" in the ".notproficient-stats" "css_element"
     And I should see "0" in the ".notrated-stats" "css_element"
     And I click on "rate-competency" of the competency "Competency A"
     And "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "good"
-    And I click on "//input[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "1/1" in the ".proficient-stats" "css_element"
     And I should see "0" in the ".notproficient-stats" "css_element"
     And I should see "0" in the ".notrated-stats" "css_element"
@@ -127,20 +123,15 @@ Feature: Display plearning plan ratings details
     And I click on "//a[contains(@class, 'moreless-toggler')]" "xpath_element"
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
-    Then I should not see "Rebecca Armenta" item in the autocomplete list
-    And I should not see "Stepanie Grant" item in the autocomplete list
-    And I should not see "Cynthia Reyes" item in the autocomplete list
-    And I should see "Donald Fletcher" item in the autocomplete list
-    And I should see "Pablo Menendez" item in the autocomplete list
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    Then I should see "Pablo Menendez" item in the autocomplete list
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
+    And I should see "No suggestions" in the "//ul[@class='form-autocomplete-suggestions']" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
     And I should see "Rebecca Armenta" item in the autocomplete list
-    And I should see "Stepanie Grant" item in the autocomplete list
-    And I should see "Pablo Menendez" item in the autocomplete list
     And I should see "Cynthia Reyes" item in the autocomplete list
-    And I should see "Donald Fletcher" item in the autocomplete list
 
   Scenario: Filter and sort user learning plan with scales values in plan
     Given I set the field "templateSelectorReport" to "Medicine Year 2"
@@ -148,13 +139,13 @@ Feature: Display plearning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[contains(., 'Final rating')]" "xpath_element"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "S"
     Then I should see "(1) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Frederic Simson" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(2) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I should see "Robert Smith" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I click on "//label[contains(., 'Sort in descending order')]" "xpath_element"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "S"
     And I should see "(2) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Robert Smith" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(1) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
@@ -172,13 +163,13 @@ Feature: Display plearning plan ratings details
     And I click on "//a[contains(@class, 'moreless-toggler')]" "xpath_element"
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
     Then I should see "(3) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Donald Fletcher" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(7) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I should see "Pablo Menendez" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I click on "//label[contains(., 'Sort in descending order')]" "xpath_element"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
     And I should see "(7) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Pablo Menendez" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(3) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
@@ -193,7 +184,7 @@ Feature: Display plearning plan ratings details
 
   Scenario: Read user learning plan by navigating between users
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
     And I click on "Pablo Menendez" item in the autocomplete list
     When I press "Apply"
     Then I should see "Competency A"
@@ -213,7 +204,7 @@ Feature: Display plearning plan ratings details
 
   Scenario: Read user competency detail
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
     And I click on "Pablo Menendez" item in the autocomplete list
     When I press "Apply"
     Then I should see "Competency A"
@@ -274,7 +265,7 @@ Feature: Display plearning plan ratings details
 
   Scenario: Rate a competency in user plan via the rate button
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
     And I should see "Competency A"
@@ -283,7 +274,7 @@ Feature: Display plearning plan ratings details
     When I click on "rate-competency" of the competency "Competency B"
     Then "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "not qualified"
-    And I click on "//input[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "Not proficient" in "level-proficiency" of the competency "Competency B"
     And I should see "not qualified" in "finalrate" of the competency "Competency B"
     And I toggle the "Competency B" detail
@@ -291,7 +282,7 @@ Feature: Display plearning plan ratings details
 
   Scenario: Rate a competency in user plan via user competency popup
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Cynthia"
     And I click on "Cynthia Reyes" item in the autocomplete list
     And I press "Apply"
     And I should see "Competency A"
@@ -301,7 +292,7 @@ Feature: Display plearning plan ratings details
     And I click on "//dd/button[contains(., 'Rate')]" "xpath_element"
     And "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "good"
-    And I click on "//input[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
     And I click on "Close" "button" in the "User competency summary" "dialogue"
     And I should see "Proficient" in "level" of the competency "Competency A"
     And I toggle the "Competency A" detail
@@ -314,14 +305,14 @@ Feature: Display plearning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//div[contains(@class, 'fradio')]/span/label[contains(@for, 'scalefilterplan')]" "xpath_element"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "m"
     Then I should not see "William Presley" item in the autocomplete list
     And I should see "Robert Smith" item in the autocomplete list
     And I should see "Frederic Simson" item in the autocomplete list
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "m"
     And I should see "Robert Smith" item in the autocomplete list
     And I should see "William Presley" item in the autocomplete list
     And I should see "Frederic Simson" item in the autocomplete list
-    
+

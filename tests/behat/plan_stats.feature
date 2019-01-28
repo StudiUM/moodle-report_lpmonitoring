@@ -7,14 +7,14 @@ Feature: Display learning plan template statistics
   Background:
     Given the lpmonitoring fixtures exist
     And I log in as "appreciator"
-    And I follow "Courses"
+    And I follow "List of courses"
     When I follow "Medicine"
-    And I expand "Reports" node
+    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
     Then I should see "Statistics for learning plans"
     And I follow "Statistics for learning plans"
 
   Scenario: Read template competencies statistics
-    Given I click on ".templatelist .form-autocomplete-downarrow" "css_element"
+    Given I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Medicine"
     And I should see "Medicine Year 1" item in the autocomplete list
     And I should see "Medicine Year 2" item in the autocomplete list
     And I click on "Medicine Year 2" item in the autocomplete list
@@ -47,7 +47,7 @@ Feature: Display learning plan template statistics
     And I should see "William Presley" in the "Linked users" "dialogue"
 
   Scenario: Read template competencies statistics in course
-    Given I click on ".templatelist .form-autocomplete-downarrow" "css_element"
+    Given I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Medicine"
     And I should see "Medicine Year 1" item in the autocomplete list
     And I click on "Medicine Year 1" item in the autocomplete list
     And I click on "//label[contains(., 'Rating in course')]" "xpath_element"
