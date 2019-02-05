@@ -33,6 +33,7 @@ use core_competency\user_competency;
 use report_lpmonitoring\external;
 use report_lpmonitoring\report_competency_config;
 use core_competency\url;
+use tool_cohortroles\api as tool_cohortroles_api;
 
 
 /**
@@ -94,6 +95,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         assign_capability('moodle/competency:templateview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
+        assign_capability('moodle/competency:plancomment', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
+        assign_capability('moodle/competency:usercompetencycomment', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         role_assign($this->roleappreciator, $appreciator->id, $syscontext->id);
 
         $this->creator = $creator;
@@ -1523,5 +1526,109 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         // Check that there is no next plan because comp 2 is not associated to course 3.
         $this->assertFalse(isset($result->navnext));
 
+    }
+
+    /**
+     * Test get comment area for a specific learning plan.
+     */
+    public function test_get_comment_area_for_plan() {
+        $this->resetAfterTest(true);
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $syscontext = context_system::instance();
+
+        // Create some users.
+        $u1 = $dg->create_user(array(
+            'firstname' => 'Rebecca',
+            'lastname' => 'Armenta')
+        );
+        $u2 = $dg->create_user(array(
+            'firstname' => 'Donald',
+            'lastname' => 'Fletcher')
+        );
+        // Create template.
+        $template = $lpg->create_template();
+
+        // Create plan from template for all users.
+        $plan1 = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+        $plan2 = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+
+        // Create a cohor and assign appreciator.
+        $this->setAdminUser();
+        $cohort = $dg->create_cohort(array('contextid' => $syscontext->id));
+        cohort_add_member($cohort->id, $u1->id);
+        cohort_add_member($cohort->id, $u2->id);
+        $params = (object) array(
+            'userid' => $this->appreciator->id,
+            'roleid' => $this->roleappreciator,
+            'cohortid' => $cohort->id
+        );
+        tool_cohortroles_api::create_cohort_role_assignment($params);
+        tool_cohortroles_api::sync_all_cohort_roles();
+
+        // Get contexts and comments areas.
+        $context1 = \context_user::instance($u1->id)->id;
+        $context2 = \context_user::instance($u2->id)->id;
+        $commentarea1 = $plan1->get_comment_object($context1, $plan1);
+        $commentarea2 = $plan2->get_comment_object($context2, $plan2);
+
+        // Add comments by appreciator.
+        $this->setUser($this->appreciator);
+        $commentarea1->add('This is the comment #1 for user 1');
+        $commentarea1->add('This is the comment #2 for user 1');
+        $commentarea2->add('This is the comment #1 for user 2');
+
+        // Add comments by students.
+        $this->setUser($u1);
+        $commentarea1->add('This is the comment #1 from student 1');
+        $commentarea1->add('This is the comment #2 from student 1');
+        $this->setUser($u2);
+        $commentarea2->add('This is the comment #1 from student 2');
+
+        // Check results for student 1 as student 1.
+        $this->setUser($u1);
+        $result = external::get_comment_area_for_plan($plan1->get('id'));
+        $result = external::clean_returnvalue(external::get_comment_area_for_plan_returns(), $result);
+        $this->assertEquals($result['count'], 4);
+        $this->assertEquals($result['contextid'], $context1);
+        $this->assertTrue($result['canpost']);
+        // Check results for student 1 as student 2.
+        $this->setUser($u2);
+        $result = external::get_comment_area_for_plan($plan1->get('id'));
+        $result = external::clean_returnvalue(external::get_comment_area_for_plan_returns(), $result);
+        $this->assertEquals($result['count'], 4);
+        $this->assertEquals($result['contextid'], $context1);
+        $this->assertFalse($result['canpost']);
+        // Check results for student 1 as appreciator.
+        $this->setUser($this->appreciator);
+        $result = external::get_comment_area_for_plan($plan1->get('id'));
+        $result = external::clean_returnvalue(external::get_comment_area_for_plan_returns(), $result);
+        $this->assertEquals($result['count'], 4);
+        $this->assertEquals($result['contextid'], $context1);
+        $this->assertTrue($result['canpost']);
+
+        // Check results for student 2 as student 1.
+        $this->setUser($u1);
+        $result = external::get_comment_area_for_plan($plan2->get('id'));
+        $result = external::clean_returnvalue(external::get_comment_area_for_plan_returns(), $result);
+        $this->assertEquals($result['count'], 2);
+        $this->assertEquals($result['contextid'], $context2);
+        $this->assertFalse($result['canpost']);
+        // Check results for student 2 as student 2.
+        $this->setUser($u2);
+        $result = external::get_comment_area_for_plan($plan2->get('id'));
+        $result = external::clean_returnvalue(external::get_comment_area_for_plan_returns(), $result);
+        $this->assertEquals($result['count'], 2);
+        $this->assertEquals($result['contextid'], $context2);
+        $this->assertTrue($result['canpost']);
+        // Check results for student 2 as appreciator.
+        $this->setUser($this->appreciator);
+        $result = external::get_comment_area_for_plan($plan2->get('id'));
+        $result = external::clean_returnvalue(external::get_comment_area_for_plan_returns(), $result);
+        $this->assertEquals($result['count'], 2);
+        $this->assertEquals($result['contextid'], $context2);
+        $this->assertTrue($result['canpost']);
     }
 }

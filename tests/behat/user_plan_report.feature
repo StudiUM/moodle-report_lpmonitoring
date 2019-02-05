@@ -1,5 +1,5 @@
 @report @javascript @report_lpmonitoring @report_lpmonitoring_for_user
-Feature: Display plearning plan ratings details
+Feature: Display learning plan ratings details
   As a student
   In order to display competencies ratings on learning plan
   I need to display rating by scale value and final rating
@@ -54,6 +54,7 @@ Feature: Display plearning plan ratings details
     And "Pharmacology" row "Grade" column of "coursesbyscalevalue" table should contain "-"
     And I click on "Close" "button" in the "Linked courses" "dialogue"
     And I should see "Not rated" in "level-proficiency" of the competency "Competency A"
+    And I should see "0" in the ".count-stats" "css_element"
     And I set the field "studentPlansSelectorReport" to "Pablo learing plan"
     And I press "Apply"
     And I should see "Learning plan competencies: Pablo learing plan"

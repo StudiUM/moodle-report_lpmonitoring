@@ -167,6 +167,15 @@ $functions = array(
         'type'         => 'read',
         'capabilities' => 'moodle/competency:planview',
         'ajax'         => true
+    ),
+    'report_lpmonitoring_get_comment_area_for_plan' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'get_comment_area_for_plan',
+        'classpath'    => '',
+        'description'  => 'Get the comment area for the specified learning plan',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:planview',
+        'ajax'         => true
     )
 );
 

@@ -28,6 +28,8 @@ defined('MOODLE_INTERNAL') || die();
 use core\external\exporter;
 use renderer_base;
 use core_tag_tag;
+use core_competency\external\plan_exporter;
+use core_comment\external\comment_area_exporter;
 
 /**
  * Class for exporting stats data for plan.
@@ -54,6 +56,9 @@ class stats_plan_exporter extends exporter {
             ),
             'nbtags' => array(
                 'type' => PARAM_INT
+            ),
+            'commentarea' => array(
+                'type' => comment_area_exporter::read_properties_definition(),
             )
         );
     }
@@ -96,6 +101,10 @@ class stats_plan_exporter extends exporter {
         $result->nbcompetenciesproficient = $nbcompetenciesproficient;
         $result->nbcompetenciesnotrated = $nbcompetenciesnotrated;
         $result->nbtags = count(core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $planid));
+
+        $commentareaexporter = new comment_area_exporter($this->related['plan']->get_comment_object());
+        $result->commentarea = $commentareaexporter->export($output);
+
         return (array) $result;
     }
 }

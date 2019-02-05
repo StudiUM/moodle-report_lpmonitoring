@@ -45,6 +45,7 @@ use core_competency\external\plan_exporter;
 use core_competency\external\template_exporter;
 use core_competency\external\user_competency_exporter;
 use core_competency\external\user_competency_plan_exporter;
+use core_comment\external\comment_area_exporter;
 use core_tag_tag;
 use report_lpmonitoring\external\stats_plan_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_detail_exporter;
@@ -1166,5 +1167,49 @@ class external extends external_api {
                 'tag' => new external_value(PARAM_TEXT, 'The tag')
             ))
         );
+    }
+
+    /**
+     * Returns description of get_comment_area_for_plan() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function get_comment_area_for_plan_parameters() {
+        $planid = new external_value(
+            PARAM_INT,
+            'The plan id',
+            VALUE_REQUIRED
+        );
+        $params = array('planid' => $planid);
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Loads the data required to render a comment area of a learning plan.
+     *
+     * @param int $planid Learning Plan id.
+     * @return stdClass
+     */
+    public static function get_comment_area_for_plan($planid) {
+        global $PAGE;
+        $params = self::validate_parameters(self::get_comment_area_for_plan_parameters(), array(
+            'planid' => $planid
+        ));
+
+        $plan = new plan($params['planid']);
+        self::validate_context($plan->get_context());
+
+        $output = $PAGE->get_renderer('core');
+        $commentareaexporter = new comment_area_exporter($plan->get_comment_object());
+        return $commentareaexporter->export($output);
+    }
+
+    /**
+     * Returns description of get_comment_area_for_plan() result value.
+     *
+     * @return \external_description
+     */
+    public static function get_comment_area_for_plan_returns() {
+        return comment_area_exporter::get_read_structure();
     }
 }
