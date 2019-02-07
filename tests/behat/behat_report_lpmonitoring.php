@@ -26,6 +26,8 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
+use Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
+
 /**
  * Step definition for learning plan report.
  *
@@ -196,6 +198,81 @@ class behat_report_lpmonitoring extends behat_base {
         $xpathtarget = "//ul[@class='form-autocomplete-suggestions']//li//span//span[contains(.,'" . $item . "')]";
 
         $this->execute('behat_general::should_not_exist', [$xpathtarget, 'xpath_element']);
+    }
+
+    /**
+     * Should see text value in specific row and column of table.
+     *
+     * @Then I should see :value in :row row :column column of :table table
+     *
+     * @param string $value
+     * @param string $row
+     * @param string $column
+     * @param string $table
+     */
+    public function i_should_see_in_row_column_of_table($value, $row, $column, $table) {
+        $tablenode = $this->get_selected_node('table', $table);
+        $tablexpath = $tablenode->getXpath();
+
+        $rowliteral = \behat_context_helper::escape($row);
+        $valueliteral = \behat_context_helper::escape($value);
+        $columnliteral = \behat_context_helper::escape($column);
+
+        if (preg_match('/^-?(\d+)-?$/', $column, $columnasnumber)) {
+            // Column indicated as a number, just use it as position of the column.
+            $columnpositionxpath = "/child::*[position() = {$columnasnumber[1]}]";
+        } else {
+            // Header can be in thead or tbody (first row), following xpath should work.
+            $theadheaderxpath = "thead/tr[1]/th[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
+                    $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])]";
+            $tbodyheaderxpath = "tbody/tr[1]/td[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
+                    $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])]";
+
+            // Check if column exists.
+            $columnheaderxpath = $tablexpath . "[" . $theadheaderxpath . " | " . $tbodyheaderxpath . "]";
+            $columnheader = $this->getSession()->getDriver()->find($columnheaderxpath);
+            if (empty($columnheader)) {
+                $columnexceptionmsg = $column . '" in table "' . $table . '"';
+                throw new ElementNotFoundException($this->getSession(), "\n$columnheaderxpath\n\n".'Column', null,
+                        $columnexceptionmsg);
+            }
+            // Following conditions were considered before finding column count.
+            // 1. Table header can be in thead/tr/th or tbody/tr/td[1].
+            // 2. First column can have th (Gradebook -> user report), so having lenient sibling check.
+            $columnpositionxpath = "/child::*[position() = count(" . $tablexpath . "/" . $theadheaderxpath .
+                "/preceding-sibling::*) + 1]";
+        }
+
+        // Check if value exists in specific row/column.
+        // Get row xpath.
+        // GoutteDriver uses DomCrawler\Crawler and it is making XPath relative to the current context, so use descendant.
+        $rowxpath = $tablexpath."/tbody/tr[descendant::th[contains(., " . $rowliteral .
+                    ")] | descendant::td[contains(., " . $rowliteral . ")]]";
+
+        $columnvaluexpath = $rowxpath . $columnpositionxpath . "[contains(normalize-space(.)," . $valueliteral . ")]";
+
+        // Looks for the requested node inside the container node.
+        $coumnnode = $this->getSession()->getDriver()->find($columnvaluexpath);
+        if (empty($coumnnode)) {
+            $locatorexceptionmsg = $value . '" in "' . $row . '" row with column "' . $column;
+            throw new ElementNotFoundException($this->getSession(), "\n$columnvaluexpath\n\n".'Column value', null,
+                    $locatorexceptionmsg);
+        }
+    }
+
+    /**
+     * Should see value tagged by dt and dd.
+     *
+     * @Then I should see :dd dd in :dt dt
+     * @param string $dd
+     * @param string $dt
+     */
+    public function i_should_see_dd_in_dt($dd, $dt) {
+        $ddliteral = \behat_context_helper::escape($dd);
+        $dtliteral = \behat_context_helper::escape($dt);
+        $xpathtarget = "//dt[contains(., $dtliteral)]/following-sibling::dd[contains(., $ddliteral)]";
+
+        $this->execute('behat_general::should_exist', [$xpathtarget, 'xpath_element']);
     }
 
 }

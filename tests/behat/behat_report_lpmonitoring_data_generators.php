@@ -147,7 +147,8 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $user1 = $datagenerator->create_user(array(
             'firstname' => 'Rebecca',
             'lastname' => 'Armenta',
-            'username' => 'rebeccaa')
+            'username' => 'rebeccaa',
+            'password' => 'rebeccaa')
         );
         $user2 = $datagenerator->create_user(array(
             'firstname' => 'Donald',
@@ -300,6 +301,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         assign_capability('moodle/competency:planmanage', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:competencygrade', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:templateview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:templatemanage', CAP_ALLOW, $roleid, $cat1ctx->id);
 
         role_assign($roleid, $appreciator->id, $cat1ctx->id);
         $params = (object) array(
