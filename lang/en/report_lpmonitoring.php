@@ -60,6 +60,7 @@ $string['nouserselected'] = 'No user selected';
 $string['proficient'] = 'Proficient';
 $string['proficientcompetencies'] = 'Competencies proficient';
 $string['pluginname'] = 'Monitoring of learning plans';
+$string['privacy:metadata'] = 'The Monitoring of learning plans plugin does not store any personal data.';
 $string['previoususer'] = 'Previous User';
 $string['rated'] = 'Rated';
 $string['ratingnumber'] = '<strong>({$a})</strong> rating';
