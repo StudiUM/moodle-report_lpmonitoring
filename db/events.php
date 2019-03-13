@@ -27,15 +27,7 @@
 // List of observers.
 $observers = array(
     array(
-        'eventname'   => '\core\event\competency_framework_updated',
-        'callback'    => '\report_lpmonitoring\event\observer::framework_updated',
-    ),
-    array(
         'eventname'   => '\core\event\competency_framework_deleted',
         'callback'    => '\report_lpmonitoring\event\observer::framework_deleted',
-    ),
-    array(
-        'eventname'   => '\core\event\competency_updated',
-        'callback'    => '\report_lpmonitoring\event\observer::competency_updated',
-    ),
+    )
 );
