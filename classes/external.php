@@ -1215,4 +1215,33 @@ class external extends external_api {
     public static function get_comment_area_for_plan_returns() {
         return comment_area_exporter::get_read_structure();
     }
+
+    /**
+     * Returns description of list_plan_competencies_report() parameters.
+     *
+     * @return \external_description
+     */
+    public static function list_plan_competencies_report_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(PARAM_INT, 'The plan ID.')
+        ));
+    }
+
+    /**
+     * List plan competencies for the report.
+     * @param  int $id The plan ID.
+     * @return array
+     */
+    public static function list_plan_competencies_report($id) {
+        return null;
+    }
+
+    /**
+     * Returns description of list_plan_competencies_report() result value.
+     *
+     * @return \external_description
+     */
+    public static function list_plan_competencies_report_returns() {
+        return null;
+    }
 }

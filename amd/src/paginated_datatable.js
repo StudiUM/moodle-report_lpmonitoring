@@ -318,9 +318,11 @@ define(['jquery', 'core/str', 'core/config', 'core/notification', 'report_lpmoni
                  * Apply dataTable on HTML table.
                  *
                  * @param {String} tableSelector the selector of table.
+                 * @param {Boolean} paginate true if pagination.
+                 * @param {Boolean} sort true if sort.
                  * @method apply
                  */
-                apply: function (tableSelector) {
+                apply: function (tableSelector, paginate, sort) {
                     str.get_strings([
                         {key: 'last'},
                         {key: 'first'},
@@ -337,6 +339,8 @@ define(['jquery', 'core/str', 'core/config', 'core/notification', 'report_lpmoni
                                     "bLengthChange": false,
                                     "bInfo": false,
                                     "pageLength": 10,
+                                    "paginate": paginate,
+                                    "sort": sort,
                                     'language': {
                                         'paginate': {
                                             'first': strings[0],

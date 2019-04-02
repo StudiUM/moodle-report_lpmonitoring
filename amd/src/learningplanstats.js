@@ -271,7 +271,7 @@ define(['jquery',
                                 titledialogue,
                                 html,
                                 function() {
-                                    DataTable.apply('#list-user-' + competencyid + '-' + scalevalue);
+                                    DataTable.apply('#list-user-' + competencyid + '-' + scalevalue, true, true);
                                 },
                                 self.destroyDialogue
                             );
@@ -302,7 +302,7 @@ define(['jquery',
                                 titledialogue,
                                 html,
                                 function(){
-                                    DataTable.apply('#list-users-stats-' + listusers.competencyid);
+                                    DataTable.apply('#list-users-stats-' + listusers.competencyid, true, true);
                                 },
                                 self.destroyDialogue
                             );

@@ -176,6 +176,15 @@ $functions = array(
         'type'         => 'read',
         'capabilities' => 'moodle/competency:planview',
         'ajax'         => true
-    )
+    ),
+    'report_lpmonitoring_list_plan_competencies_report' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'list_plan_competencies_report',
+        'classpath'    => '',
+        'description'  => 'Get the list plan competencies report',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:planview',
+        'ajax'         => true
+    ),
 );
 

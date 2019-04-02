@@ -604,17 +604,25 @@ define(['jquery',
             }]);
             promiselistCompetencies[0].then(function(results) {
                 if (results.length > 0) {
+                    // Get the "Detail" tab content.
                     var competencies = {competencies_list:results, plan:plan, hascompetencies: true};
-                    return templates.render('report_lpmonitoring/list_competencies', competencies).done(function(html, js) {
+                    templates.render('report_lpmonitoring/list_competencies', competencies).done(function(html, js) {
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         self.loadCompetencyDetail(results, plan, elementloading);
+                        $("#nav-tabs").show();
                     });
+
+                    self.loadReportTab(plan);
+
+                    return null;
                 } else {
                     elementloading.removeClass('loading');
                     return templates.render('report_lpmonitoring/list_competencies', {}).done(function(html, js) {
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
+                        $("#report-content").empty();
+                        $("#nav-tabs").hide();
                     });
                 }
             }).fail(
@@ -684,6 +692,47 @@ define(['jquery',
                     });
                 });
             });
+        };
+
+        /**
+         * Load the report tab.
+         *
+         * @param {Object} Plan
+         * @function
+         */
+        LearningplanReport.prototype.loadReportTab = function(plan) {
+            // Get the "Report" tab content.
+            var promiseCompetenciesReport = ajax.call([{
+                methodname: 'report_lpmonitoring_list_plan_competencies_report',
+                args: {
+                    id: plan.id
+                }
+            }]);
+            promiseCompetenciesReport[0].then(function(results) {
+                var competencies = {competencies_list:results, plan:plan};
+
+                // Keep the filter and search values.
+                var checkedvalue = $('input[type=radio][name=reportfilter]:checked').val();
+                if (checkedvalue == 'course') {
+                    competencies.filterchecked_course = true;
+                } else if (checkedvalue == 'module') {
+                    competencies.filterchecked_module = true;
+                } else {
+                    competencies.filterchecked_both = true;
+                }
+
+                competencies.tablesearchvalue = $('#table-search').val();
+
+                // Render the "Report" data table template.
+                templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
+                    $("#report-content").html(html);
+                    templates.runTemplateJS(js);
+                });
+            }).fail(
+                function(exp) {
+                    notification.exception(exp);
+                }
+            );
         };
 
         /**
@@ -953,7 +1002,7 @@ define(['jquery',
                                 titledialogue,
                                 html,
                                 function(){
-                                    DataTable.apply('#listevidencecompetency-' + evidences.competencyid);
+                                    DataTable.apply('#listevidencecompetency-' + evidences.competencyid, true, true);
                                 },
                                 self.destroyDialogue
                             );
@@ -992,7 +1041,7 @@ define(['jquery',
                                 titledialogue,
                                 html,
                                 function(){
-                                    DataTable.apply('#listcoursecompetency-' + listcourses.competencyid);
+                                    DataTable.apply('#listcoursecompetency-' + listcourses.competencyid, true, true);
                                 },
                                 self.destroyDialogue
                             );
@@ -1060,6 +1109,8 @@ define(['jquery',
                                 $("#userInfoContainer").html(html);
                                 $("#listPlanCompetencies").empty();
                                 $("#plan-stats-report").empty();
+                                $("#report-content").empty();
+                                $("#nav-tabs").hide();
                             });
                         } else {
                             notification.exception(exp);
@@ -1087,7 +1138,7 @@ define(['jquery',
                                 titledialogue,
                                 html,
                                 function(){
-                                    DataTable.apply('#listscalecoursecompetency-' + listcourses.competencyid);
+                                    DataTable.apply('#listscalecoursecompetency-' + listcourses.competencyid, true, true);
                                 },
                                 self.destroyDialogue
                             );

@@ -1,0 +1,164 @@
+<div class="filter-report-custom">
+    <div class="felement col-md-9 form-inline" >
+        <div class="radio radio-primary">
+            <span>
+                <input type="radio" name="reportfilter" id="course" value="course" {{#filterchecked_course}}checked=""{{/filterchecked_course}} aria-labelledby="reportfilter">
+                <label for="course">{{#str}}filtercourse, report_lpmonitoring{{/str}}</label>
+            </span>
+        </div>
+        <div class="radio radio-primary">
+            <span>
+                <input type="radio" name="reportfilter" id="module" value="module" {{#filterchecked_module}}checked=""{{/filterchecked_module}} aria-labelledby="reportfilter">
+                <label for="module">{{#str}}filtermodule, report_lpmonitoring{{/str}}</label>
+            </span>
+        </div>
+        <div class="radio radio-primary">
+            <span>
+                <input type="radio" name="reportfilter" id="both" value="both" {{#filterchecked_both}}checked=""{{/filterchecked_both}} aria-labelledby="reportfilter">
+                <label for="both">{{#str}}filterboth, report_lpmonitoring{{/str}}</label>
+            </span>
+        </div>
+    </div>
+    <div class="felement col-md-3 form-inline" >
+        <input type="text" placeholder="{{#str}}searchplaceholder, report_lpmonitoring{{/str}}" id="table-search" class="form-control" {{#tablesearchvalue}}value="{{tablesearchvalue}}"{{/tablesearchvalue}}>
+    </div>
+</div>
+
+
+<div id="table-scroll" class="table-scroll">
+  <table id="main-table" class="main-table hidden">
+    <thead>
+      <tr>
+        <th scope="col">Compétences</th>
+        <th scope="col">Preuves d'aquis</th>
+        <th scope="col" class="course"><a href="#">DMV101</a><br>
+        
+        </th>
+        <th scope="col"  class="cm-cell"><a href="#">DMV101</a><br>
+        <a class="" onclick="" href="http://localhost/moodle/mod/workshop/view.php?id=123"><img src="http://localhost/moodle/theme/image.php/boostudem/workshop/1554142822/icon" class="iconlarge activityicon" alt=" " role="presentation"><span class="instancename">Workshop 1<span class="accesshide "> Atelier d'évaluation</span></span></a>
+        </th>
+        <th scope="col"  class="cm-cell"><a href="#">DMV101</a><br>
+            <a class="" onclick="" href="http://localhost/moodle/mod/assign/view.php?id=176"><img src="http://localhost/moodle/theme/image.php/boostudem/assign/1554142822/icon" class="iconlarge activityicon" alt=" " role="presentation"><span class="instancename">Devoir 1<span class="accesshide "> Devoir</span></span></a>
+        </th>
+        <th scope="col"  class="cm-cell"><a href="#">DMV102</a><br>
+            <a class="" onclick="" href="http://localhost/moodle/mod/assign/view.php?id=176"><img src="http://localhost/moodle/theme/image.php/boostudem/assign/1554142822/icon" class="iconlarge activityicon" alt=" " role="presentation"><span class="instancename">Devoir 1<span class="accesshide "> Devoir</span></span></a>
+        </th>
+        <th scope="col"  class="cm-cell"><a href="#">DMV102</a><br>
+            <a class="" onclick="" href="http://localhost/moodle/mod/assign/view.php?id=176"><img src="http://localhost/moodle/theme/image.php/boostudem/assign/1554142822/icon" class="iconlarge activityicon" alt=" " role="presentation"><span class="instancename">Devoir 2<span class="accesshide "> Devoir</span></span></a>
+        </th>
+        <th scope="col"  class="course"><a href="#">DMV103</a><br></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>T1.1.4 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">
+Recueillir par soi-même de nouvelles données <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol>
+        </th>
+        <td>3</td>
+        <td class="sa course"><a href="#">Satisfait aux attentes</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="nsp cm-cell"><a href="#">Ne satisfait pas aux attentes</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="sa cm-cell"><a href="#">Satisfait aux attentes</a></td>
+        <td class="nsp course"><a href="#">Ne satisfait pas aux attentes</a></td>
+      </tr>
+      <tr>
+        <th>T1.1.2 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">
+Discerner l’essentiel de l’accessoire <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol></th>
+        <td></td>
+        <td class="da course"><a href="#">Dépasse les attentes</a></td>
+        <td class="sp cm-cell"><a href="#">Satisfait partiellement</a></td>
+        <td class="sa cm-cell"><a href="#">Satisfait aux attentes</a></td>
+        <td class="sa cm-cell"><a href="#">Satisfait aux attentes</a></td>
+        <td class="sp cm-cell"><a href="#">Satisfait partiellement</a></td>
+        <td class="course"></td>
+      </tr>
+      
+      <tr>
+        <th>T2.1.3 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">
+Respecter les droits d’auteur <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol></th>
+        <td></td>
+        <td class="da course"><a href="#">Dépasse les attentes</a></td>
+        <td class="nsp cm-cell"><a href="#">Ne satisfait pas aux attentes</a></td>
+        <td class="cm-cell"></td>
+        <td class="sa cm-cell"><a href="#">Satisfait aux attentes</a></td>
+        <td class="cm-cell"></td>
+        <td class="sp course"><a href="#">Satisfait partiellement</a></td>
+      </tr>
+      
+      <tr>
+        <th>T2.1.3 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">Au besoin, en mettre une autre à l’essai <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol></th>
+        <td>2</td>
+        <td class="course"></td>
+        <td class="sp cm-cell"><a href="#">Satisfait partiellement</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="nsp cm-cell"><a href="#">Ne satisfait pas aux attentes</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="sa course"><a href="#">Satisfait aux attentes</a></td>
+      </tr>
+      
+      <tr>
+        <th>T2.1.4 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">
+Saisir la structure du problème à résoudre <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol></th>
+        <td></td>
+        <td class="sp course"><a href="#">Satisfait partiellement</a></td>
+        <td class="cm-cell"></td>
+        <td class="sa cm-cell"><a href="#">Satisfait aux attentes</a></td>
+        <td class="cm-cell"></td>
+        <td class="sa cm-cell"><a href="#">Satisfait aux attentes</a></td>
+        <td class="da course"><a href="#">Dépasse les attentes</a></td>
+      </tr>
+      
+      <tr>
+        <th>T2.2.4 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">Effectuer un retour sur les étapes franchies <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol></th>
+        <td>1</td>
+        <td class="course"></td>
+        <td class="nsp  cm-cell"><a href="#">Ne satisfait pas aux attentes</a></td>
+        <td class="cm-cell"></td>
+        <td class="sp cm-cell"><a href="#">Satisfait partiellement</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="da course"><a href="#">Dépasse les attentes</a></td>
+      </tr>
+      
+      <tr>
+        <th>T3.2.4 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">Reprendre certaines d’entre elles au besoin <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol></th>
+        <td></td>
+        <td class="da course"><a href="#">Dépasse les attentes</a></td>
+        <td class="sa cm-cell"><a href="#">Satisfait aux attentes</a></td>
+        <td class="sp cm-cell"><a href="#">Satisfait partiellement</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="sa cm-cell"><a href="#">Satisfait aux attentes</a></td>
+        <td class="nsp course"><a href="#">Ne satisfait pas aux attentes</a></td>
+      </tr>
+      
+      <tr>
+        <th>T3.3.4 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">Articuler et communiquer son point de vue <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol></th>
+        <td></td>
+        <td class="course"></td>
+        <td class="sp cm-cell"><a href="#">Satisfait partiellement</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="nsp cm-cell"><a href="#">Ne satisfait pas aux attentes</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="sa course"><a href="#">Satisfait aux attentes</a></td>
+      </tr>
+      
+      <tr>
+        <th>T1.1.4 - <a href="#" data-user-competency="true" data-userid="131" data-competencyid="6" data-planid="5" title="Recueillir par soi-même de nouvelles données" role="button">Recueillir par soi-même de nouvelles données <em></em></a><br><ol class="breadcrumb tile_stats_count" id="yui_3_17_2_1_1554149345598_43">        <li> <a title="Exemple de référentiel :: SSE" href="http://localhost/moodle/admin/tool/lp/competencies.php?competencyframeworkid=1&amp;pagecontextid=1" target="_blank"><i class="fa fa-sitemap"></i> Exemple de référentiel :: SSE</a></li>        <li><a role="button" title="T1" data-action="competency-dialogue" href="#" data-id="1">T1</a>                <span> / </span>        </li>        <li><a role="button" title="T1.1" data-action="competency-dialogue" href="#" data-id="2">T1.1</a>                        </li>    </ol></th>
+        <td></td>
+        <td class="sa course"><a href="#">Satisfait aux attentes</a></td>
+        <td  class="cm-cell"></td>
+        <td class="sp cm-cell"><a href="#">Satisfait partiellement</a></td>
+        <td class="da cm-cell"><a href="#">Dépasse les attentes</a></td>
+        <td class="nsp cm-cell"><a href="#">Ne satisfait pas aux attentes</a></td>
+        <td class="sp course"><a href="#">Satisfait partiellement</a></td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+
+{{#js}}
+require(['jquery', 'report_lpmonitoring/report_datatable'], function($, Rdt) {
+    Rdt.init('#main-table', 'reportfilter', '#table-search', '#report-content .course', '#report-content .cm-cell');
+});
+{{/js}}
