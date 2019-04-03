@@ -702,6 +702,19 @@ class external extends external_api {
             'hasnavigation' => $hasnavigation
         );
 
+        foreach ($plans->fullnavigation as $key => $plan) {
+            $plan = (object) $plan;
+            $profileimage = $plan->profileimage;
+            $profileimage->size = 0;
+            $plan->profileimage = $profileimage->get_url($PAGE)->out(false);
+            $plan->current = $plan->planid == $plans->current->get('id') ? true : false;
+            if (!empty($params['tagid'])) {
+                $plan->tagid = $params['tagid'];
+            }
+            $plans->fullnavigation[$key] = $plan;
+        }
+        $result['fullnavigation'] = $plans->fullnavigation;
+
         if (isset($plans->previous)) {
             $profileimage = $plans->previous->profileimage;
             $plans->previous->profileimage = $profileimage->get_url($PAGE)->out(false);
@@ -754,11 +767,27 @@ class external extends external_api {
             'tagid' => new external_value(PARAM_INT, 'The tag ID value', VALUE_OPTIONAL)
         ), 'The user and plan ID navigation information', VALUE_OPTIONAL);
 
+        $fullnavigation = new external_multiple_structure(
+            new external_single_structure(array(
+                'fullname' => new external_value(PARAM_TEXT, 'The fullname of the user'),
+                'planname' => new external_value(PARAM_TEXT, 'The plan name'),
+                'email' => new external_value(PARAM_TEXT, 'The email of the user', VALUE_OPTIONAL),
+                'idnumber' => new external_value(PARAM_TEXT, 'The idnumber of the user', VALUE_OPTIONAL),
+                'profileimage' => new external_value(PARAM_TEXT, 'The profile image small size'),
+                'userid' => new external_value(PARAM_INT, 'The user ID value'),
+                'planid' => new external_value(PARAM_INT, 'The plan ID value'),
+                'nbrating' => new external_value(PARAM_INT, 'The nb rating value', VALUE_OPTIONAL),
+                'current' => new external_value(PARAM_BOOL, 'Is current user'),
+                'tagid' => new external_value(PARAM_INT, 'The tag ID value', VALUE_OPTIONAL)
+            ), 'Full navigation list', VALUE_OPTIONAL)
+        );
+
         return new external_single_structure(array(
             'plan' => $plan,
             'hasnavigation' => new external_value(PARAM_BOOL, 'Has navigation returned for previous and/or next plans'),
             'navprev' => $usernav,
-            'navnext' => $usernav
+            'navnext' => $usernav,
+            'fullnavigation' => $fullnavigation
         ));
     }
 

@@ -447,6 +447,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         // Test plan not based on a template.
         $result = external::read_plan($plan4->get('id'), 0);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+        $this->assertCount(0, $result['fullnavigation']);
         $this->assertEquals($plan4->get('id'), $result['plan']['id']);
         $this->assertEquals($plan4->get('name'), $result['plan']['name']);
         $this->assertEquals($user1->id, $result['plan']['user']['id']);
@@ -463,6 +464,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         // Test plan based on a template that is is the first in the list of plans.
         $result = external::read_plan($plan1->get('id'), $tpl->get('id'));
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+        $this->assertCount(3, $result['fullnavigation']);
         $this->assertEquals($plan1->get('id'), $result['plan']['id']);
         $this->assertEquals($plan1->get('name'), $result['plan']['name']);
         $this->assertEquals($user1->id, $result['plan']['user']['id']);
@@ -478,10 +480,17 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($user2->id, $result['navnext']['userid']);
         $this->assertEquals('Jonathan Cortez', $result['navnext']['fullname']);
         $this->assertEquals($plan2->get('id'), $result['navnext']['planid']);
+        $this->assertEquals('Sharon Austin', $result['fullnavigation'][0]['fullname']);
+        $this->assertTrue($result['fullnavigation'][0]['current']);
+        $this->assertEquals('Jonathan Cortez', $result['fullnavigation'][1]['fullname']);
+        $this->assertFalse($result['fullnavigation'][1]['current']);
+        $this->assertEquals('Alicia Underwood', $result['fullnavigation'][2]['fullname']);
+        $this->assertFalse($result['fullnavigation'][2]['current']);
 
         // Test plan based on a template that is in the middle in the list of plans.
         $result = external::read_plan($plan2->get('id'), $tpl->get('id'));
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+        $this->assertCount(3, $result['fullnavigation']);
         $this->assertEquals($plan2->get('id'), $result['plan']['id']);
         $this->assertEquals($plan2->get('name'), $result['plan']['name']);
         $this->assertEquals($user2->id, $result['plan']['user']['id']);
@@ -504,6 +513,12 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotrated']);
+        $this->assertEquals('Sharon Austin', $result['fullnavigation'][0]['fullname']);
+        $this->assertFalse($result['fullnavigation'][0]['current']);
+        $this->assertEquals('Jonathan Cortez', $result['fullnavigation'][1]['fullname']);
+        $this->assertTrue($result['fullnavigation'][1]['current']);
+        $this->assertEquals('Alicia Underwood', $result['fullnavigation'][2]['fullname']);
+        $this->assertFalse($result['fullnavigation'][2]['current']);
 
         // Test plan based on a template that is the last in the list of plans.
         $result = external::read_plan($plan3->get('id'), $tpl->get('id'));
@@ -527,6 +542,11 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotproficient']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotrated']);
+        $this->assertFalse($result['fullnavigation'][0]['current']);
+        $this->assertEquals('Jonathan Cortez', $result['fullnavigation'][1]['fullname']);
+        $this->assertFalse($result['fullnavigation'][1]['current']);
+        $this->assertEquals('Alicia Underwood', $result['fullnavigation'][2]['fullname']);
+        $this->assertTrue($result['fullnavigation'][2]['current']);
 
         // Test reading of plan when passing only the template ID.
         $result = external::read_plan(0, $tpl->get('id'));
@@ -1355,7 +1375,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterbycourse);
 
         $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
-
+        // Test full navigation count.
+        $this->assertCount(2, $result->fullnavigation);
         // Check plan for user 1 is found.
         $this->assertEquals($result->plan['id'], $plan1->get('id'));
         $this->assertEquals($result->plan['user']['id'], $user1->id);
@@ -1363,6 +1384,13 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         // Check next plan selected is user 2.
         $this->assertEquals($result->navnext['userid'], $user2->id);
         $this->assertEquals($result->navnext['planid'], $plan2->get('id'));
+        // Test full navigation.
+        $this->assertEquals($user1->id, $result->fullnavigation[0]['userid']);
+        $this->assertEquals(1, $result->fullnavigation[0]['nbrating']);
+        $this->assertTrue($result->fullnavigation[0]['current']);
+        $this->assertEquals($user2->id, $result->fullnavigation[1]['userid']);
+        $this->assertEquals(1, $result->fullnavigation[1]['nbrating']);
+        $this->assertFalse($result->fullnavigation[1]['current']);
 
         // Specify 2 scale values as filter.
         $scalevalues = '[{"scalevalue" : 1, "scaleid" :' . $framework->get('scaleid') . '}, '
@@ -1503,10 +1531,15 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterbycourse);
 
         $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
-
+        // Test full navigation count.
+        $this->assertCount(1, $result->fullnavigation);
         // Check plan for user 1 is found.
         $this->assertEquals($result->plan['id'], $plan1->get('id'));
         $this->assertEquals($result->plan['user']['id'], $user1->id);
+        // Test full navigation.
+        $this->assertEquals($user1->id, $result->fullnavigation[0]['userid']);
+        $this->assertEquals(1, $result->fullnavigation[0]['nbrating']);
+        $this->assertTrue($result->fullnavigation[0]['current']);
 
         // Check that there is no next plan because comp 2 is not associated to course 3.
         $this->assertFalse(isset($result->navnext));

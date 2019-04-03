@@ -1275,3 +1275,136 @@
 #report-content #table-search {
     float: right;
 }
+
+/** full navigation **/
+.toggle-lp-list-users {
+    padding-top: 5px!important;
+    padding-bottom: 5px !important;
+    padding-right: 3px !important;
+    width: 35px;
+    padding-left: 3px !important;
+    margin-bottom: 10px;
+    height: 60px;
+    display: inline-block;
+    background-color: #1375c7 !important;
+    display: block;
+    float: left;
+    margin-top: 13px;
+    border-radius: 6px;
+    height: 62px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.toggle-lp-list-users i {
+    font-size: 25px;
+    margin-bottom: 3px;
+    display: block;
+    color: #fff !important;
+}
+[data-region="blocks-lp-list-users"].lp-list-users-closed {
+    margin-left: -250px;
+}
+[data-region="blocks-lp-list-users"] {
+    -moz-transition: margin .8s ease;
+    -webkit-transition: margin .8s ease;
+    -ms-transition: margin .8s ease;
+    -o-transition: margin .8s ease;
+    transition: margin .8s ease;
+    max-width: 240px;
+    float: left;
+    margin-left: 0;
+    margin-top: 13px;
+}
+.plan-info-container.closed .plan-info-detail {
+    width: 95%;
+}
+.plan-info-container.nonavigation .plan-info-detail {
+    width: 100%;
+}
+.plan-info-detail {
+    float: left;
+    width: 80%;
+    -moz-transition: width .8s ease;
+    -webkit-transition: width .8s ease;
+    -ms-transition: width .8s ease;
+    -o-transition: width .8s ease;
+    transition: width .8s ease;
+}
+.plan-info-container .table-list-users span.nav-small {
+    font-size: 0.7em;
+    display: inline;
+}
+.plan-info-container .table-list-users span.nav-small.label {
+    display: inline-block;
+}
+.plan-info-container .table-list-users .nav-list-users-displayinfo {
+    display: inline-block;
+    float: right;
+}
+.plan-info-container .table-list-users .nav-list-users-displayinfo i.fa {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #262626;
+}
+.table-list-users {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 4px;
+    border-collapse: collapse;
+    overflow: hidden;
+    color: #262626;
+}
+.competencyreport .table-list-users img {
+    border-radius: 50%;
+    height: 25px;
+    width: 25px;
+    display: block;
+    margin: 0 auto;
+}
+.table-list-users tr.selected {
+    background-color: #bedbff !important;
+}
+.table-list-users tr {
+    cursor: pointer;
+}
+.table-list-users td {
+    border: none !important;
+    font-size: 0.9em;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+.table-list-users td span.fullname-td {
+    display: inline-block;
+    width: 165px;
+}
+.table-list-users td.img-user {
+    width: 30px
+}
+.drawer-open-left .plan-info-detail {
+    width: 70%;
+}
+@media (max-width: 1199px) {
+    [data-region="blocks-lp-list-users"] {
+        max-width: 100%;
+        width: 100%;
+    }
+    .drawer-open-left .plan-info-detail,
+    .plan-info-detail {
+        width: 100%;
+    }
+}
+@media (max-width: 1500px) and (min-width: 1190px) {
+    .plan-info-detail {
+        width: 70%;
+    }
+}
+@media (min-width: 1797px) {
+    .drawer-open-left .plan-info-detail {
+        width: 80%;
+    }
+}
+@media (max-width: 1316px) and (min-width: 1200px) {
+    .drawer-open-left .plan-info-detail {
+        width: 60%;
+    }
+}

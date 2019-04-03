@@ -328,7 +328,8 @@ class api {
                                           gradecount,
                                           tempid,
                                           $fields,
-                                          p.id AS planid
+                                          p.id AS planid,
+                                          p.name AS planname
                                     FROM  (
                                             (SELECT ucc.userid AS useridentifier, Count(ucc.grade) gradecount,
                                                     tc.templateid AS tempid
@@ -360,6 +361,7 @@ class api {
                                           tempid,
                                           $fields,
                                           p.id AS planid,
+                                          p.name AS planname,
                                           p.status as planstatus,
                                           tableusercomp
                                     FROM  (
@@ -401,7 +403,7 @@ class api {
                 ORDER BY $sort";
         } else {
             // If no scale filter defined.
-            $sql = "SELECT $fields, p.id as planid
+            $sql = "SELECT $fields, p.id as planid, p.name as planname
                   FROM {" . \core_competency\plan::TABLE . "} p
                   JOIN {user} u ON u.id = p.userid
                  WHERE p.templateid = :templateid
@@ -428,6 +430,7 @@ class api {
             $userplan['profileimage'] = new \user_picture($user);
             $userplan['fullname'] = fullname($user);
             $userplan['userid'] = $user->id;
+            $userplan['planname'] = $user->planname;
             $userplan['planid'] = $user->planid;
             $userplan['nbrating'] = (isset($user->gradecount)) ? $user->gradecount : 0;
             $usercontext = \context_user::instance($user->id);
@@ -529,6 +532,7 @@ class api {
         $currentplan = null;
         $prevplan = null;
         $nextplan = null;
+        $userplans = [];
         // Get the current plan depending on the values passed in parameter.
         $currentplanid = $planid;
         if ( !empty($templateid) || !empty($tagid) ) {
@@ -583,7 +587,8 @@ class api {
         return (object) array(
             'current' => $currentplan,
             'previous' => $prevplan,
-            'next' => $nextplan
+            'next' => $nextplan,
+            'fullnavigation' => $userplans
         );
     }
 
@@ -975,6 +980,7 @@ class api {
                     $record['profileimagesmall'] = $record['profileimage'];
                     $record['fullname'] = fullname($user);
                     $record['userid'] = $user->id;
+                    $record['email'] = $user->email;
                     $record['planid'] = $planinfos->id;
                     $record['planname'] = $planinfos->name;
 

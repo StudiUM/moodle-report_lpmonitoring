@@ -1089,10 +1089,23 @@ define(['jquery',
             }]);
             promise[0].then(function(results) {
                 results.templateid = parseInt(templateid);
+                if (results.hasnavigation === false) {
+                    $('.plan-info-container').addClass('nonavigation');
+                } else {
+                    $('.plan-info-container').removeClass('nonavigation');
+                }
+                // State of navigation.
+                results.navigationclosed = false;
+                if ($('.plan-info-container').hasClass('closed')) {
+                    results.navigationclosed = true;
+                }
                 if (self.userView === false) {
                     return templates.render('report_lpmonitoring/user_info', results).done(function(html) {
                         $("#userInfoContainer").html(html);
                         self.loadListCompetencies(results.plan, elementloading);
+                        return templates.render('report_lpmonitoring/users_list_navigation', results).done(function(html) {
+                            $("#users-list-full-navigation").html(html);
+                        });
                     });
                 } else {
                     str.get_string('learningplancompetencies', 'report_lpmonitoring', results.plan.name).done(function(planname) {
@@ -1111,6 +1124,7 @@ define(['jquery',
                                 $("#plan-stats-report").empty();
                                 $("#report-content").empty();
                                 $("#nav-tabs").hide();
+                                $("#users-list-full-navigation").empty();
                             });
                         } else {
                             notification.exception(exp);
@@ -1266,6 +1280,27 @@ define(['jquery',
 
             // User plan navigation.
             $(".competencyreport").on('click', 'a.navigatetoplan', function(event) {
+                event.preventDefault();
+                var planid = $(this).data('planid');
+                var templateid = $(this).data('templateid');
+                var tagid = $(this).data('tagid');
+                self.displayPlan(planid, templateid, tagid);
+            });
+
+            // User plan full navigation.
+            $(".competencyreport").on('click', '.toggle-lp-list-users', function(event) {
+                event.preventDefault();
+                $(this).find('i.angle').toggleClass('fa-angle-double-right fa-angle-double-left');
+                $(this).closest('.plan-info-container').toggleClass('closed');
+                $('div[data-region="blocks-lp-list-users"]').toggleClass('lp-list-users-closed');
+            });
+            $(".competencyreport").on('click', '.plan-info-container .table-list-users .nav-list-users-displayinfo', function(event) {
+                event.stopPropagation();
+                event.preventDefault();
+                $(this).find('i.fa').toggleClass('fa-angle-down fa-angle-up');
+                $(this).parent().find('span.item-nav-list-users-info').toggleClass('hidden');
+            });
+            $(".competencyreport").on('click', '.plan-info-container .table-list-users tr', function(event) {
                 event.preventDefault();
                 var planid = $(this).data('planid');
                 var templateid = $(this).data('templateid');
