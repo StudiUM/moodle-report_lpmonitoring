@@ -43,6 +43,7 @@
       "profileimageurl": "invalid url",
       "profileimageurlsmall": "invalid url",
       "nbrating": "6",
+      "nbcomments": "2",
       "hasidentity": true,
       "identity": "p001421, useremail@nomailtest.com"
       
@@ -59,3 +60,7 @@
 {{#nbrating}}
 <span class="nbratinguser">{{#str}}ratingnumber, report_lpmonitoring, {{{nbrating}}}{{/str}}</span>
 {{/nbrating}}
+
+{{#nbcomments}}
+<span class="nbratinguser">{{#str}}commentsnumber, report_lpmonitoring, {{{nbcomments}}}{{/str}}</span>
+{{/nbcomments}}

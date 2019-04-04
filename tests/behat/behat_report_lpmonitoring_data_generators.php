@@ -28,6 +28,7 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Gherkin\Node\TableNode as TableNode;
 use Behat\Behat\Tester\Exception\PendingException as PendingException;
+use report_lpmonitoring\api;
 use core_competency\api as core_competency_api;
 use tool_cohortroles\api as tool_cohortroles_api;
 
@@ -69,10 +70,14 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         // Create course.
         $course1 = $datagenerator->create_course(array('shortname' => 'Anatomy', 'fullname' => 'Anatomy', 'category' => $cat1->id));
         $course2 = $datagenerator->create_course(array('shortname' => 'Genetic', 'fullname' => 'Genetic', 'category' => $cat1->id));
-        $course3 = $datagenerator->create_course(array('shortname' => 'Psychology', 'fullname' => 'Psychology', 'category' => $cat1->id));
-        $course4 = $datagenerator->create_course(array('shortname' => 'Pharmacology', 'fullname' => 'Pharmacology', 'category' => $cat1->id));
-        $course5 = $datagenerator->create_course(array('shortname' => 'Pathology', 'fullname' => 'Pathology', 'category' => $cat1->id));
-        $course6 = $datagenerator->create_course(array('shortname' => 'Neuroscience', 'fullname' => 'Neuroscience', 'category' => $cat1->id));
+        $course3 = $datagenerator->create_course(array('shortname' => 'Psychology', 'fullname' => 'Psychology',
+            'category' => $cat1->id));
+        $course4 = $datagenerator->create_course(array('shortname' => 'Pharmacology', 'fullname' => 'Pharmacology',
+            'category' => $cat1->id));
+        $course5 = $datagenerator->create_course(array('shortname' => 'Pathology', 'fullname' => 'Pathology',
+            'category' => $cat1->id));
+        $course6 = $datagenerator->create_course(array('shortname' => 'Neuroscience', 'fullname' => 'Neuroscience',
+            'category' => $cat1->id));
 
         // Create templates.
         $template1 = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
@@ -415,5 +420,17 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
          // Make Fred plan complete.
         core_competency_api::complete_plan($pfred->get('id'));
 
+        // Add comments to some user plans.
+        $plans = api::read_plan(null, $template1->get('id'))->fullnavigation;
+        $plan1 = api::read_plan($plans[0]['planid'])->current;
+        $plan3 = api::read_plan($plans[2]['planid'])->current;
+        // Add comments to Rebecca.
+        $context1 = \context_user::instance($user1->id)->id;
+        $commentarea1 = $plan1->get_comment_object($context1, $plan1);
+        $commentarea1->add('This is the comment #1 for Rebecca');
+        // Add comments to Stepanie.
+        $context3 = \context_user::instance($user3->id)->id;
+        $commentarea3 = $plan3->get_comment_object($context3, $plan3);
+        $commentarea3->add('This is the comment #1 for Stepanie');
     }
 }

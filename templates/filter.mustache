@@ -79,11 +79,22 @@
                         <label class="col-form-label d-inline" for="learningplanSelectorReport">{{#str}}usersfromtemplate, report_lpmonitoring{{/str}}</label>
                     </div>
                     <div class="felement fautocomplete col-md-9 form-inline  ">
-                        <select style="display: none" data-scalesortorder="" data-scalefilter="" id="learningplanSelectorReport" data-templateid="" data-scalefilterapply="" class="form-control">
+                        <select style="display: none" data-scalesortorder="" data-scalefilter="" id="learningplanSelectorReport" data-templateid="" data-scalefilterapply="" data-withcomments="" class="form-control">
                         </select>
                     </div>
                 </div>
                 <div class="advanced" style="display: none">
+                    <div class="fitem form-group row">
+                        <div class="fitemtitle col-md-3">
+                            <label>{{#str}}comments{{/str}}</label>
+                        </div>
+                        <div class="felement col-md-9 form-inline">
+                            <div class="checkbox checkbox-primary">
+                                <input id="filter-comment" type="checkbox">
+                                <label for="filter-comment">{{#str}}atleastonecomment, report_lpmonitoring{{/str}}</label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="fitem form-group row">
                         <div class="fitemtitle col-md-3">
                             <label>{{#str}}scalesfortemplate, report_lpmonitoring{{/str}}</label>

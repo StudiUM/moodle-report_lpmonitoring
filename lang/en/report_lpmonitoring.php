@@ -25,6 +25,7 @@
 
 $string['advancedfilter'] = 'Advanced filter';
 $string['apply'] = 'Apply';
+$string['atleastonecomment'] = 'Learning plans with at least one comment';
 $string['colorconfiguration'] = 'Competencies scale colors';
 $string['colorsforscale'] = 'Colors for the scale: {$a}';
 $string['colorsforscalesaved'] = 'The colors of {$a} scale were saved successfully.';
@@ -32,6 +33,7 @@ $string['comment'] = 'Comment';
 $string['comments'] = 'Comments';
 $string['commentsedit'] = 'View or add comments';
 $string['commentseditshort'] = 'View/Add';
+$string['commentsnumber'] = '<strong>({$a})</strong> comment(s)';
 $string['course'] = 'Course';
 $string['emptytemplate'] = 'No learning plans found';
 $string['errormanagetags'] = 'Error submitting the tags edition form';

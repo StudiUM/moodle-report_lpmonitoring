@@ -11,6 +11,7 @@
         * idnumber
         * email
         * nbrating
+        * nbcomments
         * profileimage
 }}
 {{#hasnavigation}}
@@ -37,6 +38,9 @@
                 {{#nbrating}}
                 <span class="label label-info nav-small">{{#str}}ratingnumber, report_lpmonitoring, {{{nbrating}}}{{/str}}</span>
                 {{/nbrating}}
+                {{#nbcomments}}
+                <span class="label label-info nav-small">{{#str}}commentsnumber, report_lpmonitoring, {{{nbcomments}}}{{/str}}</span>
+                {{/nbcomments}}
             </td>
         </tr>
         {{/fullnavigation}}

@@ -182,6 +182,31 @@ Feature: Display plearning plan ratings details
     And I should see "Donald Fletcher" in the ".currentplan" "css_element"
     And I should see "Pablo Menendez" in the ".nexplan" "css_element"
 
+  Scenario: Filter user learning plan with comments
+    Given I set the field "templateSelectorReport" to "Medicine Year 1"
+    And I click on "//a[contains(@class, 'moreless-toggler')]" "xpath_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
+    And I should see "Rebecca Armenta" item in the autocomplete list
+    And I should not see "comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
+    And I should see "Cynthia Reyes" item in the autocomplete list
+    And I should not see "comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    And I should see "Pablo Menendez" item in the autocomplete list
+    When I press "Apply"
+    Then I should see "Rebecca Armenta" in the ".currentplan" "css_element"
+    And I should see "Donald Fletcher" in the ".nexplan" "css_element"
+    And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'at least one comment')]" "xpath_element"
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to ""
+    And I should see "Rebecca Armenta" item in the autocomplete list
+    And I should see "(1) comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
+    And I should see "Stepanie Grant" item in the autocomplete list
+    And I should see "(1) comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
+    And I should not see "Cynthia Reyes" item in the autocomplete list
+    And I should not see "Pablo Menendez" item in the autocomplete list
+    And I press "Apply"
+    And I should see "Rebecca Armenta" in the ".currentplan" "css_element"
+    And I should see "Stepanie Grant" in the ".nexplan" "css_element"
+
   Scenario: Read user learning plan by navigating between users
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
     And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
@@ -220,14 +245,14 @@ Feature: Display plearning plan ratings details
     And "Pharmacology" row "Rated" column of "listcourseincompetencytable" table should contain "Yes"
     And "Pathology" row "Rated" column of "listcourseincompetencytable" table should contain "Yes"
     And "Neuroscience" row "Rated" column of "listcourseincompetencytable" table should contain "Yes"
-    And I set the field "Search" to "Pathology"
+    And I set the field with xpath "//div[@class='lpmonitoringdialogue']//input[@type='search']" to "Pathology"
     And I should see "Pathology" in the "Linked courses" "dialogue"
     And I should not see "Anatomy" in the "Linked courses" "dialogue"
     And I should not see "Genetic" in the "Linked courses" "dialogue"
     And I should not see "Psychology" in the "Linked courses" "dialogue"
     And I should not see "Pharmacology" in the "Linked courses" "dialogue"
     And I should not see "Neuroscience" in the "Linked courses" "dialogue"
-    And I set the field "Search" to "Nothing"
+    And I set the field with xpath "//div[@class='lpmonitoringdialogue']//input[@type='search']" to "Nothing"
     And I should see "No matching records found" in the "Linked courses" "dialogue"
     And I click on "Close" "button" in the "Linked courses" "dialogue"
     And I should see "1" in "listevidence" of the competency "Competency A"
@@ -235,7 +260,7 @@ Feature: Display plearning plan ratings details
     And "List of evidence" "dialogue" should be visible
     And I should see "Search"
     And I should see "My evidence" in the "List of evidence" "dialogue"
-    And I set the field "Search" to "Nothing"
+    And I set the field with xpath "//div[@class='lpmonitoringdialogue']//input[@type='search']" to "Nothing"
     And I should see "No matching records found" in the "List of evidence" "dialogue"
     And I click on "Close" "button" in the "List of evidence" "dialogue"
     And I should see "4" for "not good" in the row "1" of "Competency A" rating
@@ -248,7 +273,7 @@ Feature: Display plearning plan ratings details
     And "Genetic" row "Grade" column of "coursesbyscalevalue" table should contain "-"
     And "Pathology" row "Grade" column of "coursesbyscalevalue" table should contain "-"
     And "Neuroscience" row "Grade" column of "coursesbyscalevalue" table should contain "-"
-    And I set the field "Search" to "Genetic"
+    And I set the field with xpath "//div[@class='lpmonitoringdialogue']//input[@type='search']" to "Genetic"
     And I should see "Genetic" in the "Linked courses" "dialogue"
     And I should not see "Anatomy" in the "Linked courses" "dialogue"
     And I should not see "Neuroscience" in the "Linked courses" "dialogue"

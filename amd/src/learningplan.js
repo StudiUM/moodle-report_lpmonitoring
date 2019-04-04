@@ -78,6 +78,8 @@ define(['jquery',
             // Display rating in user plan.
             $(".competencyreport").on("change", ".displayratings input[type=checkbox]",
                 this.changeDisplayRating.bind(this)).change();
+            // Only plans with comments filter.
+            $('.competencyreport').on('change','#filter-comment' ,this.changeWithcommentsHandler.bind(this)).change();
 
             // When the tags are modified we reload the tags filter.
             $(".competencyreport").on('DOMSubtreeModified', ".tags-stats", this.reloadTagsIfNeeded.bind(this));
@@ -111,6 +113,8 @@ define(['jquery',
         LearningplanReport.prototype.scalefilterbycourse = null;
         /** @var {String} Apply scale sortorder. */
         LearningplanReport.prototype.scalesortorder = 'ASC';
+        /** @var {String} Apply filter for only plans with comments. */
+        LearningplanReport.prototype.withcomments = false;
 
         /** @var {String} The template select box selector. */
         LearningplanReport.prototype.templateSelector = "#templateSelectorReport";
@@ -798,7 +802,8 @@ define(['jquery',
                     templateid: null,
                     planid: planid,
                     scalefilterbycourse: scalefilterbycourse,
-                    tagid: null
+                    tagid: null,
+                    withcomments: false
                 }
             }
             ]);
@@ -892,9 +897,11 @@ define(['jquery',
             var templateid = null;
             var planid = null;
             var tagid = null;
+            self.withcomments = false;
             if (templateSelected === true) {
                 templateid = self.templateId;
                 planid = self.learningplanId;
+                self.withcomments = $("#filter-comment").is(':checked');
             } else if (tagSelected === true) {
                 tagid = self.tagId;
                 planid = self.tagLearningplanId;
@@ -903,6 +910,7 @@ define(['jquery',
                 planid = self.studentLearningplanId;
             }
             self.scalesvaluesSelected = $(self.learningplanSelector).data('scalefilter');
+
             self.displayPlan(planid, templateid, tagid);
         };
 
@@ -980,6 +988,19 @@ define(['jquery',
                 self.scalesortorder = 'DESC';
             }
             $(self.learningplanSelector).data('scalesortorder', self.scalesortorder);
+        };
+
+        /**
+         * Handler on "only plans with comments" filter change.
+         *
+         * @name   changeWithcommentsHandler
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.changeWithcommentsHandler = function() {
+            var self = this;
+            self.withcomments = $("#filter-comment").is(':checked');
+            $(self.learningplanSelector).data('withcomments', self.withcomments);
         };
 
         /**
@@ -1084,7 +1105,8 @@ define(['jquery',
                     scalevalues: self.scalesvaluesSelected,
                     scalefilterbycourse: scalefilterbycourse,
                     scalesortorder: self.scalesortorder,
-                    tagid: parseInt(tagid)
+                    tagid: parseInt(tagid),
+                    withcomments: self.withcomments
                 }
             }]);
             promise[0].then(function(results) {
@@ -1294,7 +1316,8 @@ define(['jquery',
                 $(this).closest('.plan-info-container').toggleClass('closed');
                 $('div[data-region="blocks-lp-list-users"]').toggleClass('lp-list-users-closed');
             });
-            $(".competencyreport").on('click', '.plan-info-container .table-list-users .nav-list-users-displayinfo', function(event) {
+            var tmpselector = '.plan-info-container .table-list-users .nav-list-users-displayinfo';
+            $(".competencyreport").on('click', tmpselector, function(event) {
                 event.stopPropagation();
                 event.preventDefault();
                 $(this).find('i.fa').toggleClass('fa-angle-down fa-angle-up');
@@ -1406,6 +1429,8 @@ define(['jquery',
                 var scalesortorder = $(selector).data('scalesortorder');
                 scalesortorder = scalesortorder ? scalesortorder : 'ASC';
                 var scalefilterbycourse = scalefilterapply === false ? 0 : 1;
+                var withcomments = $(selector).data('withcomments');
+                withcomments = withcomments ? withcomments : false;
                 var templateid = $(selector).data('templateid');
                 if (templateid === '') {
                     return [];
@@ -1418,7 +1443,8 @@ define(['jquery',
                         templateid: parseInt(templateid),
                         scalevalues: $(selector).data('scalefilter'),
                         scalefilterbycourse: scalefilterbycourse,
-                        scalesortorder: scalesortorder
+                        scalesortorder: scalesortorder,
+                        withcomments: withcomments
                     }
                 }]);
 

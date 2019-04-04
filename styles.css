@@ -1376,6 +1376,7 @@
 .table-list-users td span.fullname-td {
     display: inline-block;
     width: 165px;
+    overflow: hidden;
 }
 .table-list-users td.img-user {
     width: 30px
@@ -1393,18 +1394,16 @@
         width: 100%;
     }
 }
-@media (max-width: 1500px) and (min-width: 1190px) {
+@media (max-width: 1500px) and (min-width: 1200px) {
     .plan-info-detail {
         width: 70%;
     }
-}
-@media (min-width: 1797px) {
     .drawer-open-left .plan-info-detail {
-        width: 80%;
+        width: 65%;
     }
 }
-@media (max-width: 1316px) and (min-width: 1200px) {
+@media (min-width: 1800px) {
     .drawer-open-left .plan-info-detail {
-        width: 60%;
+        width: 80%;
     }
 }

@@ -16,21 +16,20 @@ Feature: Manage learning plans comments
     And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Rebecca"
     And I click on "Rebecca Armenta" item in the autocomplete list
     When I press "Apply"
-    Then I should see "Comments"
-    And I should see "0" in the ".comments-stats" "css_element"
+    Then I should see "1" in the ".comments-stats" "css_element"
     And I click on "//a[contains(@data-action, 'managecommentsmodal')]" "xpath_element"
     And "View or add comments" "dialogue" should be visible
-    And I set the field with xpath "//textarea[contains(@id, 'plancommentarea')]" to "Comment 1 for Rebecca"
-    And I click on "Save comment" "link"
     And I set the field with xpath "//textarea[contains(@id, 'plancommentarea')]" to "Comment 2 for Rebecca"
     And I click on "Save comment" "link"
+    And I set the field with xpath "//textarea[contains(@id, 'plancommentarea')]" to "Comment 3 for Rebecca"
+    And I click on "Save comment" "link"
     And I click on "Close" "button" in the "View or add comments" "dialogue"
-    And I should see "2" in the ".comments-stats" "css_element"
+    And I should see "3" in the ".comments-stats" "css_element"
     And I click on "//a[contains(@data-action, 'managecommentsmodal')]" "xpath_element"
     And "View or add comments" "dialogue" should be visible
-    And I click on "//ul[contains(@class, 'comment-list')]/li[1]//div[contains(@class, 'comment-delete')]/a" "xpath_element"
+    And I click on "//ul[contains(@class, 'comment-list')]/li[2]//div[contains(@class, 'comment-delete')]/a" "xpath_element"
     And I click on "Close" "button" in the "View or add comments" "dialogue"
-    And I should see "1" in the ".comments-stats" "css_element"
+    And I should see "2" in the ".comments-stats" "css_element"
     And I click on ".nexplan" "css_element"
     And I should see "Donald Fletcher"
     And I should see "Comments"
@@ -48,8 +47,7 @@ Feature: Manage learning plans comments
     And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"
     And I click on "Pablo Menendez" item in the autocomplete list
     When I press "Apply"
-    Then I should see "Comments"
-    And I should see "0" in the ".comments-stats" "css_element"
+    Then I should see "0" in the ".comments-stats" "css_element"
     And I click on "//a[contains(@data-action, 'managecommentsmodal')]" "xpath_element"
     And "View or add comments" "dialogue" should be visible
     And I set the field with xpath "//textarea[contains(@id, 'plancommentarea')]" to "Comment 1 for Pablo"

@@ -214,6 +214,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:planmanage', CAP_ALLOW, $roleid, $syscontext->id);
+        assign_capability('moodle/competency:plancomment', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:competencygrade', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:templateview', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/site:viewuseridentity', CAP_ALLOW, $roleid, $syscontext->id);
@@ -1262,6 +1263,48 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     }
 
     /**
+     * Test the "Only plans with comments" filter of get learning plans from templateid.
+     */
+    public function test_search_users_by_templateid_and_withcomments() {
+        $this->setUser($this->appreciatorforcategory);
+
+        $plans = api::read_plan(0, $this->templateincategory->get('id'));
+        $plan1 = $plans->current;
+        $plan2 = api::read_plan($plans->next->planid)->current;
+
+        // Add comments to user1.
+        $context1 = \context_user::instance($this->user1->id)->id;
+        $commentarea1 = $plan1->get_comment_object($context1, $plan1);
+        $commentarea1->add('This is the comment #1 for user 1');
+        $commentarea1->add('This is the comment #2 for user 1');
+        $commentarea1->add('This is the comment #3 for user 1');
+        // All users.
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false);
+        $this->assertCount(2, $users);
+        $this->assertEquals(0, reset($users)['nbcomments']);
+        $this->assertEquals(0, next($users)['nbcomments']);
+        // Only users with comments.
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true);
+        $this->assertCount(1, $users);
+        $this->assertEquals(3, reset($users)['nbcomments']);
+
+        // Add comments to user2 and to the test again.
+        $context2 = \context_user::instance($this->user2->id)->id;
+        $commentarea2 = $plan2->get_comment_object($context2, $plan2);
+        $commentarea2->add('This is the comment #1 for user 2');
+        // All users.
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false);
+        $this->assertCount(2, $users);
+        $this->assertEquals(0, reset($users)['nbcomments']);
+        $this->assertEquals(0, next($users)['nbcomments']);
+        // Only users with comments.
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true);
+        $this->assertCount(2, $users);
+        $this->assertEquals(3, reset($users)['nbcomments']);
+        $this->assertEquals(1, next($users)['nbcomments']);
+    }
+
+    /**
      * Test get competency detail for lpmonitoring report when scale is defined in framework.
      */
     public function test_get_lp_monitoring_competency_detail_framework_scale() {
@@ -1741,9 +1784,12 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $mpg->create_report_competency_config($record);
 
         // Create plan from template for all users.
-        $plan = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
 
         // Rate user competency1 for all users.
         $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp1->get('id'),

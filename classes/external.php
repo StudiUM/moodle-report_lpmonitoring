@@ -100,13 +100,20 @@ class external extends external_api {
             VALUE_DEFAULT,
             'ASC'
         );
+        $withcomments = new external_value(
+            PARAM_BOOL,
+            'Only plans with comments',
+            VALUE_DEFAULT,
+            false
+        );
 
         $params = array(
             'templateid' => $templateid,
             'query' => $query,
             'scalevalues' => $scalevalues,
             'scalefilterbycourse' => $scalefilterbycourse,
-            'scalesortorder' => $scalesortorder
+            'scalesortorder' => $scalesortorder,
+            'withcomments' => $withcomments
         );
         return new external_function_parameters($params);
     }
@@ -119,24 +126,28 @@ class external extends external_api {
      * @param string $scalevalues The scale values filter.
      * @param int $scalefilterbycourse Apply the scale filters on grade in course.
      * @param string $scalesortorder The scale sort order ('ASC'/'DESC').
+     * @param boolean $withcomments Only plans with comments.
      *
      * @return boolean
      */
-    public static function search_users_by_templateid($templateid, $query, $scalevalues, $scalefilterbycourse, $scalesortorder) {
+    public static function search_users_by_templateid($templateid, $query, $scalevalues, $scalefilterbycourse, $scalesortorder,
+            $withcomments) {
         global $PAGE;
         $params = self::validate_parameters(self::search_users_by_templateid_parameters(), array(
             'templateid' => $templateid,
             'query' => $query,
             'scalevalues' => $scalevalues,
             'scalefilterbycourse' => $scalefilterbycourse,
-            'scalesortorder' => $scalesortorder
+            'scalesortorder' => $scalesortorder,
+            'withcomments' => $withcomments
         ));
 
         $context = context_system::instance();
         self::validate_context($context);
 
         $records = api::search_users_by_templateid($params['templateid'], $params['query'],
-                json_decode($params['scalevalues'], true), $params['scalefilterbycourse'], $params['scalesortorder']);
+                json_decode($params['scalevalues'], true), $params['scalefilterbycourse'], $params['scalesortorder'],
+                $params['withcomments']);
 
         foreach ($records as $key => $record) {
             $profileimage = $record['profileimage'];
@@ -160,6 +171,7 @@ class external extends external_api {
                 'userid' => new external_value(PARAM_INT, 'The user id value'),
                 'planid' => new external_value(PARAM_INT, 'The plan id value'),
                 'nbrating' => new external_value(PARAM_INT, 'Total rating number'),
+                'nbcomments' => new external_value(PARAM_INT, 'Number of comments on the plan'),
                 'email' => new external_value(PARAM_TEXT, 'The email of the user', VALUE_OPTIONAL),
                 'idnumber' => new external_value(PARAM_TEXT, 'The idnumber of the user', VALUE_OPTIONAL),
                 'phone1' => new external_value(PARAM_TEXT, 'The phone1 of the user', VALUE_OPTIONAL),
@@ -625,7 +637,8 @@ class external extends external_api {
             'scalevalues' => new external_value(PARAM_TEXT, 'The scale values filter'),
             'scalefilterbycourse' => new external_value(PARAM_INT, 'Apply the scale filters on grade in course'),
             'scalesortorder' => new external_value(PARAM_TEXT, 'Scale sort order', VALUE_DEFAULT, 'ASC'),
-            'tagid' => new external_value(PARAM_INT, 'The tag ID')
+            'tagid' => new external_value(PARAM_INT, 'The tag ID'),
+            'withcomments' => new external_value(PARAM_BOOL, 'Only plans with comments')
         ));
     }
 
@@ -639,12 +652,12 @@ class external extends external_api {
      * @param int $scalefilterbycourse Apply the scale filters on grade in course
      * @param string $scalesortorder Scale sort order
      * @param int $tagid The tag ID
+     * @param boolean $withcomments True to return only plans with at leat one comment
      * @return array
      */
     public static function read_plan($planid, $templateid, $scalevalues = '', $scalefilterbycourse = true,
-            $scalesortorder= 'ASC', $tagid = null) {
+            $scalesortorder= 'ASC', $tagid = null, $withcomments = false) {
         global $PAGE;
-
         $context = context_system::instance();
         self::validate_context($context);
 
@@ -654,12 +667,13 @@ class external extends external_api {
                     'scalevalues' => $scalevalues,
                     'scalefilterbycourse' => $scalefilterbycourse,
                     'scalesortorder' => $scalesortorder,
-                    'tagid' => $tagid
+                    'tagid' => $tagid,
+                    'withcomments' => $withcomments
                 ));
 
         $plans = api::read_plan($params['planid'], $params['templateid'],
                 json_decode($params['scalevalues'], true), $params['scalefilterbycourse'],
-                $params['scalesortorder'], $params['tagid']);
+                $params['scalesortorder'], $params['tagid'], $params['withcomments']);
         self::validate_context($plans->current->get_context());
 
         $output = $PAGE->get_renderer('report_lpmonitoring');
@@ -777,6 +791,7 @@ class external extends external_api {
                 'userid' => new external_value(PARAM_INT, 'The user ID value'),
                 'planid' => new external_value(PARAM_INT, 'The plan ID value'),
                 'nbrating' => new external_value(PARAM_INT, 'The nb rating value', VALUE_OPTIONAL),
+                'nbcomments' => new external_value(PARAM_INT, 'The nomber of comments', VALUE_OPTIONAL),
                 'current' => new external_value(PARAM_BOOL, 'Is current user'),
                 'tagid' => new external_value(PARAM_INT, 'The tag ID value', VALUE_OPTIONAL)
             ), 'Full navigation list', VALUE_OPTIONAL)

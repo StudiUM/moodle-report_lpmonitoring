@@ -1080,10 +1080,14 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $mpg->create_report_competency_config($record);
 
         // Create plan from template for all users.
-        $plan = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
-        $plan = $lpg->create_plan(array('userid' => $u4->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u3->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+        $plan = $lpg->create_plan(array('userid' => $u4->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
 
         // Rate user competency1 for all users 1 to 3.
         $uc = $lpg->create_user_competency(array('userid' => $u1->id, 'competencyid' => $comp1->get('id'),
@@ -1663,5 +1667,83 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($result['count'], 2);
         $this->assertEquals($result['contextid'], $context2);
         $this->assertTrue($result['canpost']);
+    }
+
+    /**
+     * Test the "Only plans with comments" filter of get learning plans from templateid
+     */
+    public function test_search_users_by_templateid_and_withcomments() {
+        $this->resetAfterTest(true);
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $syscontext = context_system::instance();
+
+        // Create some users.
+        $u1 = $dg->create_user(array(
+            'firstname' => 'Rebecca',
+            'lastname' => 'Armenta')
+        );
+        $u2 = $dg->create_user(array(
+            'firstname' => 'Donald',
+            'lastname' => 'Fletcher')
+        );
+        // Create template.
+        $template = $lpg->create_template();
+
+        // Create plan from template for all users.
+        $plan1 = $lpg->create_plan(array('userid' => $u1->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+        $plan2 = $lpg->create_plan(array('userid' => $u2->id, 'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE));
+
+        // Create a cohor and assign appreciator.
+        $this->setAdminUser();
+        $cohort = $dg->create_cohort(array('contextid' => $syscontext->id));
+        cohort_add_member($cohort->id, $u1->id);
+        cohort_add_member($cohort->id, $u2->id);
+        $params = (object) array(
+            'userid' => $this->appreciator->id,
+            'roleid' => $this->roleappreciator,
+            'cohortid' => $cohort->id
+        );
+        tool_cohortroles_api::create_cohort_role_assignment($params);
+        tool_cohortroles_api::sync_all_cohort_roles();
+
+        // Get contexts and comments areas.
+        $context1 = \context_user::instance($u1->id)->id;
+        $context2 = \context_user::instance($u2->id)->id;
+        $commentarea1 = $plan1->get_comment_object($context1, $plan1);
+        $commentarea2 = $plan2->get_comment_object($context2, $plan2);
+        $this->setUser($this->appreciator);
+
+        // Add comments for user 1.
+        $commentarea1->add('This is the comment #1 for user 1');
+        $commentarea1->add('This is the comment #2 for user 1');
+        // All users.
+        $result = external::read_plan(null, $template->get('id'), '', true, 'ASC', null, false);
+        $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+        $this->assertCount(2, $result['fullnavigation']);
+        $this->assertEquals(0, reset($result['fullnavigation'])['nbcomments']);
+        $this->assertEquals(0, next($result['fullnavigation'])['nbcomments']);
+        // With comments.
+        $result = external::read_plan(null, $template->get('id'), '', true, 'ASC', null, true);
+        $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+        $this->assertCount(1, $result['fullnavigation']);
+        $this->assertEquals(2, reset($result['fullnavigation'])['nbcomments']);
+
+        // Add comments for user 2.
+        $commentarea2->add('This is the comment #1 for user 2');
+        // All users.
+        $result = external::read_plan(null, $template->get('id'), '', true, 'ASC', null, false);
+        $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+        $this->assertCount(2, $result['fullnavigation']);
+        $this->assertEquals(0, reset($result['fullnavigation'])['nbcomments']);
+        $this->assertEquals(0, next($result['fullnavigation'])['nbcomments']);
+        // With comments.
+        $result = external::read_plan(null, $template->get('id'), '', true, 'ASC', null, true);
+        $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+        $this->assertCount(2, $result['fullnavigation']);
+        $this->assertEquals(2, reset($result['fullnavigation'])['nbcomments']);
+        $this->assertEquals(1, next($result['fullnavigation'])['nbcomments']);
     }
 }

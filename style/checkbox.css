@@ -1,4 +1,7 @@
 .competencyreport .checkbox {
+    padding-left: 5px;
+}
+.competencyreport #scale .checkbox {
     padding-left: 20px;
 }
 .competencyreport .checkbox label {
