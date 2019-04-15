@@ -82,7 +82,8 @@ define(['jquery',
                 this.changeDisplayRating.bind(this)).change();
             // Only plans with comments filter.
             $('.competencyreport').on('change','#filter-comment' ,this.changeWithcommentsHandler.bind(this)).change();
-
+            // Only students with at least two plans.
+            $('.competencyreport').on('change','#filter-plan' ,this.changeWithplansHandler.bind(this)).change();
             // When the tags are modified we reload the tags filter.
             $(".competencyreport").on('DOMSubtreeModified', ".tags-stats", this.reloadTagsIfNeeded.bind(this));
         };
@@ -117,6 +118,8 @@ define(['jquery',
         LearningplanReport.prototype.scalesortorder = 'ASC';
         /** @var {String} Apply filter for only plans with comments. */
         LearningplanReport.prototype.withcomments = false;
+        /** @var {String} Apply filter for only students with at least two plans. */
+        LearningplanReport.prototype.withplans = false;
         /** @var {Boolean} Is course module competency grading enabled. */
         LearningplanReport.prototype.cmcompgradingEnabled = false;
 
@@ -809,7 +812,8 @@ define(['jquery',
                     planid: planid,
                     scalefilterin: self.scalefilterin,
                     tagid: null,
-                    withcomments: false
+                    withcomments: false,
+                    withplans: false
                 }
             }
             ]);
@@ -905,10 +909,12 @@ define(['jquery',
             var planid = null;
             var tagid = null;
             self.withcomments = false;
+            self.withplans = false;
             if (templateSelected === true) {
                 templateid = self.templateId;
                 planid = self.learningplanId;
                 self.withcomments = $("#filter-comment").is(':checked');
+                self.withplans = $("#filter-plan").is(':checked');
             } else if (tagSelected === true) {
                 tagid = self.tagId;
                 planid = self.tagLearningplanId;
@@ -1015,6 +1021,19 @@ define(['jquery',
             var self = this;
             self.withcomments = $("#filter-comment").is(':checked');
             $(self.learningplanSelector).data('withcomments', self.withcomments);
+        };
+
+        /**
+         * Handler on "only students with minimum two plans" filter change.
+         *
+         * @name   changeWithplansHandler
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.changeWithplansHandler = function() {
+            var self = this;
+            self.withplans = $("#filter-plan").is(':checked');
+            $(self.learningplanSelector).data('withplans', self.withplans);
         };
 
         /**
@@ -1147,7 +1166,8 @@ define(['jquery',
                     scalefilterin: self.scalefilterin,
                     scalesortorder: self.scalesortorder,
                     tagid: parseInt(tagid),
-                    withcomments: self.withcomments
+                    withcomments: self.withcomments,
+                    withplans: self.withplans
                 }
             }]);
             promise[0].then(function(results) {
@@ -1484,6 +1504,8 @@ define(['jquery',
                 scalesortorder = scalesortorder ? scalesortorder : 'ASC';
                 var withcomments = $(selector).data('withcomments');
                 withcomments = withcomments ? withcomments : false;
+                var withplans = $(selector).data('withplans');
+                withplans = withplans ? withplans : false;
                 var templateid = $(selector).data('templateid');
                 if (templateid === '') {
                     return [];
@@ -1497,7 +1519,8 @@ define(['jquery',
                         scalevalues: $(selector).data('scalefilter'),
                         scalefilterin: scalefilterapply,
                         scalesortorder: scalesortorder,
-                        withcomments: withcomments
+                        withcomments: withcomments,
+                        withplans: withplans
                     }
                 }]);
 

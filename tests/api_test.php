@@ -1305,6 +1305,64 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     }
 
     /**
+     * Test the "Only user with at least two learning plans" filter of get learning plans from templateid.
+     */
+    public function test_search_users_by_templateid_and_withplans() {
+        $this->setAdminUser();
+
+        $plans = api::read_plan(0, $this->templateincategory->get('id'));
+        $plan1 = $plans->current;
+        $plan2 = api::read_plan($plans->next->planid)->current;
+
+        // All users - at the beginning none of them have plans.
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false, false);
+        $this->assertCount(2, $users);
+        $this->assertEquals(0, reset($users)['nbplans']);
+        $this->assertEquals(0, next($users)['nbplans']);
+        $this->assertEquals(0, reset($users)['nbcomments']);
+        $this->assertEquals(0, next($users)['nbcomments']);
+
+        // Create 3 plans for user 1.
+        $dg  = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+
+        $plana = $lpg->create_plan(array('userid' => $this->user1->id, 'status' => plan::STATUS_ACTIVE));
+        $planb = $lpg->create_plan(array('userid' => $this->user1->id, 'status' => plan::STATUS_ACTIVE));
+        $planc = $lpg->create_plan(array('userid' => $this->user1->id, 'status' => plan::STATUS_ACTIVE));
+
+        // User : Only user1 has three learning plan.
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false, true);
+        $this->assertCount(1, $users);
+        $this->assertEquals(4, reset($users)['nbplans']);
+        $this->assertEquals(0, reset($users)['nbcomments']);
+
+        $context1 = \context_user::instance($this->user1->id)->id;
+        $commentarea1 = $plan1->get_comment_object($context1, $plan1);
+        $commentarea1->add('This is the comment #1 for user 1');
+        $commentarea1->add('This is the comment #2 for user 1');
+        $commentarea1->add('This is the comment #3 for user 1');
+
+        // User : Only user1 has two learning plan with comments each.
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true, true);
+        $this->assertCount(1, $users);
+        $this->assertEquals(4, reset($users)['nbplans']);
+        $this->assertEquals(3, reset($users)['nbcomments']);
+
+        // Add comments to user2 and to the test again.
+        $context2 = \context_user::instance($this->user2->id)->id;
+        $commentarea2 = $plan2->get_comment_object($context2, $plan2);
+        $commentarea2->add('This is the comment #1 for user 2');
+
+        // Only users with comments and one learning plan.
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true, false);
+        $this->assertCount(2, $users);
+        $this->assertEquals(0, reset($users)['nbplans']);
+        $this->assertEquals(0, next($users)['nbplans']);
+        $this->assertEquals(3, reset($users)['nbcomments']);
+        $this->assertEquals(1, next($users)['nbcomments']);
+    }
+
+    /**
      * Test get competency detail for lpmonitoring report when scale is defined in framework.
      */
     public function test_get_lp_monitoring_competency_detail_framework_scale() {

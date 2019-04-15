@@ -22,8 +22,7 @@
         <tr class="{{#current}}selected{{/current}}"
             data-planid="{{planid}}"
             data-templateid="{{templateid}}"
-            data-tagid="{{tagid}}"
-            >
+            data-tagid="{{tagid}}">
             <td class="img-user"><img alt="{{#str}}imagealt{{/str}}: {{fullname}}" src="{{profileimage}}" /></td>
             <td>
                 <span class="fullname-td">{{fullname}}</span>
@@ -41,6 +40,9 @@
                 {{#nbcomments}}
                 <span class="label label-info nav-small">{{#str}}commentsnumber, report_lpmonitoring, {{{nbcomments}}}{{/str}}</span>
                 {{/nbcomments}}
+                {{#nbplans}}
+                <span class="label label-info nav-small">{{#str}}plansnumber, report_lpmonitoring, {{{nbplans}}}{{/str}}</span>
+                {{/nbplans}}
             </td>
         </tr>
         {{/fullnavigation}}

@@ -26,6 +26,7 @@
 $string['advancedfilter'] = 'Advanced filter';
 $string['apply'] = 'Apply';
 $string['atleastonecomment'] = 'Learning plans with at least one comment';
+$string['atleasttwoplans'] = 'Students with at least two Learning plans';
 $string['colorconfiguration'] = 'Competencies scale colors';
 $string['colorsforscale'] = 'Colors for the scale: {$a}';
 $string['colorsforscalesaved'] = 'The colors of {$a} scale were saved successfully.';
@@ -66,6 +67,7 @@ $string['notproficientcompetencies'] = 'Competencies not proficient';
 $string['notrated'] = 'Not rated';
 $string['notratedcompetencies'] = 'Competencies not rated';
 $string['nouserselected'] = 'No user selected';
+$string['plansnumber'] = '<strong>({$a})</strong> learning plans';
 $string['proficient'] = 'Proficient';
 $string['proficientcompetencies'] = 'Competencies proficient';
 $string['pluginname'] = 'Monitoring of learning plans';

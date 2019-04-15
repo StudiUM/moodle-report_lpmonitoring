@@ -251,6 +251,7 @@ class api {
      * @param boolean $scalefilterin Apply the scale filters on grade in plan, course or course module
      * @param string $scalesortorder Order by rating number ASC or DESC
      * @param boolean $withcomments Only plans with comments
+     * @param boolean $withplans Only students with at least two plans
      * @return array( array(
      *                      'profileimage' => string,
      *                      'fullname' => string,
@@ -262,7 +263,7 @@ class api {
      *              )
      */
     public static function search_users_by_templateid($templateid, $query, $scalesvalues = array(), $scalefilterin = '',
-            $scalesortorder = "ASC", $withcomments = false) {
+            $scalesortorder = "ASC", $withcomments = false, $withplans = false) {
         global $CFG, $DB;
         if (!in_array(strtolower($scalesortorder), array('asc', 'desc'))) {
             throw new \coding_exception('Sort order must be ASC or DESC');
@@ -479,6 +480,18 @@ class api {
                 $nbcomments = 0;
             }
 
+            // Return plans from which students have at least two plans.
+            if ($withplans) {
+                $allplans = core_competency_api::list_user_plans($user->id);
+
+                $nbplans = count($allplans);
+                if ($nbplans <= 1) {
+                    continue;
+                }
+            } else {
+                $nbplans = 0;
+            }
+
             // Add user picture.
             $userplan = array();
             $userplan['profileimage'] = new \user_picture($user);
@@ -488,6 +501,7 @@ class api {
             $userplan['planid'] = $user->planid;
             $userplan['nbrating'] = (isset($user->gradecount)) ? $user->gradecount : 0;
             $userplan['nbcomments'] = $nbcomments;
+            $userplan['nbplans'] = $nbplans;
             $usercontext = \context_user::instance($user->id);
             // Build identity fields.
             if (!empty($extrasearchfields) && has_capability('moodle/site:viewuseridentity', $usercontext)) {
@@ -572,6 +586,7 @@ class api {
      * @param string $sortorder Scale sort order
      * @param int $tagid The tag ID
      * @param int $withcomments Only plans with comments
+     * @param int $withplans Only students with at least two plans
      * @return array((object) array(
      *                            'current' => \core_competency\plan,
      *                            'previous' => \stdClass
@@ -579,7 +594,7 @@ class api {
      *                        ))
      */
     public static function read_plan($planid = null, $templateid = null, $scalesvalues = array(), $scalefilterin = '',
-            $sortorder = 'ASC', $tagid = null, $withcomments = false) {
+            $sortorder = 'ASC', $tagid = null, $withcomments = false, $withplans = false) {
 
         if (empty($planid) && empty($templateid) && empty($tagid)) {
             throw new coding_exception('A plan ID and/or a template ID and/or a tag ID must be specified');
@@ -596,7 +611,7 @@ class api {
                 $userplans = self::search_plans_with_tag($tagid);
             } else {
                 $userplans = array_values(self::search_users_by_templateid($templateid , '', $scalesvalues, $scalefilterin,
-                        $sortorder, $withcomments));
+                        $sortorder, $withcomments, $withplans));
             }
             $currentindex = null;
             // We throw an exception if no plans are found.
