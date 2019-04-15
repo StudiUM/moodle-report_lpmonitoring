@@ -59,13 +59,22 @@ class linked_course_exporter extends \core\external\exporter {
         $coursedata = $this->data;
         $result = new \stdClass();
 
-        $urlparams = array('userid' => $this->related['relatedinfo']->userid,
-                'competencyid' => $this->related['relatedinfo']->competencyid, 'courseid' => $coursedata->course->id);
-        $url = (new \moodle_url('/admin/tool/lp/user_competency_in_course.php', $urlparams))->out();
+        if (isset($this->related['relatedinfo']->competencyid) && !empty($this->related['relatedinfo']->competencyid)) {
+            $urlparams = array('userid' => $this->related['relatedinfo']->userid,
+                    'competencyid' => $this->related['relatedinfo']->competencyid, 'courseid' => $coursedata->course->id);
+            $url = (new \moodle_url('/admin/tool/lp/user_competency_in_course.php', $urlparams))->out();
+        } else {
+            $urlparams = array('user' => $this->related['relatedinfo']->userid, 'id' => $coursedata->course->id);
+            $url = (new \moodle_url('/report/competency/index.php', $urlparams))->out();
+        }
 
         $result->url = $url;
         $result->coursename = $coursedata->course->shortname;
-        $result->rated = !empty($coursedata->usecompetencyincourse->get('grade')) ? true : false;
+        if (isset($coursedata->usecompetencyincourse) && !empty($coursedata->usecompetencyincourse->get('grade'))) {
+            $result->rated = true;
+        } else {
+            $result->rated = false;
+        }
 
         return (array) $result;
     }

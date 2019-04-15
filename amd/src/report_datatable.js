@@ -34,33 +34,64 @@ define(['jquery', 'report_lpmonitoring/paginated_datatable'],
              * @param {string} activitiesSelector The CSS selector used for activities columns and cells.
              */
             var ReportDataTable = function(tableSelector, reportfilterName, searchSelector, coursesSelector, activitiesSelector) {
+                this.tableSelector = tableSelector;
+                this.reportfilterName = reportfilterName;
+                this.searchSelector = searchSelector;
+                this.coursesSelector = coursesSelector;
+                this.activitiesSelector = activitiesSelector;
+
+                var self = this;
 
                 DataTable.apply(tableSelector, false, false);
 
                 // Initialise the functions to filter and search.
                 $('input[type=radio][name=' + reportfilterName + ']').change(function() {
-                    if (this.value == 'course') {
-                        $(coursesSelector).show();
-                        $(activitiesSelector).hide();
-                    }
-                    else if (this.value == 'module') {
-                        $(coursesSelector).hide();
-                        $(activitiesSelector).show();
-                    }
-                    else {
-                        $(coursesSelector).show();
-                        $(activitiesSelector).show();
-                    }
+                    self.performSearch();
+                });
+                $(searchSelector).on('input', function() {
+                    self.performSearch();
                 });
 
-                $(searchSelector).on('input', function(e) {
-                    $(tableSelector).DataTable().search( e.target.value ).draw();
-                });
-
-                // Do the search and filters according to the actual values.
-                $('input[type=radio][name=' + reportfilterName + ']:checked').change();
-                $(tableSelector).DataTable().search( $(searchSelector).val() ).draw();
+                // Perform the search and filters according to the actual values.
+                self.performSearch();
                 $(tableSelector).show();
+            };
+
+            /** @var {String} The table CSS selector. */
+            ReportDataTable.prototype.tableSelector = null;
+            /** @var {String} The report filter name (for radio buttons). */
+            ReportDataTable.prototype.reportfilterName = null;
+            /** @var {String} The search input CSS selector. */
+            ReportDataTable.prototype.searchSelector = null;
+            /** @var {String} The courses cells CSS selector. */
+            ReportDataTable.prototype.coursesSelector = null;
+            /** @var {String} The activities (course modules) cells CSS selector. */
+            ReportDataTable.prototype.activitiesSelector = null;
+
+            /**
+             * Perform the search and make sure the correct radio button is applied to the table (hide cells accordingly).
+             *
+             * @name   performSearch
+             * @return {Void}
+             * @function
+             */
+            ReportDataTable.prototype.performSearch = function() {
+                // The search must be before the hiding of columns.
+                $(this.tableSelector).DataTable().search( $(this.searchSelector).val() ).draw();
+
+                var checkedvalue = $('input[type=radio][name=' + this.reportfilterName + ']:checked').val();
+                if (checkedvalue == 'course') {
+                    $(this.coursesSelector).show();
+                    $(this.activitiesSelector).hide();
+                }
+                else if (checkedvalue == 'module') {
+                    $(this.coursesSelector).hide();
+                    $(this.activitiesSelector).show();
+                }
+                else {
+                    $(this.coursesSelector).show();
+                    $(this.activitiesSelector).show();
+                }
             };
 
             return {

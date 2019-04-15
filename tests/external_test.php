@@ -30,6 +30,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
 use core_competency\plan;
 use core_competency\user_competency;
+use report_lpmonitoring\api;
 use report_lpmonitoring\external;
 use report_lpmonitoring\report_competency_config;
 use core_competency\url;
@@ -1859,5 +1860,325 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(4, reset($resultd)['nbplans']);
         $this->assertEquals(3, reset($resultd)['nbcomments']);
 
+    }
+
+    /**
+     * Test list plan competencies and evaluations for lpmonitoring report.
+     */
+    public function test_list_plan_competencies_report() {
+        global $DB;
+        $this->setUser($this->creator);
+
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $mpg = $dg->get_plugin_generator('report_lpmonitoring');
+
+        // Create framework 1 with its scale.
+        $scale1 = $dg->create_scale(array('scale' => 'A,B,C,D'));
+        $scaleconfig = array(array('scaleid' => $scale1->id));
+        $scaleconfig[] = array('name' => 'A', 'id' => 1, 'scaledefault' => 1, 'proficient' => 1);
+        $scaleconfig[] = array('name' => 'B', 'id' => 2, 'scaledefault' => 0, 'proficient' => 1);
+        $scaleconfig[] = array('name' => 'C', 'id' => 3, 'scaledefault' => 0, 'proficient' => 0);
+        $scaleconfig[] = array('name' => 'D', 'id' => 4, 'scaledefault' => 0, 'proficient' => 0);
+        $f1 = $lpg->create_framework(array('scaleid' => $scale1->id, 'scaleconfiguration' => $scaleconfig));
+
+        $scaleconfig = array();
+        $scaleconfig[] = array('id' => 1, 'color' => '#AAAAAA');
+        $scaleconfig[] = array('id' => 2, 'color' => '#BBBBBB');
+        $scaleconfig[] = array('id' => 3, 'color' => '#CCCCCC');
+        $scaleconfig[] = array('id' => 4, 'color' => '#DDDDDD');
+
+        $record = new stdclass();
+        $record->competencyframeworkid = $f1->get('id');
+        $record->scaleid = $f1->get('scaleid');
+        $record->scaleconfiguration = json_encode($scaleconfig);
+        $mpg->create_report_competency_config($record);
+
+        // Create framework 2 with its scale.
+        $scale2 = $dg->create_scale(array('scale' => 'Very Bad,Bad,Good,Very Good'));
+        $scaleconfig = array(array('scaleid' => $scale2->id));
+        $scaleconfig[] = array('name' => 'Very Bad', 'id' => 1, 'scaledefault' => 1, 'proficient' => 1);
+        $scaleconfig[] = array('name' => 'Bad', 'id' => 2, 'scaledefault' => 0, 'proficient' => 1);
+        $scaleconfig[] = array('name' => 'Good', 'id' => 3, 'scaledefault' => 0, 'proficient' => 0);
+        $scaleconfig[] = array('name' => 'Very Good', 'id' => 4, 'scaledefault' => 0, 'proficient' => 0);
+        $f2 = $lpg->create_framework(array('scaleid' => $scale2->id, 'scaleconfiguration' => $scaleconfig));
+
+        $scaleconfig = array();
+        $scaleconfig[] = array('id' => 1, 'color' => '#FF0000');
+        $scaleconfig[] = array('id' => 2, 'color' => '#00FFFF');
+        $scaleconfig[] = array('id' => 3, 'color' => '#FF00FF');
+        $scaleconfig[] = array('id' => 4, 'color' => '#00FF00');
+
+        $record = new stdclass();
+        $record->competencyframeworkid = $f2->get('id');
+        $record->scaleid = $f2->get('scaleid');
+        $record->scaleconfiguration = json_encode($scaleconfig);
+        $mpg->create_report_competency_config($record);
+
+        $user = $dg->create_user();
+
+        $c1a = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id')));
+        $c1b = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id')));
+        $c1c = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id')));
+        $c2a = $lpg->create_competency(array('competencyframeworkid' => $f2->get('id')));
+        $c2b = $lpg->create_competency(array('competencyframeworkid' => $f2->get('id')));
+        $c2c = $lpg->create_competency(array('competencyframeworkid' => $f2->get('id')));
+
+        $tpl = $lpg->create_template();
+        $lpg->create_template_competency(array('templateid' => $tpl->get('id'), 'competencyid' => $c1a->get('id')));
+        $lpg->create_template_competency(array('templateid' => $tpl->get('id'), 'competencyid' => $c1c->get('id')));
+        $lpg->create_template_competency(array('templateid' => $tpl->get('id'), 'competencyid' => $c2b->get('id')));
+        $lpg->create_template_competency(array('templateid' => $tpl->get('id'), 'competencyid' => $c2c->get('id')));
+
+        $plan = $lpg->create_plan(array('userid' => $user->id, 'templateid' => $tpl->get('id'),
+                'status' => plan::STATUS_ACTIVE));
+
+        $uc1a = $lpg->create_user_competency(array('userid' => $user->id, 'competencyid' => $c1a->get('id'),
+            'status' => user_competency::STATUS_IN_REVIEW, 'reviewerid' => $this->creator->id));
+        $uc1c = $lpg->create_user_competency(array('userid' => $user->id, 'competencyid' => $c1c->get('id'),
+            'grade' => 1, 'proficiency' => 0));
+        $uc2b = $lpg->create_user_competency(array('userid' => $user->id, 'competencyid' => $c2b->get('id'),
+            'grade' => 2, 'proficiency' => 1));
+
+        $this->setAdminUser();
+
+        // Create courses.
+        $c1 = $dg->create_course();
+        $c2 = $dg->create_course();
+        $c3 = $dg->create_course();
+
+        // Associate competencies to courses.
+        $lpg->create_course_competency(array('competencyid' => $c1a->get('id'), 'courseid' => $c1->id));
+        $lpg->create_course_competency(array('competencyid' => $c1c->get('id'), 'courseid' => $c1->id));
+        $lpg->create_course_competency(array('competencyid' => $c2b->get('id'), 'courseid' => $c1->id));
+        $lpg->create_course_competency(array('competencyid' => $c1a->get('id'), 'courseid' => $c2->id));
+        $lpg->create_course_competency(array('competencyid' => $c1c->get('id'), 'courseid' => $c2->id));
+        // In course where user is not enroled.
+        $lpg->create_course_competency(array('competencyid' => $c1c->get('id'), 'courseid' => $c3->id));
+        // In course but not in plan.
+        $lpg->create_course_competency(array('competencyid' => $c1b->get('id'), 'courseid' => $c2->id));
+
+        // Enrol the user 1 in C1 and C2.
+        $dg->enrol_user($user->id, $c1->id);
+        $dg->enrol_user($user->id, $c2->id);
+
+        // Assign rates to comptencies in courses C1 and C2.
+        $lpg->create_user_competency_course(array('userid' => $user->id, 'competencyid' => $c1a->get('id'),
+            'grade' => 1, 'courseid' => $c1->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $user->id, 'competencyid' => $c2b->get('id'),
+            'grade' => 2, 'courseid' => $c1->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $user->id, 'competencyid' => $c1c->get('id'),
+            'grade' => 1, 'courseid' => $c2->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $user->id, 'competencyid' => $c1b->get('id'),
+            'grade' => 1, 'courseid' => $c2->id, 'proficiency' => 1));
+
+        // Add prior learning evidence.
+        $ue1 = $lpg->create_user_evidence(array('userid' => $user->id));
+        $ue2 = $lpg->create_user_evidence(array('userid' => $user->id));
+        $ue3 = $lpg->create_user_evidence(array('userid' => $user->id));
+
+        // Associate the prior learning evidence to competency.
+        $lpg->create_user_evidence_competency(array('userevidenceid' => $ue1->get('id'), 'competencyid' => $c2b->get('id')));
+        $lpg->create_user_evidence_competency(array('userevidenceid' => $ue2->get('id'), 'competencyid' => $c2b->get('id')));
+        $lpg->create_user_evidence_competency(array('userevidenceid' => $ue3->get('id'), 'competencyid' => $c2c->get('id')));
+
+        if (api::is_cm_comptency_grading_enabled()) {
+            // Create modules.
+            $module1 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c1->id));
+            $datacm1 = get_coursemodule_from_id('data', $module1->cmid);
+            $module2 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c1->id));
+            $datacm2 = get_coursemodule_from_id('data', $module2->cmid);
+            $module3 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c2->id));
+            $datacm3 = get_coursemodule_from_id('data', $module3->cmid);
+
+            // Assign competencies to modules.
+            $lpg->create_course_module_competency(array('competencyid' => $c1a->get('id'), 'cmid' => $module1->cmid));
+            $lpg->create_course_module_competency(array('competencyid' => $c1a->get('id'), 'cmid' => $module3->cmid));
+            $lpg->create_course_module_competency(array('competencyid' => $c1c->get('id'), 'cmid' => $module1->cmid));
+            $lpg->create_course_module_competency(array('competencyid' => $c1c->get('id'), 'cmid' => $module2->cmid));
+            $lpg->create_course_module_competency(array('competencyid' => $c1b->get('id'), 'cmid' => $module2->cmid));
+
+            // Assign rates to competencies in modules.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($datacm1, $user->id, $c1c->get('id'), 3);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($datacm2, $user->id, $c1c->get('id'), 2);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($datacm3, $user->id, $c1a->get('id'), 3);
+        }
+
+        $this->setUser($this->appreciator);
+
+        // Get the data for the report.
+        $result = external::list_plan_competencies_report($plan->get('id'));
+        $result = external::clean_returnvalue(external::list_plan_competencies_report_returns(), $result);
+
+        $this->assertEquals(api::is_cm_comptency_grading_enabled(), $result['iscmcompetencygradingenabled']);
+
+        $this->assertCount(2, $result['courses']);
+        if (api::is_cm_comptency_grading_enabled()) {
+            foreach ($result['courses'] as $indexcourse => $course) {
+                if ($course['course']['coursename'] == $c1->shortname) {
+                    $this->assertCount(2, $course['modules']);
+                    if ($course['modules'][0]['cmname'] == $module1->name) {
+                        $this->assertEquals($module2->name, $course['modules'][1]['cmname']);
+                    } else {
+                        $this->assertEquals($module2->name, $course['modules'][0]['cmname']);
+                        $this->assertEquals($module1->name, $course['modules'][1]['cmname']);
+                    }
+                } else {
+                    $this->assertCount(1, $course['modules']);
+                    $this->assertEquals($module3->name, $course['modules'][0]['cmname']);
+                }
+            }
+        }
+
+        $this->assertCount(4, $result['competencies_list']);
+        foreach ($result['competencies_list'] as $competency) {
+            if (api::is_cm_comptency_grading_enabled()) {
+                // Courses and modules.
+                if ($competency['competency']['id'] == $c1a->get('id')) {
+                    $this->assertEquals(0, $competency['competencydetail']['nbevidence']);
+                    $this->assertCount(5, $competency['evaluationslist']);
+
+                    $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
+                    $this->assertEquals('#AAAAAA', $competency['evaluationslist'][0]['color']);
+                    $this->assertEquals('A', $competency['evaluationslist'][0]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][2]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][2]['name']);
+
+                    $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][3]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][3]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
+                    $this->assertEquals('#CCCCCC', $competency['evaluationslist'][4]['color']);
+                    $this->assertEquals('C', $competency['evaluationslist'][4]['name']);
+                } else if ($competency['competency']['id'] == $c1c->get('id')) {
+                    $this->assertEquals(0, $competency['competencydetail']['nbevidence']);
+                    $this->assertCount(5, $competency['evaluationslist']);
+
+                    $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
+                    $this->assertEquals('#CCCCCC', $competency['evaluationslist'][1]['color']);
+                    $this->assertEquals('C', $competency['evaluationslist'][1]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
+                    $this->assertEquals('#BBBBBB', $competency['evaluationslist'][2]['color']);
+                    $this->assertEquals('B', $competency['evaluationslist'][2]['name']);
+
+                    $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
+                    $this->assertEquals('#AAAAAA', $competency['evaluationslist'][3]['color']);
+                    $this->assertEquals('A', $competency['evaluationslist'][3]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][4]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][4]['name']);
+                } else if ($competency['competency']['id'] == $c2b->get('id')) {
+                    $this->assertEquals(2, $competency['competencydetail']['nbevidence']);
+                    $this->assertCount(5, $competency['evaluationslist']);
+
+                    $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
+                    $this->assertEquals('#00FFFF', $competency['evaluationslist'][0]['color']);
+                    $this->assertEquals('Bad', $competency['evaluationslist'][0]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][2]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][2]['name']);
+
+                    $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][3]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][3]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][4]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][4]['name']);
+                } else {
+                    // Competency $c2c.
+                    $this->assertEquals($c2c->get('id'), $competency['competency']['id']);
+                    $this->assertEquals(1, $competency['competencydetail']['nbevidence']);
+                    $this->assertCount(5, $competency['evaluationslist']);
+
+                    $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][2]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][2]['name']);
+
+                    $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][3]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][3]['name']);
+
+                    $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][4]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][4]['name']);
+                }
+            } else {
+                // Only courses, no modules.
+                if ($competency['competency']['id'] == $c1a->get('id')) {
+                    $this->assertEquals(0, $competency['competencydetail']['nbevidence']);
+                    $this->assertCount(2, $competency['evaluationslist']);
+
+                    $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
+                    $this->assertEquals('#AAAAAA', $competency['evaluationslist'][0]['color']);
+                    $this->assertEquals('A', $competency['evaluationslist'][0]['name']);
+
+                    $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                } else if ($competency['competency']['id'] == $c1c->get('id')) {
+                    $this->assertEquals(0, $competency['competencydetail']['nbevidence']);
+                    $this->assertCount(2, $competency['evaluationslist']);
+
+                    $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['name']);
+
+                    $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
+                    $this->assertEquals('#AAAAAA', $competency['evaluationslist'][1]['color']);
+                    $this->assertEquals('A', $competency['evaluationslist'][1]['name']);
+                } else if ($competency['competency']['id'] == $c2b->get('id')) {
+                    $this->assertEquals(2, $competency['competencydetail']['nbevidence']);
+                    $this->assertCount(2, $competency['evaluationslist']);
+
+                    $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
+                    $this->assertEquals('#00FFFF', $competency['evaluationslist'][0]['color']);
+                    $this->assertEquals('Bad', $competency['evaluationslist'][0]['name']);
+
+                    $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                } else {
+                    // Competency $c2c.
+                    $this->assertEquals($c2c->get('id'), $competency['competency']['id']);
+                    $this->assertEquals(1, $competency['competencydetail']['nbevidence']);
+                    $this->assertCount(2, $competency['evaluationslist']);
+
+                    $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['name']);
+
+                    $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['color']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                }
+            }
+        }
     }
 }

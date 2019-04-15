@@ -40,18 +40,21 @@ use core_competency\url;
 use core_competency\external as core_competency_external;
 use core_competency\api as core_competency_api;
 use core_user\external\user_summary_exporter;
+use core_competency\course_competency;
 use core_competency\user_competency;
 use core_competency\external\competency_exporter;
 use core_competency\external\plan_exporter;
 use core_competency\external\template_exporter;
 use core_competency\external\user_competency_exporter;
+use core_competency\external\user_competency_course_exporter;
 use core_competency\external\user_competency_plan_exporter;
 use core_comment\external\comment_area_exporter;
 use core_tag_tag;
-use report_lpmonitoring\external\stats_plan_exporter;
+use report_lpmonitoring\external\list_plan_competency_report_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_detail_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_incourse_exporter;
+use report_lpmonitoring\external\stats_plan_exporter;
 use context_system;
 use moodle_exception;
 
@@ -1290,7 +1293,16 @@ class external extends external_api {
      * @return array
      */
     public static function list_plan_competencies_report($id) {
-        return null;
+        global $PAGE;
+        $context = context_system::instance();
+        self::validate_context($context);
+        $output = $PAGE->get_renderer('report_lpmonitoring');
+
+        $plan = \core_competency\api::read_plan($id);
+        $resultcompetencies = self::list_plan_competencies($id);
+        $exporter = new list_plan_competency_report_exporter($resultcompetencies, ['plan' => $plan]);
+        $result = $exporter->export($output);
+        return $result;
     }
 
     /**
@@ -1299,6 +1311,6 @@ class external extends external_api {
      * @return \external_description
      */
     public static function list_plan_competencies_report_returns() {
-        return null;
+        return list_plan_competency_report_exporter::get_read_structure();
     }
 }

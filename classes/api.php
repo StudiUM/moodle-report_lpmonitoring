@@ -32,6 +32,7 @@ use core_user;
 use context;
 use core_competency\api as core_competency_api;
 use core_competency\course_competency;
+use core_competency\course_module_competency;
 use core_competency\competency;
 use core_competency\template;
 use core_competency\plan;
@@ -756,6 +757,15 @@ class api {
             $gradegrade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $userid));
             $courseinfo->gradetxt = grade_format_gradevalue($gradegrade->finalgrade, $gradeitem, true, GRADE_DISPLAY_TYPE_LETTER);
 
+            // Find modules evaluations.
+            if (self::is_cm_comptency_grading_enabled()) {
+                $modules = course_module_competency::list_course_modules($competencyid, $course->id);
+                $courseinfo->modules = array();
+                foreach ($modules as $cmid) {
+                    $courseinfo->modules[] = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cmid,
+                        $userid, $competencyid);
+                }
+            }
             $competencydetails->courses[] = $courseinfo;
         }
         $competencydetails->cms = array();

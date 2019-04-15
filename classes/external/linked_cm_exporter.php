@@ -73,7 +73,7 @@ class linked_cm_exporter extends \core\external\exporter {
         $result->cmname = $modinfo->cms[$cmdata->cmid]->name;
         $result->cmicon = $modinfo->cms[$cmdata->cmid]->get_icon_url()->out();
         $result->url = $url;
-        $result->rated = !empty($cmdata->usecompetencyincm->get('grade')) ? true : false;
+        $result->rated = (isset($cmdata->usecompetencyincm) && !empty($cmdata->usecompetencyincm->get('grade'))) ? true : false;
 
         return (array) $result;
     }

@@ -625,19 +625,16 @@ define(['jquery',
                         self.loadCompetencyDetail(results, plan, elementloading);
                         $("#nav-tabs").show();
                     });
-
-                    self.loadReportTab(plan);
-
-                    return null;
                 } else {
                     elementloading.removeClass('loading');
-                    return templates.render('report_lpmonitoring/list_competencies', {}).done(function(html, js) {
+                    templates.render('report_lpmonitoring/list_competencies', {}).done(function(html, js) {
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         $("#report-content").empty();
                         $("#nav-tabs").hide();
                     });
                 }
+                self.loadReportTab(plan);
             }).fail(
                 function(exp) {
                     elementloading.removeClass('loading');
@@ -715,6 +712,7 @@ define(['jquery',
          * @function
          */
         LearningplanReport.prototype.loadReportTab = function(plan) {
+            var learningplan = this;
             // Get the "Report" tab content.
             var promiseCompetenciesReport = ajax.call([{
                 methodname: 'report_lpmonitoring_list_plan_competencies_report',
@@ -723,25 +721,39 @@ define(['jquery',
                 }
             }]);
             promiseCompetenciesReport[0].then(function(results) {
-                var competencies = {competencies_list:results, plan:plan};
+                if (results['competencies_list'].length > 0) {
+                    var competencies = {reportinfos:results, plan:plan, hascompetencies: true};
 
-                // Keep the filter and search values.
-                var checkedvalue = $('input[type=radio][name=reportfilter]:checked').val();
-                if (checkedvalue == 'course') {
-                    competencies.filterchecked_course = true;
-                } else if (checkedvalue == 'module') {
-                    competencies.filterchecked_module = true;
+                    // Keep the filter and search values.
+                    var checkedvalue = $('input[type=radio][name=reportfilter]:checked').val();
+                    if (checkedvalue == 'course') {
+                        competencies.filterchecked_course = true;
+                    } else if (checkedvalue == 'module') {
+                        competencies.filterchecked_module = true;
+                    } else {
+                        competencies.filterchecked_both = true;
+                    }
+
+                    competencies.tablesearchvalue = $('#table-search').val();
+
+                    // Render the "Report" data table template.
+                    templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
+                        $("#report-content").html(html);
+                        templates.runTemplateJS(js);
+                        var popup = new Popup('[data-region=report-competencies-section]', '[data-user-competency=true]');
+                        // Override the after show refresh method of the user competency popup.
+                        popup._refresh = function() {
+                            var self = this;
+                            learningplan.reloadCompetencyDetail(self._competencyId, self._userId, self._planId);
+                        };
+                    });
                 } else {
-                    competencies.filterchecked_both = true;
+                    var competencies = {hascompetencies: false};
+                    templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
+                        $("#report-content").html(html);
+                        templates.runTemplateJS(js);
+                    });
                 }
-
-                competencies.tablesearchvalue = $('#table-search').val();
-
-                // Render the "Report" data table template.
-                templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
-                    $("#report-content").html(html);
-                    templates.runTemplateJS(js);
-                });
             }).fail(
                 function(exp) {
                     notification.exception(exp);

@@ -463,8 +463,6 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
      * Test get competency detail for lpmonitoring report (grading in course module).
      */
     public function test_get_competency_detail() {
-        global $DB;
-
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
@@ -592,5 +590,112 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         // Enable grading competency in course module.
         api::$iscmcompetencygradingenabled = true;
 
+    }
+
+    /**
+     * Test get competency detail for lpmonitoring report with modules.
+     */
+    public function test_get_lp_monitoring_competency_detail() {
+        $this->setAdminUser();
+
+        $this->resetAfterTest(true);
+        $generator = phpunit_util::get_data_generator();
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $mpg = $dg->get_plugin_generator('report_lpmonitoring');
+
+        $c1 = $dg->create_course();
+        $c2 = $dg->create_course();
+        $u1 = $dg->create_user();
+
+        // Create framework with competencies.
+        $framework = $lpg->create_framework();
+        $comp1 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));   // In C1, and C2.
+        $comp2 = $lpg->create_competency(array('competencyframeworkid' => $framework->get('id')));   // In C2.
+
+        // Create plan for user1.
+        $plan = $lpg->create_plan(array('userid' => $u1->id, 'status' => plan::STATUS_ACTIVE));
+        $lpg->create_plan_competency(array('planid' => $plan->get('id'), 'competencyid' => $comp1->get('id')));
+        $lpg->create_plan_competency(array('planid' => $plan->get('id'), 'competencyid' => $comp2->get('id')));
+
+        // Associated competencies to courses.
+        $lpg->create_course_competency(array('competencyid' => $comp1->get('id'), 'courseid' => $c1->id));
+        $lpg->create_course_competency(array('competencyid' => $comp2->get('id'), 'courseid' => $c1->id));
+        $lpg->create_course_competency(array('competencyid' => $comp2->get('id'), 'courseid' => $c2->id));
+
+        // Create scale report configuration for the scale of framework.
+        $scaleconfig = array();
+        $scaleconfig[] = array('id' => 1, 'name' => 'A',  'color' => '#AAAAA');
+        $scaleconfig[] = array('id' => 2, 'name' => 'B',  'color' => '#BBBBB');
+        $scaleconfig[] = array('id' => 3, 'name' => 'C',  'color' => '#CCCCC');
+        $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
+
+        $record = new stdclass();
+        $record->competencyframeworkid = $framework->get('id');
+        $record->scaleid = $framework->get('scaleid');
+        $record->scaleconfiguration = json_encode($scaleconfig);
+        $mpg->create_report_competency_config($record);
+
+        // Enrol the user 1 in C1, C2.
+        $dg->enrol_user($u1->id, $c1->id);
+        $dg->enrol_user($u1->id, $c2->id);
+
+        // Create modules.
+        $data1 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c1->id));
+        $datacm1 = get_coursemodule_from_id('data', $data1->cmid);
+        $data2 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c2->id));
+        $datacm2 = get_coursemodule_from_id('data', $data2->cmid);
+        $data3 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c2->id));
+        $datacm3 = get_coursemodule_from_id('data', $data3->cmid);
+
+        // Assign competencies to modules.
+        $lpg->create_course_module_competency(array('competencyid' => $comp1->get('id'), 'cmid' => $data1->cmid));
+        $lpg->create_course_module_competency(array('competencyid' => $comp2->get('id'), 'cmid' => $data1->cmid));
+        $lpg->create_course_module_competency(array('competencyid' => $comp2->get('id'), 'cmid' => $data2->cmid));
+        $lpg->create_course_module_competency(array('competencyid' => $comp2->get('id'), 'cmid' => $data3->cmid));
+
+        // Assign rates to competencies in modules.
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($datacm1, $u1->id, $comp1->get('id'), 1);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($datacm1, $u1->id, $comp2->get('id'), 2);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($datacm3, $u1->id, $comp2->get('id'), 3);
+
+        $this->setUser($this->appreciator);
+
+        $result = api::get_competency_detail($u1->id, $comp1->get('id'), $plan->get('id'));
+
+        // Check that all courses linked to the competency are found.
+        $this->assertCount(1, $result->courses);
+
+        // Check rate for comp1 : module 1 is 1.
+        foreach ($result->courses as $element) {
+            $this->assertEquals($c1->id, $element->course->id);
+            $this->assertCount(1, $element->modules);
+            $this->assertEquals(1, $element->modules[0]->get('grade'));
+        }
+
+        $result = api::get_competency_detail($u1->id, $comp2->get('id'), $plan->get('id'));
+
+        // Check that all courses linked to the competency are found.
+        $this->assertCount(2, $result->courses);
+        $listcourses = array($c1->id, $c2->id);
+        $this->assertTrue(in_array($result->courses[0]->course->id, $listcourses));
+        $this->assertTrue(in_array($result->courses[1]->course->id, $listcourses));
+
+        // Check rate for comp2 : module 1 is 2, module 2 is not rated, module 3 is 3.
+        foreach ($result->courses as $element) {
+            if ($element->course->id == $c1->id) {
+                $this->assertCount(1, $element->modules);
+                $this->assertEquals(2, $element->modules[0]->get('grade'));
+            } else {
+                $this->assertCount(2, $element->modules);
+                foreach ($element->modules as $module) {
+                    if ($module->get('cmid') == $data2->cmid) {
+                        $this->assertNull($module->get('grade'));
+                    } else {
+                        $this->assertEquals(3, $module->get('grade'));
+                    }
+                }
+            }
+        }
     }
 }
