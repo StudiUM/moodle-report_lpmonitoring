@@ -40,9 +40,11 @@ define(['jquery',
         /**
          * Learning plan report.
          * @param {Boolean} userview True if the report is for user view (student).
+         * @param {Boolean} cmcompgradingenabled True if grading in course module competency is enabled.
          */
-        var LearningplanReport = function(userview) {
+        var LearningplanReport = function(userview, cmcompgradingenabled) {
             this.userView = userview || false;
+            this.cmcompgradingEnabled = cmcompgradingenabled || false;
 
             // Init the form filter.
             this.initPage();
@@ -109,12 +111,14 @@ define(['jquery',
         LearningplanReport.prototype.scalesvaluesSelected = null;
         /** @var {ColorContrast} ColorContrast object instance. */
         LearningplanReport.prototype.colorcontrast = null;
-        /** @var {Boolean} Apply scale filters on grade in course. */
-        LearningplanReport.prototype.scalefilterbycourse = null;
+        /** @var {String} Apply scale filters on grade in plan, course or course module. */
+        LearningplanReport.prototype.scalefilterin = '';
         /** @var {String} Apply scale sortorder. */
         LearningplanReport.prototype.scalesortorder = 'ASC';
         /** @var {String} Apply filter for only plans with comments. */
         LearningplanReport.prototype.withcomments = false;
+        /** @var {Boolean} Is course module competency grading enabled. */
+        LearningplanReport.prototype.cmcompgradingEnabled = false;
 
         /** @var {String} The template select box selector. */
         LearningplanReport.prototype.templateSelector = "#templateSelectorReport";
@@ -432,6 +436,7 @@ define(['jquery',
          * @function
          */
         LearningplanReport.prototype.loadScalesFromTemplate = function(templateid) {
+            var self = this;
             var promise = ajax.call([{
                 methodname: 'report_lpmonitoring_get_scales_from_template',
                 args: {
@@ -441,6 +446,7 @@ define(['jquery',
             promise[0].then(function(results) {
                 var context = {};
                 context.scales = results;
+                context.cmcompgradingenabled = self.cmcompgradingEnabled;
                 templates.render('report_lpmonitoring/scale_filter', context).done(function(html, js) {
                     $('.competencyreport #scale').html(html);
                     templates.runTemplateJS(js);
@@ -784,7 +790,6 @@ define(['jquery',
         LearningplanReport.prototype.reloadCompetencyDetail = function(competencyid, userid, planid) {
             var self = this;
             self.competencies[competencyid] = {};
-            var scalefilterbycourse = self.scalefilterbycourse === false ? 0 : 1;
             var promise = ajax.call([{
                 methodname: 'core_competency_read_plan',
                 args: { id: planid }
@@ -801,7 +806,7 @@ define(['jquery',
                     scalevalues: "",
                     templateid: null,
                     planid: planid,
-                    scalefilterbycourse: scalefilterbycourse,
+                    scalefilterin: self.scalefilterin,
                     tagid: null,
                     withcomments: false
                 }
@@ -935,7 +940,11 @@ define(['jquery',
                 $('.competencyreport input[name=optionscalesortorder]').prop("disabled", false);
 
                 if ($("#scalefiltercourse").is(":not(:checked)") && $("#scalefilterplan").is(":not(:checked)")) {
-                    $('#scalefiltercourse').prop("checked", true);
+                    if (self.cmcompgradingEnabled) {
+                        $('#scalefiltercoursemodule').prop("checked", true);
+                    } else {
+                        $('#scalefiltercourse').prop("checked", true);
+                    }
                 }
                 if ($("#scalesortorderasc").is(":not(:checked)") && $("#scalesortorderdesc").is(":not(:checked)")) {
                     $('#scalesortorderasc').prop("checked", true);
@@ -964,14 +973,17 @@ define(['jquery',
         LearningplanReport.prototype.changeScaleApplyHandler = function() {
             var self = this;
 
-            self.scalefilterbycourse = '';
+            self.scalefilterin = '';
             if ($("#scalefilterplan").is(':checked')) {
-                self.scalefilterbycourse = false;
+                self.scalefilterin = '';
             }
             if ($("#scalefiltercourse").is(':checked')) {
-                self.scalefilterbycourse = true;
+                self.scalefilterin = 'course';
             }
-            $(self.learningplanSelector).data('scalefilterapply', self.scalefilterbycourse);
+            if ($("#scalefiltercoursemodule").is(':checked')) {
+                self.scalefilterin = 'coursemodule';
+            }
+            $(self.learningplanSelector).data('scalefilterapply', self.scalefilterin);
         };
 
         /**
@@ -1092,8 +1104,6 @@ define(['jquery',
             // Hide collapse links as long as the competencies details are not displayed.
             $('.competencyreport .competency-detail a.collapse-link').css('visibility', 'hidden');
 
-            var scalefilterbycourse = self.scalefilterbycourse === false ? 0 : 1;
-
             // Set scales values empty if not defined.
             self.scalesvaluesSelected = self.userView === false ? self.scalesvaluesSelected : "";
 
@@ -1103,7 +1113,7 @@ define(['jquery',
                     planid: parseInt(planid),
                     templateid: parseInt(templateid),
                     scalevalues: self.scalesvaluesSelected,
-                    scalefilterbycourse: scalefilterbycourse,
+                    scalefilterin: self.scalefilterin,
                     scalesortorder: self.scalesortorder,
                     tagid: parseInt(tagid),
                     withcomments: self.withcomments
@@ -1390,11 +1400,12 @@ define(['jquery',
              * Main initialisation.
              *
              * @param {Boolean} True if the report is for user view (student).
+             * @param {Boolean} cmcompgradingenabled True if grading in course module competency is enabled.
              * @return {LearningplanReport} A new instance of LearningplanReport.
              * @method init
              */
-            init: function(userview) {
-                return new LearningplanReport(userview);
+            init: function(userview, cmcompgradingenabled) {
+                return new LearningplanReport(userview, cmcompgradingenabled);
             },
             /**
              * Process result autocomplete.
@@ -1428,7 +1439,6 @@ define(['jquery',
                 var scalefilterapply = $(selector).data('scalefilterapply');
                 var scalesortorder = $(selector).data('scalesortorder');
                 scalesortorder = scalesortorder ? scalesortorder : 'ASC';
-                var scalefilterbycourse = scalefilterapply === false ? 0 : 1;
                 var withcomments = $(selector).data('withcomments');
                 withcomments = withcomments ? withcomments : false;
                 var templateid = $(selector).data('templateid');
@@ -1442,7 +1452,7 @@ define(['jquery',
                         query: query,
                         templateid: parseInt(templateid),
                         scalevalues: $(selector).data('scalefilter'),
-                        scalefilterbycourse: scalefilterbycourse,
+                        scalefilterin: scalefilterapply,
                         scalesortorder: scalesortorder,
                         withcomments: withcomments
                     }

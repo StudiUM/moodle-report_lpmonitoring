@@ -69,6 +69,7 @@ class report implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         $data = new stdClass();
         $data->pagecontextid = $this->pagecontext->id;
+        $data->cmcompgradingenabled = report_lpmonitoring_api::is_cm_comptency_grading_enabled();
 
         $data->templates = array();
         foreach ($this->learningplantemplates as $template) {

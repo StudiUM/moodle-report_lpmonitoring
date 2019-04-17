@@ -123,6 +123,7 @@ Feature: Display plearning plan ratings details
     And I click on "//a[contains(@class, 'moreless-toggler')]" "xpath_element"
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
+    And I click on "//label[text()='Rating in course']" "xpath_element"
     And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
     Then I should see "Pablo Menendez" item in the autocomplete list
     And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
@@ -163,6 +164,7 @@ Feature: Display plearning plan ratings details
     And I click on "//a[contains(@class, 'moreless-toggler')]" "xpath_element"
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
+    And I click on "//label[text()='Rating in course']" "xpath_element"
     And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
     Then I should see "(3) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Donald Fletcher" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"

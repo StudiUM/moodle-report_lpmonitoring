@@ -1120,7 +1120,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 2),
             array('scaleid' => $scale2->id, 'scalevalue' => 3),
         );
-        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues);
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'course');
         $this->assertCount(3, $users);
         $userinfo = array_values($users);
         $this->assertEquals(array($userinfo[0]['fullname'], $userinfo[1]['fullname'], $userinfo[2]['fullname']),
@@ -1132,7 +1132,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertEquals(2, $userinfo[2]['nbrating']);
         $this->assertEquals("User12 Lastname2", $userinfo[2]['fullname']);
         // Test with order DESC.
-        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'course', 'DESC');
         $userinfo = array_values($users);
         $this->assertEquals(2, $userinfo[0]['nbrating']);
         $this->assertEquals("User12 Lastname2", $userinfo[0]['fullname']);
@@ -1146,7 +1146,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 1),
             array('scaleid' => $scale2->id, 'scalevalue' => 2),
         );
-        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, false, 'ASC');
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, '', 'ASC');
         $this->assertCount(2, $users);
         $userinfo = array_values($users);
         $this->assertEquals(1, $userinfo[0]['nbrating']);
@@ -1154,7 +1154,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertEquals(2, $userinfo[1]['nbrating']);
         $this->assertEquals('User11 Lastname1', $userinfo[1]['fullname']);
         // Test with scales order DESC.
-        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, false, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, '', 'DESC');
         $this->assertCount(2, $users);
         $userinfo = array_values($users);
         $this->assertEquals(2, $userinfo[0]['nbrating']);
@@ -1167,7 +1167,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 3),
             array('scaleid' => $scale1->id, 'scalevalue' => 2),
         );
-        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues);
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'course');
         $this->assertCount(3, $users);
         $userinfo = array_values($users);
         $this->assertEquals(array($userinfo[0]['fullname'], $userinfo[1]['fullname'], $userinfo[2]['fullname']),
@@ -1177,7 +1177,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scalevalues = array(
             array('scaleid' => $scale2->id, 'scalevalue' => 6),
         );
-        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues);
+        $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'course');
         $this->assertCount(0, $users);
 
         // Test search users in completed plans.
@@ -1197,7 +1197,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Now we have 2 different ratings for user1/competencies in active plan.
         $this->setUser($appreciator);
-        $users = api::search_users_by_templateid($template->get('id'), 'User11', $scalevalues, false, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User11', $scalevalues, '', 'DESC');
         $this->assertCount(1, $users);
         $this->assertEquals('User11 Lastname1', $users[$user1->id]['fullname']);
         // The 2 ratings from completed plan should be returned.
@@ -1209,7 +1209,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 3),
             array('scaleid' => $scale1->id, 'scalevalue' => 4)
         );
-        $users = api::search_users_by_templateid($template->get('id'), 'User11', $scalevalues, false, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User11', $scalevalues, '', 'DESC');
         $this->assertCount(0, $users);
 
         // Test when user is unsubscribed from course 1.
@@ -1223,7 +1223,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 3),
             array('scaleid' => $scale1->id, 'scalevalue' => 4)
         );
-        $users = api::search_users_by_templateid($template->get('id'), 'User3', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User3', $scalevalues, 'course', 'DESC');
         $this->assertCount(1, $users);
         $this->assertEquals('User3 Lastname3', $users[$user3->id]['fullname']);
         $this->assertEquals(1, $users[$user3->id]['nbrating']);
@@ -1235,7 +1235,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $enrol->unenrol_user($instance, $user3->id);
 
         $this->setUser($appreciator);
-        $users = api::search_users_by_templateid($template->get('id'), 'User3', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User3', $scalevalues, 'course', 'DESC');
         $this->assertCount(0, $users);
 
         // Test when competency 1 removed from course 1.
@@ -1247,7 +1247,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             array('scaleid' => $scale2->id, 'scalevalue' => 1),
             array('scaleid' => $scale2->id, 'scalevalue' => 2)
         );
-        $users = api::search_users_by_templateid($template->get('id'), 'User12', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User12', $scalevalues, 'course', 'DESC');
         $this->assertCount(1, $users);
         $this->assertEquals('User12 Lastname2', $users[$user2->id]['fullname']);
         $this->assertEquals(1, $users[$user2->id]['nbrating']);
@@ -1257,7 +1257,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         core_competency_api::remove_competency_from_course($course2->id, $c1->get('id'));
 
         $this->setUser($appreciator);
-        $users = api::search_users_by_templateid($template->get('id'), 'User12', $scalevalues, true, 'DESC');
+        $users = api::search_users_by_templateid($template->get('id'), 'User12', $scalevalues, 'course', 'DESC');
         $this->assertCount(0, $users);
 
     }
@@ -1279,12 +1279,12 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $commentarea1->add('This is the comment #2 for user 1');
         $commentarea1->add('This is the comment #3 for user 1');
         // All users.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', false);
         $this->assertCount(2, $users);
         $this->assertEquals(0, reset($users)['nbcomments']);
         $this->assertEquals(0, next($users)['nbcomments']);
         // Only users with comments.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', true);
         $this->assertCount(1, $users);
         $this->assertEquals(3, reset($users)['nbcomments']);
 
@@ -1293,12 +1293,12 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $commentarea2 = $plan2->get_comment_object($context2, $plan2);
         $commentarea2->add('This is the comment #1 for user 2');
         // All users.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', false);
         $this->assertCount(2, $users);
         $this->assertEquals(0, reset($users)['nbcomments']);
         $this->assertEquals(0, next($users)['nbcomments']);
         // Only users with comments.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', true);
         $this->assertCount(2, $users);
         $this->assertEquals(3, reset($users)['nbcomments']);
         $this->assertEquals(1, next($users)['nbcomments']);

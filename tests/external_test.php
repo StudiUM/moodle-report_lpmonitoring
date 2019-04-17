@@ -396,7 +396,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
 
     /**
      * Test we can read plan.
-     * @group read_plan
      */
     public function test_read_plan() {
         $dg = $this->getDataGenerator();
@@ -1375,8 +1374,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
 
         // Specify one scale value as filter.
         $scalevalues = '[{"scalevalue" : 2, "scaleid" :' . $framework->get('scaleid') . '}]';
-        $scalefilterbycourse = 0;
-        $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterbycourse);
+        $scalefilterin = '';
+        $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterin);
 
         $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
         // Test full navigation count.
@@ -1399,8 +1398,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         // Specify 2 scale values as filter.
         $scalevalues = '[{"scalevalue" : 1, "scaleid" :' . $framework->get('scaleid') . '}, '
                 . '{"scalevalue" : 3, "scaleid" :' . $framework->get('scaleid') .'}]';
-        $scalefilterbycourse = 0;
-        $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterbycourse);
+        $scalefilterin = '';
+        $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterin);
 
         $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
 
@@ -1531,8 +1530,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
 
         // Specify one scale value as filter.
         $scalevalues = '[{"scalevalue" : 2, "scaleid" :' . $framework->get('scaleid') . '}]';
-        $scalefilterbycourse = 1;
-        $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterbycourse);
+        $scalefilterincourse = 'course';
+        $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterincourse);
 
         $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
         // Test full navigation count.
@@ -1551,8 +1550,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         // Specify 2 scale values as filter.
         $scalevalues = '[{"scalevalue" : 1, "scaleid" :' . $framework->get('scaleid') . '}, '
                 . '{"scalevalue" : 3, "scaleid" :' . $framework->get('scaleid') .'}]';
-        $scalefilterbycourse = 1;
-        $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterbycourse);
+        $scalefilterincourse = 'course';
+        $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterincourse);
 
         $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
 
@@ -1720,13 +1719,13 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $commentarea1->add('This is the comment #1 for user 1');
         $commentarea1->add('This is the comment #2 for user 1');
         // All users.
-        $result = external::read_plan(null, $template->get('id'), '', true, 'ASC', null, false);
+        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, false);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertCount(2, $result['fullnavigation']);
         $this->assertEquals(0, reset($result['fullnavigation'])['nbcomments']);
         $this->assertEquals(0, next($result['fullnavigation'])['nbcomments']);
         // With comments.
-        $result = external::read_plan(null, $template->get('id'), '', true, 'ASC', null, true);
+        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, true);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertCount(1, $result['fullnavigation']);
         $this->assertEquals(2, reset($result['fullnavigation'])['nbcomments']);
@@ -1734,13 +1733,13 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         // Add comments for user 2.
         $commentarea2->add('This is the comment #1 for user 2');
         // All users.
-        $result = external::read_plan(null, $template->get('id'), '', true, 'ASC', null, false);
+        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, false);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertCount(2, $result['fullnavigation']);
         $this->assertEquals(0, reset($result['fullnavigation'])['nbcomments']);
         $this->assertEquals(0, next($result['fullnavigation'])['nbcomments']);
         // With comments.
-        $result = external::read_plan(null, $template->get('id'), '', true, 'ASC', null, true);
+        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, true);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertCount(2, $result['fullnavigation']);
         $this->assertEquals(2, reset($result['fullnavigation'])['nbcomments']);

@@ -24,6 +24,16 @@
     none.
 }}
 <div class="scalefiltercontainer">
+    {{#cmcompgradingenabled}}
+    <div class="fitem fitem_fradio fitem_fradiogroup">
+        <div class="fradio radio radio-primary">
+            <span>
+                <input type="radio" name="optionscalefilter" id="scalefiltercoursemodule" value="2" disabled="disabled" aria-labelledby="scalefilterapply">
+                <label for="scalefiltercoursemodule">{{#str}}finalratingcoursemodule, report_lpmonitoring{{/str}}</label>
+            </span>
+        </div>
+    </div>
+    {{/cmcompgradingenabled}}
     <div class="fitem fitem_fradio fitem_fradiogroup">
         <div class="fradio radio radio-primary">
             <span>

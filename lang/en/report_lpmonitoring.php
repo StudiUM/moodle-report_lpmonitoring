@@ -44,6 +44,7 @@ $string['filtercourse'] = 'In the course';
 $string['filtermodule'] = 'In the course module';
 $string['finalrating'] = 'Final rating';
 $string['finalratingcourse'] = 'Rating in course';
+$string['finalratingcoursemodule'] = 'Rating in activity';
 $string['invalidframework'] = 'Invalid competency framework';
 $string['invalidscaleconfiguration'] = 'Invalid scale configuration';
 $string['learningplancompetencies'] = 'Learning plan competencies: {$a}';

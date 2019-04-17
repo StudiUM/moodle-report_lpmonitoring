@@ -58,7 +58,7 @@
 </div>
 {{#js}}
 require(['report_lpmonitoring/learningplan', 'tool_lp/competencydialogue'], function(report, Compdialogue) {
-    report.init();
+    report.init(false, {{cmcompgradingenabled}});
     Compdialogue.init();
 });
 {{/js}}

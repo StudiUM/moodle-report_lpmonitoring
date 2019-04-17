@@ -57,6 +57,9 @@ use moodle_exception;
  */
 class api {
 
+    /** @var boolean iscmcompetencygradingenabled  **/
+    static $iscmcompetencygradingenabled = true;
+
     /**
      * Get scales from frameworkid.
      *
@@ -245,7 +248,7 @@ class api {
      * @param int $templateid The template ID
      * @param string $query The search query
      * @param array $scalesvalues scales values filter
-     * @param boolean $scalefilterbycourse Apply the scale filters on grade in course
+     * @param boolean $scalefilterin Apply the scale filters on grade in plan, course or course module
      * @param string $scalesortorder Order by rating number ASC or DESC
      * @param boolean $withcomments Only plans with comments
      * @return array( array(
@@ -258,11 +261,15 @@ class api {
      *                      )
      *              )
      */
-    public static function search_users_by_templateid($templateid, $query, $scalesvalues = array(), $scalefilterbycourse = true,
+    public static function search_users_by_templateid($templateid, $query, $scalesvalues = array(), $scalefilterin = '',
             $scalesortorder = "ASC", $withcomments = false) {
         global $CFG, $DB;
         if (!in_array(strtolower($scalesortorder), array('asc', 'desc'))) {
-            throw new coding_exception('Sort order must be ASC or DESC');
+            throw new \coding_exception('Sort order must be ASC or DESC');
+        }
+
+        if ($scalefilterin == 'coursemodule' && !self::is_cm_comptency_grading_enabled()) {
+            throw new \coding_exception('Grading competency in course module is disabled');
         }
 
         $template = core_competency_api::read_template($templateid);
@@ -304,7 +311,7 @@ class api {
             $paramsfilter = $paramsfilter + $params1 + $params2 + $queryparams;
 
             // If scale values in plan, we should build the "IN" SQL for both usercomp and usercompplan.
-            if (!$scalefilterbycourse) {
+            if (!$scalefilterin) {
                 list($insqlframework, $params1) = $DB->get_in_or_equal($scalevalues,
                     SQL_PARAMS_NAMED, 'gradeframework');
                 list($insqlcompetency, $params2) = $DB->get_in_or_equal($scalevalues,
@@ -323,7 +330,7 @@ class api {
 
         if ($sqlfilterin != '') {
             // Depending in filterbycourse param, we choose which table to use.
-            if ($scalefilterbycourse) {
+            if ($scalefilterin == 'course') {
                 // We have to check if users are enroled in course and competency is linked to the course.
                 $sqlscalefilter = "SELECT useridentifier,
                                           gradecount,
@@ -344,6 +351,40 @@ class api {
                                                     AND ue.status = :active
 					       JOIN {enrol} e
 						    ON ue.enrolid = e.id AND e.courseid = ucc.courseid
+                                                    AND e.status = :enabled
+                                               JOIN {" . \core_competency\competency::TABLE . "} c
+                                                    ON c.id = ucc.competencyid
+                                               JOIN {" . \core_competency\competency_framework::TABLE . "} cf
+                                                    ON cf.id = c.competencyframeworkid
+                                             WHERE ($sqlfilterin)
+                                          GROUP BY useridentifier)
+                                        ) usergrade";
+
+                $paramsfilter += array('active' => ENROL_USER_ACTIVE);
+                $paramsfilter += array('enabled' => ENROL_INSTANCE_ENABLED);
+            } else if ($scalefilterin == 'coursemodule') {
+                // We have to check if users are enroled in course and competency is linked to the course module.
+                $sqlscalefilter = "SELECT useridentifier,
+                                          gradecount,
+                                          tempid,
+                                          $fields,
+                                          p.id AS planid,
+                                          p.name AS planname
+                                    FROM  (
+                                            (SELECT ucc.userid AS useridentifier, Count(ucc.grade) gradecount,
+                                                    tc.templateid AS tempid
+                                               FROM {" . \core_competency\template_competency::TABLE . "} tc
+                                               JOIN {" . \core_competency\course_module_competency::TABLE . "} cc
+                                                    ON tc.competencyid = cc.competencyid AND tc.templateid = :templateid
+                                               JOIN {" . \tool_cmcompetency\user_competency_coursemodule::TABLE . "} ucc
+                                                    ON ucc.competencyid = tc.competencyid AND cc.cmid = ucc.cmid
+                                               JOIN {course_modules} cm
+                                                    ON cm.id = ucc.cmid
+                                               JOIN {user_enrolments} ue
+						    ON ue.userid = ucc.userid
+                                                    AND ue.status = :active
+					       JOIN {enrol} e
+						    ON ue.enrolid = e.id AND e.courseid = cm.course
                                                     AND e.status = :enabled
                                                JOIN {" . \core_competency\competency::TABLE . "} c
                                                     ON c.id = ucc.competencyid
@@ -527,7 +568,7 @@ class api {
      * @param int $planid The plan ID
      * @param int $templateid The template ID
      * @param array $scalesvalues The Scales values filter
-     * @param boolean $scalefilterbycourse Apply the scale filters on grade in course
+     * @param boolean $scalefilterin Apply the scale filters on grade in plan, course or course module
      * @param string $sortorder Scale sort order
      * @param int $tagid The tag ID
      * @param int $withcomments Only plans with comments
@@ -537,7 +578,7 @@ class api {
      *                            'next' => \stdClass
      *                        ))
      */
-    public static function read_plan($planid = null, $templateid = null, $scalesvalues = array(), $scalefilterbycourse = true,
+    public static function read_plan($planid = null, $templateid = null, $scalesvalues = array(), $scalefilterin = '',
             $sortorder = 'ASC', $tagid = null, $withcomments = false) {
 
         if (empty($planid) && empty($templateid) && empty($tagid)) {
@@ -554,7 +595,7 @@ class api {
             if (!empty($tagid)) {
                 $userplans = self::search_plans_with_tag($tagid);
             } else {
-                $userplans = array_values(self::search_users_by_templateid($templateid , '', $scalesvalues, $scalefilterbycourse,
+                $userplans = array_values(self::search_users_by_templateid($templateid , '', $scalesvalues, $scalefilterin,
                         $sortorder, $withcomments));
             }
             $currentindex = null;
@@ -1004,5 +1045,12 @@ class api {
             }
         }
         return $records;
+    }
+
+    /**
+     * Check if course module competency grading is enabled.
+     */
+    public static function is_cm_comptency_grading_enabled() {
+        return self::$iscmcompetencygradingenabled;
     }
 }
