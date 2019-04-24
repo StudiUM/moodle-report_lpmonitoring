@@ -66,6 +66,7 @@ class user_report_page implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         $data = new stdClass();
         $data->userid = $this->userid;
+        $data->cmcompgradingenabled = \report_lpmonitoring\api::is_cm_comptency_grading_enabled();
 
         // Attach standard objects as mustache can not parse \core_competency\plan objects.
         $data->plans = array();

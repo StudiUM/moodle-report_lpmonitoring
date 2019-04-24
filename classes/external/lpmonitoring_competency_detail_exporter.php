@@ -79,6 +79,9 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
             'hasrating' => array(
                 'type' => PARAM_BOOL
             ),
+            'hasratingincms' => array(
+                'type' => PARAM_BOOL
+            ),
             'nbevidence' => array(
                 'type' => PARAM_INT
             ),
@@ -92,8 +95,18 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
             'nbcoursesrated' => array(
                 'type' => PARAM_INT
             ),
+            'nbcmstotal' => array(
+                'type' => PARAM_INT
+            ),
+            'nbcmsrated' => array(
+                'type' => PARAM_INT
+            ),
             'listtotalcourses' => array(
                 'type' => linked_course_exporter::read_properties_definition(),
+                'multiple' => true
+            ),
+            'listtotalcms' => array(
+                'type' => linked_cm_exporter::read_properties_definition(),
                 'multiple' => true
             ),
             'scalecompetencyitems' => array(
@@ -168,6 +181,25 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
             $result->listtotalcourses[] = $totalcourse;
         }
         $result->hasrating = $result->nbcoursesrated > 0 ? true : false;
+
+        // List of courses modules linked to the competency.
+        $result->nbcmstotal = 0;
+        $result->nbcmsrated = 0;
+        $result->listtotalcms = array();
+
+        foreach ($data->cms as $cmdata) {
+            $relatedinfo = new \stdClass();
+            $relatedinfo->userid = $data->userid;
+            $relatedinfo->competencyid = $data->competency->get('id');
+            $totalcmexporter = new linked_cm_exporter($cmdata, array('relatedinfo' => $relatedinfo));
+            $totalcm = $totalcmexporter->export($output);
+            if ($totalcm->rated) {
+                $result->nbcmsrated++;
+            }
+            $result->nbcmstotal++;
+            $result->listtotalcms[] = $totalcm;
+        }
+        $result->hasratingincms = $result->nbcmsrated > 0 ? true : false;
 
         // Information for each scale value.
         $result->scalecompetencyitems = array();

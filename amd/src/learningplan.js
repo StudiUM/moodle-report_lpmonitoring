@@ -676,6 +676,7 @@ define(['jquery',
                     // Locally store competency information.
                     self.competencies[context.competencyid].competencydetail = context;
                     context.plan = plan;
+                    context.cmcompgradingenabled = self.cmcompgradingEnabled;
                     templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
                         var compid = context.competencyid;
                         var userid = plan.user.id;
@@ -818,6 +819,7 @@ define(['jquery',
                     // Locally store competency information.
                     self.competencies[results.competencyid].competencydetail = results;
                     results.plan = plan;
+                    results.cmcompgradingenabled = self.cmcompgradingEnabled;
                     templates.render('report_lpmonitoring/competency_detail', results).done(function(html, js) {
                         $('#comp-' + results.competencyid + ' .x_content').html(html);
                         templates.runTemplateJS(js);
@@ -1075,6 +1077,35 @@ define(['jquery',
                                 html,
                                 function(){
                                     DataTable.apply('#listcoursecompetency-' + listcourses.competencyid, true, true);
+                                },
+                                self.destroyDialogue
+                            );
+                        }).fail(notification.exception);
+                });
+            }
+        };
+
+        /**
+         * Display the list of courses modules in competency.
+         *
+         * @name   displayCmlist
+         * @param {Object[]} listcms
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.displayCmlist = function(listcms) {
+            var self = this;
+            if (listcms.listtotalcms.length > 0) {
+                str.get_string('linkedcms', 'report_lpmonitoring').done(
+                function(titledialogue) {
+                    templates.render('report_lpmonitoring/list_cms_in_competency', listcms)
+                        .done(function(html) {
+                            // Show the dialogue.
+                            new Dialogue(
+                                titledialogue,
+                                html,
+                                function(){
+                                    DataTable.apply('#listcmcompetency-' + listcms.competencyid, true, true);
                                 },
                                 self.destroyDialogue
                             );
@@ -1362,6 +1393,18 @@ define(['jquery',
                     totallistcourses.listtotalcourses = self.competencies[competencyid].competencydetail.listtotalcourses;
                     totallistcourses.competencyid = competencyid;
                     self.displayCourselist(totallistcourses);
+                }
+            });
+
+            // Handle click on total number of courses modules.
+            $(".competencyreport").on('click', 'a.totalnbcms', function(event) {
+                event.preventDefault();
+                var competencyid = $(this).data('competencyid');
+                if (typeof self.competencies[competencyid] !== 'undefined') {
+                    var totallistcms = {};
+                    totallistcms.listtotalcms = self.competencies[competencyid].competencydetail.listtotalcms;
+                    totallistcms.competencyid = competencyid;
+                    self.displayCmlist(totallistcms);
                 }
             });
 

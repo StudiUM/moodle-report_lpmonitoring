@@ -743,6 +743,27 @@ class api {
 
             $competencydetails->courses[] = $courseinfo;
         }
+        $competencydetails->cms = array();
+        if (self::is_cm_comptency_grading_enabled()) {
+            $cms = \tool_cmcompetency\api::list_coursesmodules_using_competency($competencyid);
+
+            foreach ($cms as $cm) {
+                $cminfo = new \stdClass();
+                $cminfo->cmid = $cm;
+
+                // Find rating in course module.
+                $cminfo->usecompetencyincm = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cm, $userid,
+                        $competencyid);
+
+                // Find most recent course module evidences.
+                $sort = 'timecreated';
+                $order = 'DESC';
+                $cminfo->cmevidences = \tool_cmcompetency\api::list_evidence_in_coursemodule($userid, $cm, $competencyid,
+                        $sort, $order);
+
+                $competencydetails->cms[] = $cminfo;
+            }
+        }
 
         return $competencydetails;
     }

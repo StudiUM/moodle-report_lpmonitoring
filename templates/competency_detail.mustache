@@ -32,10 +32,14 @@
     * hasevidence - true if competency has evidence
     * nbevidence - number of evidence
     * hasrating - true if competency has rating in courses
+    * hasratingincms - true if competency has rating in courses modules
 
     * nbcoursesrated - number of course rated
-    * nbcoursestotal - courses number 
-    
+    * nbcoursestotal - courses number
+
+    * nbcmsrated - number of course module rated
+    * nbcmstotal - courses modules number 
+
     * scalecompetencyitems - scale used in the competency
       * color - color of the scale value
       * name - name of scale value
@@ -47,8 +51,15 @@
     <div class="tile_stats_count">
         <h5 class="count_top truncate" ><i class="fa fa-book"></i> {{#str}}totalnumberrating, report_lpmonitoring{{/str}}</h5>
         <div class="count blue">
-            <a class="blue totalnbcourses" role="button" title="{{#str}}totalnumberrating, report_lpmonitoring{{/str}}" href="#"  data-competencyid="{{competencyid}}">{{nbcoursesrated}}/{{nbcoursestotal}}</a>
+            <a class="blue totalnbcourses" role="button" title="{{#str}}totalnumberratingincourses, report_lpmonitoring{{/str}}" href="#"  data-competencyid="{{competencyid}}">{{nbcoursesrated}}/{{nbcoursestotal}}</a>
+            <span class="counttitle">{{#str}}incourses, report_lpmonitoring{{/str}}</span>
         </div>
+        {{#cmcompgradingenabled}}
+        <div class="count blue">
+            <a class="blue totalnbcms" role="button" title="{{#str}}totalnumberratingincms, report_lpmonitoring{{/str}}" href="#"  data-competencyid="{{competencyid}}">{{nbcmsrated}}/{{nbcmstotal}}</a>
+            <span class="counttitle">{{#str}}incms, report_lpmonitoring{{/str}}</span>
+        </div>
+        {{/cmcompgradingenabled}}
         {{#hasevidence}}
         <span class="count_top"><i class="fa fa-certificate"></i> {{#str}}userevidence, tool_lp{{/str}}</span>
         <div class="blue preuve">

@@ -283,4 +283,109 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertEquals($this->user1->id, $result['plan']['user']['id']);
     }
+
+    /**
+     * Test get competency detail for lpmonitoring report (grading in course module).
+     */
+    public function test_get_competency_detail() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
+        // Create courses.
+        $course1 = $dg->create_course();
+        $course2 = $dg->create_course();
+        // Create course modules.
+        $pagegenerator = $this->getDataGenerator()->get_plugin_generator('mod_page');
+        $page1 = $pagegenerator->create_instance(array('course' => $course1->id));
+        $page2 = $pagegenerator->create_instance(array('course' => $course1->id));
+        $page11 = $pagegenerator->create_instance(array('course' => $course2->id));
+        $page22 = $pagegenerator->create_instance(array('course' => $course2->id));
+        $cm1 = get_coursemodule_from_instance('page', $page1->id);
+        $cm2 = get_coursemodule_from_instance('page', $page2->id);
+        $cm11 = get_coursemodule_from_instance('page', $page11->id);
+        $cm22 = get_coursemodule_from_instance('page', $page22->id);
+
+        // Enrol users in courses.
+        $dg->enrol_user($this->user1->id, $course1->id);
+        $dg->enrol_user($this->user1->id, $course2->id);
+        $dg->enrol_user($this->user2->id, $course1->id);
+        $dg->enrol_user($this->user2->id, $course2->id);
+        $dg->enrol_user($this->user3->id, $course1->id);
+
+        // Create some course competencies.
+        $cpg->create_course_competency(array('competencyid' => $this->comp1->get('id'), 'courseid' => $course1->id));
+        $cpg->create_course_competency(array('competencyid' => $this->comp2->get('id'), 'courseid' => $course1->id));
+        $cpg->create_course_competency(array('competencyid' => $this->comp1->get('id'), 'courseid' => $course2->id));
+        $cpg->create_course_competency(array('competencyid' => $this->comp2->get('id'), 'courseid' => $course2->id));
+        // Link competencies to course modules.
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp1->get('id'), 'cmid' => $cm1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp1->get('id'), 'cmid' => $cm2->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm2->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp1->get('id'), 'cmid' => $cm11->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm11->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp1->get('id'), 'cmid' => $cm22->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm22->id));
+
+        // Rate user1 in course modules cm1, cm2 and cm11.
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user1->id, $this->comp1->get('id'), 1);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm2, $this->user1->id, $this->comp1->get('id'), 2);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm11, $this->user1->id, $this->comp1->get('id'), 1);
+        // Rate user2 in course modules cm1.
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user2->id, $this->comp1->get('id'), 1);
+
+        // Test for user1 for comp1.
+        $planuser1 = \core_competency\plan::get_record(array('userid' => $this->user1->id));
+        $result = external::get_competency_detail($this->user1->id, $this->comp1->get('id'), $planuser1->get('id'));
+        $result = (object) external_api::clean_returnvalue(external::get_competency_detail_returns(), $result);
+
+        $this->assertCount(4, $result->listtotalcms);
+        $this->assertEquals(3, $result->nbcmsrated);
+        $this->assertEquals(4, $result->nbcmstotal);
+        $this->assertEquals('Page 1', $result->listtotalcms[0]['cmname']);
+        $this->assertEquals('Page 2', $result->listtotalcms[1]['cmname']);
+        $this->assertEquals('Page 3', $result->listtotalcms[2]['cmname']);
+        $this->assertEquals('Page 4', $result->listtotalcms[3]['cmname']);
+        $this->assertTrue($result->listtotalcms[0]['rated']);
+        $this->assertTrue($result->listtotalcms[1]['rated']);
+        $this->assertTrue($result->listtotalcms[2]['rated']);
+        $this->assertFalse($result->listtotalcms[3]['rated']);
+
+        // Test for user2 for comp1.
+        $planuser2 = \core_competency\plan::get_record(array('userid' => $this->user2->id));
+        $result = external::get_competency_detail($this->user2->id, $this->comp1->get('id'), $planuser2->get('id'));
+        $result = (object) external_api::clean_returnvalue(external::get_competency_detail_returns(), $result);
+
+        $this->assertCount(4, $result->listtotalcms);
+        $this->assertEquals(1, $result->nbcmsrated);
+        $this->assertEquals(4, $result->nbcmstotal);
+        $this->assertEquals('Page 1', $result->listtotalcms[0]['cmname']);
+        $this->assertEquals('Page 2', $result->listtotalcms[1]['cmname']);
+        $this->assertEquals('Page 3', $result->listtotalcms[2]['cmname']);
+        $this->assertEquals('Page 4', $result->listtotalcms[3]['cmname']);
+        $this->assertTrue($result->listtotalcms[0]['rated']);
+        $this->assertFalse($result->listtotalcms[1]['rated']);
+        $this->assertFalse($result->listtotalcms[2]['rated']);
+        $this->assertFalse($result->listtotalcms[3]['rated']);
+
+        // Test for user2 for comp2.
+        $result = external::get_competency_detail($this->user2->id, $this->comp2->get('id'), $planuser2->get('id'));
+        $result = (object) external_api::clean_returnvalue(external::get_competency_detail_returns(), $result);
+
+        $this->assertCount(4, $result->listtotalcms);
+        $this->assertEquals(0, $result->nbcmsrated);
+        $this->assertEquals(4, $result->nbcmstotal);
+        $this->assertEquals('Page 1', $result->listtotalcms[0]['cmname']);
+        $this->assertEquals('Page 2', $result->listtotalcms[1]['cmname']);
+        $this->assertEquals('Page 3', $result->listtotalcms[2]['cmname']);
+        $this->assertEquals('Page 4', $result->listtotalcms[3]['cmname']);
+        $this->assertFalse($result->listtotalcms[0]['rated']);
+        $this->assertFalse($result->listtotalcms[1]['rated']);
+        $this->assertFalse($result->listtotalcms[2]['rated']);
+        $this->assertFalse($result->listtotalcms[3]['rated']);
+    }
+
 }
