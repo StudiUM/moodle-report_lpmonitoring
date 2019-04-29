@@ -147,7 +147,7 @@ $functions = array(
         'classpath'    => '',
         'description'  => 'Save the tags submitted by a form',
         'type'         => 'write',
-        'capabilities' => 'moodle/competency:planmanage',
+        'capabilities' => 'moodle/competency:competencygrade',
         'ajax'         => true
     ),
     'report_lpmonitoring_search_plans_with_tag' => array(

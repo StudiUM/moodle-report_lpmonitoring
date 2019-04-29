@@ -298,10 +298,8 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);
-        assign_capability('moodle/competency:planmanage', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:competencygrade', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:templateview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:templatemanage', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:plancomment', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:usercompetencycomment', CAP_ALLOW, $roleid, $syscontext->id);
 
@@ -313,6 +311,22 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         );
         tool_cohortroles_api::create_cohort_role_assignment($params);
         $roles = tool_cohortroles_api::sync_all_cohort_roles();
+
+        // Create role for managing the learning plan templates.
+        $manager = $datagenerator->create_user(
+                array(
+                    'firstname' => 'LP templates manager',
+                    'lastname' => 'Test',
+                    'username' => 'lpmanager',
+                    'password' => 'lpmanager'
+                )
+        );
+        $role2id = create_role('LP templates manager role', 'rolelpmanager', 'learning plan templates manager role description');
+        assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $role2id, $cat1ctx->id);
+        assign_capability('moodle/competency:competencyview', CAP_ALLOW, $role2id, $cat1ctx->id);
+        assign_capability('moodle/competency:templatemanage', CAP_ALLOW, $role2id, $cat1ctx->id);
+        assign_capability('moodle/competency:templateview', CAP_ALLOW, $role2id, $cat1ctx->id);
+        role_assign($role2id, $manager->id, $cat1ctx->id);
 
         // Rate some comptencies in course for Pablo.
         core_competency_api::grade_competency_in_course($course1->id, $user4->id, $c1->get('id'), 1, "My note");

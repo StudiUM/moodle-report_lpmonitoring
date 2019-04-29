@@ -40,6 +40,7 @@ use core_competency\url;
 use core_competency\external as core_competency_external;
 use core_competency\api as core_competency_api;
 use core_user\external\user_summary_exporter;
+use core_competency\user_competency;
 use core_competency\external\competency_exporter;
 use core_competency\external\plan_exporter;
 use core_competency\external\template_exporter;
@@ -676,6 +677,7 @@ class external extends external_api {
         $planexport->statusname = $plans->current->get_statusname();
         $planexport->usercontext = $plans->current->get_context()->id;
         $planexport->canmanage = $plans->current->can_manage();
+        $planexport->cangrade = user_competency::can_grade_user($plans->current->get('userid'));
         $planexport->displayrating = \tool_lp\api::has_to_display_rating_for_plan($planexport->id);
         $planexport->canresetdisplayrating = \tool_lp\api::can_reset_display_rating_for_plan($planexport->id);
         // Set learning plan url.
@@ -731,6 +733,7 @@ class external extends external_api {
             'usercontext' => new external_value(PARAM_INT, 'The user context ID value'),
             'isactive' => new external_value(PARAM_BOOL, 'Is plan active'),
             'canmanage' => new external_value(PARAM_BOOL, 'Can manage user plan'),
+            'cangrade' => new external_value(PARAM_BOOL, 'Can grade user plan'),
             'displayrating' => new external_value(PARAM_BOOL, 'Is ratings displayed for user'),
             'canresetdisplayrating' => new external_value(PARAM_BOOL, 'Plan has a display rating setting'),
             'isdraft' => new external_value(PARAM_BOOL, 'Is plan draft'),

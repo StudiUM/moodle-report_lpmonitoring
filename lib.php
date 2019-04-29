@@ -132,7 +132,8 @@ function report_lpmonitoring_output_fragment_tags($args) {
     $planid = $args->planid;
 
     $plan = new \core_competency\plan($planid);
-    if ($plan->can_manage()) {
+    $cangrade = \core_competency\user_competency::can_grade_user($plan->get('userid'));
+    if ($cangrade) {
 
         $mform = new \report_lpmonitoring\form\tags(null, array('planid' => $planid));
         // Used to set the planid.

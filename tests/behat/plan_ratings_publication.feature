@@ -6,7 +6,7 @@ Feature: Manage publication of ratings in learning plans
 
   Background:
     Given the lpmonitoring fixtures exist
-    And I log in as "appreciator"
+    And I log in as "lpmanager"
     And I follow "List of courses"
     When I follow "Medicine"
     And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
@@ -16,6 +16,8 @@ Feature: Manage publication of ratings in learning plans
   Scenario: Manage learning plan ratings publication [template level]
     # Template level
     Given I click on "Hide ratings for this template" of edit menu in the "Medicine Year 1" row
+    And I log out
+    And I log in as "appreciator"
     And I follow "List of courses"
     And I follow "Medicine"
     And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
@@ -55,7 +57,7 @@ Feature: Manage publication of ratings in learning plans
     And I should see "-" in "Competency B" row "Proficient" column of "generaltable" table
     And I log out
     # Login as learning plan admin
-    And I log in as "appreciator"
+    And I log in as "lpmanager"
     And I follow "List of courses"
     And I follow "Medicine"
     And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
@@ -89,6 +91,8 @@ Feature: Manage publication of ratings in learning plans
 
   Scenario: Manage learning plan ratings publication [learning plan level]
     Given I click on "Hide ratings for this template" of edit menu in the "Medicine Year 1" row
+    And I log out
+    And I log in as "appreciator"
     And I follow "List of courses"
     And I follow "Medicine"
     And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
@@ -133,7 +137,9 @@ Feature: Manage publication of ratings in learning plans
     And I should see "No" in "cmp3" row "Proficient" column of "generaltable" table
 
   Scenario: Manage learning plan ratings publication [reset display rating in learning plan]
-    Given I follow "List of courses"
+    Given I log out
+    And I log in as "appreciator"
+    And I follow "List of courses"
     And I follow "Medicine"
     And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
     And I follow "Monitoring of learning plans"
