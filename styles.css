@@ -549,6 +549,7 @@
 }
 .competencyreport table.tile_info td a,
 .competencyreport table.tile_info td span.nbcourses,
+.competencyreport table.tile_info td span.nbcms,
 .competencyreport table.tile_info td span.nbusers{
     display: inline-block;
     text-align: center;
@@ -1439,4 +1440,10 @@
     display: inline-block;
     margin-left: 8px;
     font-weight: 300;
+}
+ul.detail-comp-tab li a::first-letter {
+    text-transform: capitalize;
+}
+.competencyreport .nav-tabs.detail-comp-tab {
+    margin-top: 10px;
 }

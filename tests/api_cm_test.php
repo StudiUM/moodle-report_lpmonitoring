@@ -95,6 +95,7 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
+        $mpg = $dg->get_plugin_generator('report_lpmonitoring');
 
         $creator = $dg->create_user(array('firstname' => 'Creator'));
         $appreciator = $dg->create_user(array('firstname' => 'Appreciator'));
@@ -146,6 +147,17 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
             'contextid' => $cat1ctx->id
         );
         $this->frameworkincategory = $cpg->create_framework($framework);
+
+        // Create scale report configuration.
+        $scaleconfig[] = array('id' => 1, 'name' => 'not good',  'color' => '#AAAAA');
+        $scaleconfig[] = array('id' => 2, 'name' => 'good',  'color' => '#BBBBB');
+
+        $record = new stdclass();
+        $record->competencyframeworkid = $this->frameworkincategory->get('id');
+        $record->scaleid = $scale->id;
+        $record->scaleconfiguration = json_encode($scaleconfig);
+        $mpg->create_report_competency_config($record);
+
         $this->comp1 = $cpg->create_competency(array(
             'competencyframeworkid' => $this->frameworkincategory->get('id'),
             'shortname' => 'Competency A')
@@ -471,15 +483,14 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $course1 = $dg->create_course();
         $course2 = $dg->create_course();
         // Create course modules.
-        $pagegenerator = $this->getDataGenerator()->get_plugin_generator('mod_page');
-        $page1 = $pagegenerator->create_instance(array('course' => $course1->id));
-        $page2 = $pagegenerator->create_instance(array('course' => $course1->id));
-        $page11 = $pagegenerator->create_instance(array('course' => $course2->id));
-        $page22 = $pagegenerator->create_instance(array('course' => $course2->id));
-        $cm1 = get_coursemodule_from_instance('page', $page1->id);
-        $cm2 = get_coursemodule_from_instance('page', $page2->id);
-        $cm11 = get_coursemodule_from_instance('page', $page11->id);
-        $cm22 = get_coursemodule_from_instance('page', $page22->id);
+        $data = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course1->id));
+        $data2 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course1->id));
+        $data11 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course2->id));
+        $data22 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course2->id));
+        $cm1 = get_coursemodule_from_id('data', $data->cmid);
+        $cm2 = get_coursemodule_from_id('data', $data2->cmid);
+        $cm11 = get_coursemodule_from_id('data', $data11->cmid);
+        $cm22 = get_coursemodule_from_id('data', $data22->cmid);
 
         // Enrol users in courses.
         $dg->enrol_user($this->user1->id, $course1->id);
@@ -487,6 +498,15 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $dg->enrol_user($this->user2->id, $course1->id);
         $dg->enrol_user($this->user2->id, $course2->id);
         $dg->enrol_user($this->user3->id, $course1->id);
+        // Insert student grades for the activities.
+        $grade = new \stdClass();
+        $grade->userid   = $this->user1->id;
+        $grade->rawgrade = 80;
+        grade_update('mod/data', $course1->id, 'mod', 'data', $data->id, 0, $grade);
+        $grade->rawgrade = 30;
+        grade_update('mod/data', $course1->id, 'mod', 'data', $data2->id, 0, $grade);
+        $grade->rawgrade = 20;
+        grade_update('mod/data', $course2->id, 'mod', 'data', $data11->id, 0, $grade);
 
         // Create some course competencies.
         $cpg->create_course_competency(array('competencyid' => $this->comp1->get('id'), 'courseid' => $course1->id));
@@ -523,6 +543,14 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertEquals(2, $result->cms[1]->usecompetencyincm->get('grade'));
         $this->assertEquals(1, $result->cms[2]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[3]->usecompetencyincm->get('grade'));
+        $this->assertEquals('B-', $result->cms[0]->grade);
+        $this->assertEquals('F', $result->cms[1]->grade);
+        $this->assertEquals('F', $result->cms[2]->grade);
+        $this->assertEquals('-', $result->cms[3]->grade);
+        $this->assertCount(1, $result->cms[0]->cmevidences);
+        $this->assertCount(1, $result->cms[1]->cmevidences);
+        $this->assertCount(1, $result->cms[2]->cmevidences);
+        $this->assertCount(0, $result->cms[3]->cmevidences);
 
         // Test for user2 for comp1.
         $planuser2 = \core_competency\plan::get_record(array('userid' => $this->user2->id));
@@ -537,6 +565,14 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertEquals(null, $result->cms[1]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[2]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[3]->usecompetencyincm->get('grade'));
+        $this->assertEquals('-', $result->cms[0]->grade);
+        $this->assertEquals('-', $result->cms[1]->grade);
+        $this->assertEquals('-', $result->cms[2]->grade);
+        $this->assertEquals('-', $result->cms[3]->grade);
+        $this->assertCount(1, $result->cms[0]->cmevidences);
+        $this->assertCount(0, $result->cms[1]->cmevidences);
+        $this->assertCount(0, $result->cms[2]->cmevidences);
+        $this->assertCount(0, $result->cms[3]->cmevidences);
 
         // Test for user2 for comp2.
         $result = api::get_competency_detail($this->user2->id, $this->comp2->get('id'), $planuser2->get('id'));
@@ -550,6 +586,14 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertEquals(null, $result->cms[1]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[2]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[3]->usecompetencyincm->get('grade'));
+        $this->assertEquals('-', $result->cms[0]->grade);
+        $this->assertEquals('-', $result->cms[1]->grade);
+        $this->assertEquals('-', $result->cms[2]->grade);
+        $this->assertEquals('-', $result->cms[3]->grade);
+        $this->assertCount(0, $result->cms[0]->cmevidences);
+        $this->assertCount(0, $result->cms[1]->cmevidences);
+        $this->assertCount(0, $result->cms[2]->cmevidences);
+        $this->assertCount(0, $result->cms[3]->cmevidences);
 
         // Test when competency 1 is removed from course module cm1.
         $this->setAdminUser();
@@ -566,6 +610,12 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertEquals(2, $result->cms[0]->usecompetencyincm->get('grade'));
         $this->assertEquals(1, $result->cms[1]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[2]->usecompetencyincm->get('grade'));
+        $this->assertEquals('F', $result->cms[0]->grade);
+        $this->assertEquals('F', $result->cms[1]->grade);
+        $this->assertEquals('-', $result->cms[2]->grade);
+        $this->assertCount(1, $result->cms[0]->cmevidences);
+        $this->assertCount(1, $result->cms[1]->cmevidences);
+        $this->assertCount(0, $result->cms[2]->cmevidences);
 
         // Test for user2 for comp1.
         $result = api::get_competency_detail($this->user2->id, $this->comp1->get('id'), $planuser2->get('id'));
@@ -577,6 +627,12 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertEquals(null, $result->cms[0]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[1]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[2]->usecompetencyincm->get('grade'));
+        $this->assertEquals('-', $result->cms[0]->grade);
+        $this->assertEquals('-', $result->cms[1]->grade);
+        $this->assertEquals('-', $result->cms[2]->grade);
+        $this->assertCount(0, $result->cms[0]->cmevidences);
+        $this->assertCount(0, $result->cms[1]->cmevidences);
+        $this->assertCount(0, $result->cms[2]->cmevidences);
 
         // Test get_competency_detail when grading competency in course module is disabled.
         api::$iscmcompetencygradingenabled = false;

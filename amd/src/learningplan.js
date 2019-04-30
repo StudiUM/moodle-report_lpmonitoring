@@ -139,6 +139,9 @@ define(['jquery',
         /** @var {Boolean} Indicate that the tags are currently loading, to prevent loading them twice at the same time. */
         LearningplanReport.prototype.tagsAreLoading = false;
 
+        /** @var {String} Active tab course or course module. */
+        LearningplanReport.prototype.compDetailActiveTab = null;
+
         /**
          * Triggered when a template is selected.
          *
@@ -683,15 +686,28 @@ define(['jquery',
                         var planid = plan.id;
                         var scaleid = context.scaleid;
                         $('#comp-' + compid + ' .x_content').html(html);
+
+                        // Show comptency ratings details tabs.
+                        if (self.compDetailActiveTab === 'incoursemodule') {
+                            $('.detail-comp-tab a[href="#tab-incms-content-' + context.competencyid + '"]').tab('show');
+                        } else {
+                            $('.detail-comp-tab a[href="#tab-incourses-content-' + context.competencyid + '"]').tab('show');
+                        }
                         if (context.cangrade) {
                             // Apply inline grader.
                             self.applyInlineGrader(compid, userid, planid, scaleid);
                         }
 
-                        // Apply Donut Graph to the competency.
+                        // Apply Donut Graph to the competency in courses.
                         if (context.hasrating !== false) {
-                            self.ApplyDonutGraph(compid, context);
+                            self.ApplyDonutGraph(compid, context, false);
                         }
+
+                        // Apply Donut Graph to the competency in courses modules.
+                        if (context.hasratingincms !== false && self.cmcompgradingEnabled) {
+                            self.ApplyDonutGraph(compid, context, true);
+                        }
+
                         // If all template are loaded then hide the loader.
                         if (index === requests.length - 1) {
                             element.removeClass('loading');
@@ -839,14 +855,25 @@ define(['jquery',
                     templates.render('report_lpmonitoring/competency_detail', results).done(function(html, js) {
                         $('#comp-' + results.competencyid + ' .x_content').html(html);
                         templates.runTemplateJS(js);
+                        // Show comptency ratings details tabs.
+                        if (self.compDetailActiveTab === 'incoursemodule') {
+                            $('.detail-comp-tab a[href="#tab-incms-content-' + results.competencyid + '"]').tab('show');
+                        } else {
+                            $('.detail-comp-tab a[href="#tab-incourses-content-' + results.competencyid + '"]').tab('show');
+                        }
                         if (results.cangrade) {
                             // Apply inline grader.
                             self.applyInlineGrader(results.competencyid, userid, planid, results.scaleid);
                         }
 
-                        // Apply Donut Graph to the competency.
+                        // Apply Donut Graph to the competency in courses.
                         if (results.hasrating !== false) {
-                            self.ApplyDonutGraph(results.competencyid, results);
+                            self.ApplyDonutGraph(results.competencyid, results, false);
+                        }
+
+                        // Apply Donut Graph to the competency in courses modules.
+                        if (results.hasratingincm !== false && self.cmcompgradingEnabled) {
+                            self.ApplyDonutGraph(results.competencyid, results, true);
                         }
                         self.colorContrast.apply('#comp-' + results.competencyid + ' .x_content .tile-stats .label.cr-scalename');
                     });
@@ -876,34 +903,44 @@ define(['jquery',
          * @name   ApplyDonutGraph
          * @param  {Number} competencyid
          * @param  {Array} data
+         * @param  {Boolean} forcm
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.ApplyDonutGraph = function(competencyid, data) {
+        LearningplanReport.prototype.ApplyDonutGraph = function(competencyid, data, forcm) {
             var options = {
                 legend: false,
                 responsive: false,
                 tooltips: {enabled: false}
             };
             var colors = [];
-            var coursebyscales = [];
+            var canvasselector = '#canvas-graph-' + competencyid;
+            if (forcm) {
+                canvasselector = '#cm-canvas-graph-' + competencyid;
+            }
+
+            var itemsbyscales = [];
             $.each(data.scalecompetencyitems, function(index, record) {
                 colors.push(record.color);
-                coursebyscales.push(record.nbcourse);
+                if (forcm) {
+                    itemsbyscales.push(record.nbcm);
+                } else {
+                    itemsbyscales.push(record.nbcourse);
+                }
             });
-            new Chart($('#canvas-graph-' + competencyid), {
+
+            new Chart($(canvasselector), {
                 type: 'doughnut',
                 data: {
                     labels: [],
                     datasets: [{
-                        data: coursebyscales,
+                        data: itemsbyscales,
                         backgroundColor: colors,
                         hoverBackgroundColor: []
                     }]
                 },
                 options: options
             });
-
         };
 
         /**
@@ -935,6 +972,11 @@ define(['jquery',
                 planid = self.studentLearningplanId;
             }
             self.scalesvaluesSelected = $(self.learningplanSelector).data('scalefilter');
+            if (self.scalefilterin === 'coursemodule') {
+                self.compDetailActiveTab = 'incoursemodule';
+            } else {
+                self.compDetailActiveTab = 'incourse';
+            }
 
             self.displayPlan(planid, templateid, tagid);
         };
@@ -1258,6 +1300,36 @@ define(['jquery',
         };
 
         /**
+         * Display the list of courses modules in competency.
+         *
+         * @name   displayScaleCmList
+         * @param {Object[]} listitems
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.displayScaleCmList = function(listitems) {
+            var self = this;
+            if (listitems.scalecompetencyitem.listcms.length > 0) {
+                str.get_string('linkedcms', 'report_lpmonitoring').done(
+                function(titledialogue) {
+                    templates.render('report_lpmonitoring/list_cms_in_scale_value', listitems)
+                        .done(function(html) {
+                            // Show the dialogue.
+                            new Dialogue(
+                                titledialogue,
+                                html,
+                                function(){
+                                    DataTable.apply('#listscalecmcompetency-' + listitems.competencyid, true, true);
+                                },
+                                self.destroyDialogue
+                            );
+                            self.colorContrast.apply('.moodle-dialogue-base .label.cr-scalename');
+                        }).fail(notification.exception);
+                });
+            }
+        };
+
+        /**
          * Init the differents page blocks and inputs form.
          *
          * @name   initPage
@@ -1329,13 +1401,18 @@ define(['jquery',
                 event.preventDefault();
                 var competencyid = $(this).data("competencyid");
                 var scalevalue = $(this).data("scalevalue");
+                var type = $(this).data("type");
 
                 if (typeof self.competencies[competencyid] !== 'undefined') {
-                    var listcourses = {};
+                    var listitems = {};
                     var competencydetail = self.competencies[competencyid].competencydetail;
-                    listcourses.scalecompetencyitem = competencydetail.scalecompetencyitems[scalevalue - 1];
-                    listcourses.competencyid = competencyid;
-                    self.displayScaleCourseList(listcourses);
+                    listitems.scalecompetencyitem = competencydetail.scalecompetencyitems[scalevalue - 1];
+                    listitems.competencyid = competencyid;
+                    if (type === 'incm') {
+                        self.displayScaleCmList(listitems);
+                    } else {
+                        self.displayScaleCourseList(listitems);
+                    }
                 }
             });
 
@@ -1437,6 +1514,15 @@ define(['jquery',
                     totallistcms.listtotalcms = self.competencies[competencyid].competencydetail.listtotalcms;
                     totallistcms.competencyid = competencyid;
                     self.displayCmlist(totallistcms);
+                }
+            });
+            // Handle click on rating tabs.
+            $(".competencyreport").on('click', '.detail-comp-tab a', function(event) {
+                event.preventDefault();
+                if ($(event.target).hasClass('incm')) {
+                    self.compDetailActiveTab = "incoursemodule";
+                } else {
+                    self.compDetailActiveTab = "incourse";
                 }
             });
 

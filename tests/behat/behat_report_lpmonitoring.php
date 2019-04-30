@@ -95,7 +95,7 @@ class behat_report_lpmonitoring extends behat_base {
                 $xpath = "//span[contains(@class, '$targetclass') and ancestor-or-self::div/h4/a[contains(., '$compname')]]";
                 break;
             case 'no-data-available':
-                 $xpath = "//div[contains(., '$compname')]/div/div/div/"
+                 $xpath = "//div[contains(., '$compname')]/div/div/div/div/div/"
                     . "table/tbody/tr/td/div[contains(@class, '$targetclass')]";
                 break;
             case 'incourse':

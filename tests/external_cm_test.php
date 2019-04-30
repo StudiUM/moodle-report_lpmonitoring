@@ -298,15 +298,18 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $course1 = $dg->create_course();
         $course2 = $dg->create_course();
         // Create course modules.
-        $pagegenerator = $this->getDataGenerator()->get_plugin_generator('mod_page');
-        $page1 = $pagegenerator->create_instance(array('course' => $course1->id));
-        $page2 = $pagegenerator->create_instance(array('course' => $course1->id));
-        $page11 = $pagegenerator->create_instance(array('course' => $course2->id));
-        $page22 = $pagegenerator->create_instance(array('course' => $course2->id));
-        $cm1 = get_coursemodule_from_instance('page', $page1->id);
-        $cm2 = get_coursemodule_from_instance('page', $page2->id);
-        $cm11 = get_coursemodule_from_instance('page', $page11->id);
-        $cm22 = get_coursemodule_from_instance('page', $page22->id);
+        $data = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course1->id,
+            'name' => 'Data 1'));
+        $data2 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course1->id,
+            'name' => 'Data 2'));
+        $data11 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course2->id,
+            'name' => 'Data 11'));
+        $data22 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course2->id,
+            'name' => 'Data 22'));
+        $cm1 = get_coursemodule_from_id('data', $data->cmid);
+        $cm2 = get_coursemodule_from_id('data', $data2->cmid);
+        $cm11 = get_coursemodule_from_id('data', $data11->cmid);
+        $cm22 = get_coursemodule_from_id('data', $data22->cmid);
 
         // Enrol users in courses.
         $dg->enrol_user($this->user1->id, $course1->id);
@@ -314,6 +317,16 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $dg->enrol_user($this->user2->id, $course1->id);
         $dg->enrol_user($this->user2->id, $course2->id);
         $dg->enrol_user($this->user3->id, $course1->id);
+
+        // Insert student grades for the activities.
+        $grade = new \stdClass();
+        $grade->userid   = $this->user1->id;
+        $grade->rawgrade = 80;
+        grade_update('mod/data', $course1->id, 'mod', 'data', $data->id, 0, $grade);
+        $grade->rawgrade = 30;
+        grade_update('mod/data', $course1->id, 'mod', 'data', $data2->id, 0, $grade);
+        $grade->rawgrade = 95;
+        grade_update('mod/data', $course2->id, 'mod', 'data', $data11->id, 0, $grade);
 
         // Create some course competencies.
         $cpg->create_course_competency(array('competencyid' => $this->comp1->get('id'), 'courseid' => $course1->id));
@@ -331,11 +344,17 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm22->id));
 
         // Rate user1 in course modules cm1, cm2 and cm11.
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user1->id, $this->comp1->get('id'), 1);
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm2, $this->user1->id, $this->comp1->get('id'), 2);
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm11, $this->user1->id, $this->comp1->get('id'), 1);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user1->id, $this->comp1->get('id'), 1,
+                'My note Data 1');
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user1->id, $this->comp1->get('id'), 1,
+                'My last note Data 1');
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm2, $this->user1->id, $this->comp1->get('id'), 2,
+                'My note Data 2');
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm11, $this->user1->id, $this->comp1->get('id'), 1,
+                'My note Data 11');
         // Rate user2 in course modules cm1.
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user2->id, $this->comp1->get('id'), 1);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user2->id, $this->comp1->get('id'), 1,
+                'My note Data 1 u2');
 
         // Test for user1 for comp1.
         $planuser1 = \core_competency\plan::get_record(array('userid' => $this->user1->id));
@@ -345,14 +364,31 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $this->assertCount(4, $result->listtotalcms);
         $this->assertEquals(3, $result->nbcmsrated);
         $this->assertEquals(4, $result->nbcmstotal);
-        $this->assertEquals('Page 1', $result->listtotalcms[0]['cmname']);
-        $this->assertEquals('Page 2', $result->listtotalcms[1]['cmname']);
-        $this->assertEquals('Page 3', $result->listtotalcms[2]['cmname']);
-        $this->assertEquals('Page 4', $result->listtotalcms[3]['cmname']);
+        $this->assertEquals('Data 1', $result->listtotalcms[0]['cmname']);
+        $this->assertEquals('Data 2', $result->listtotalcms[1]['cmname']);
+        $this->assertEquals('Data 11', $result->listtotalcms[2]['cmname']);
+        $this->assertEquals('Data 22', $result->listtotalcms[3]['cmname']);
         $this->assertTrue($result->listtotalcms[0]['rated']);
         $this->assertTrue($result->listtotalcms[1]['rated']);
         $this->assertTrue($result->listtotalcms[2]['rated']);
         $this->assertFalse($result->listtotalcms[3]['rated']);
+        $this->assertCount(2, $result->scalecompetencyitems);
+        $this->assertCount(2, $result->scalecompetencyitems[0]['listcms']);
+        $this->assertEquals(2, $result->scalecompetencyitems[0]['nbcm']);
+        $this->assertCount(1, $result->scalecompetencyitems[1]['listcms']);
+        $this->assertEquals(1, $result->scalecompetencyitems[1]['nbcm']);
+
+        $this->assertEquals('Data 1', $result->scalecompetencyitems[0]['listcms'][0]['cmname']);
+        $this->assertEquals('Data 11', $result->scalecompetencyitems[0]['listcms'][1]['cmname']);
+        $this->assertEquals('Data 2', $result->scalecompetencyitems[1]['listcms'][0]['cmname']);
+
+        $this->assertEquals(2, $result->scalecompetencyitems[0]['listcms'][0]['nbnotes']);
+        $this->assertEquals(1, $result->scalecompetencyitems[0]['listcms'][1]['nbnotes']);
+        $this->assertEquals(1, $result->scalecompetencyitems[1]['listcms'][0]['nbnotes']);
+
+        $this->assertEquals('B-', $result->scalecompetencyitems[0]['listcms'][0]['grade']);
+        $this->assertEquals('A', $result->scalecompetencyitems[0]['listcms'][1]['grade']);
+        $this->assertEquals('F', $result->scalecompetencyitems[1]['listcms'][0]['grade']);
 
         // Test for user2 for comp1.
         $planuser2 = \core_competency\plan::get_record(array('userid' => $this->user2->id));
@@ -362,14 +398,21 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $this->assertCount(4, $result->listtotalcms);
         $this->assertEquals(1, $result->nbcmsrated);
         $this->assertEquals(4, $result->nbcmstotal);
-        $this->assertEquals('Page 1', $result->listtotalcms[0]['cmname']);
-        $this->assertEquals('Page 2', $result->listtotalcms[1]['cmname']);
-        $this->assertEquals('Page 3', $result->listtotalcms[2]['cmname']);
-        $this->assertEquals('Page 4', $result->listtotalcms[3]['cmname']);
+        $this->assertEquals('Data 1', $result->listtotalcms[0]['cmname']);
+        $this->assertEquals('Data 2', $result->listtotalcms[1]['cmname']);
+        $this->assertEquals('Data 11', $result->listtotalcms[2]['cmname']);
+        $this->assertEquals('Data 22', $result->listtotalcms[3]['cmname']);
         $this->assertTrue($result->listtotalcms[0]['rated']);
         $this->assertFalse($result->listtotalcms[1]['rated']);
         $this->assertFalse($result->listtotalcms[2]['rated']);
         $this->assertFalse($result->listtotalcms[3]['rated']);
+        $this->assertCount(2, $result->scalecompetencyitems);
+        $this->assertCount(1, $result->scalecompetencyitems[0]['listcms']);
+        $this->assertEquals(1, $result->scalecompetencyitems[0]['nbcm']);
+
+        $this->assertEquals('Data 1', $result->scalecompetencyitems[0]['listcms'][0]['cmname']);
+        $this->assertEquals(1, $result->scalecompetencyitems[0]['listcms'][0]['nbnotes']);
+        $this->assertEquals('-', $result->scalecompetencyitems[0]['listcms'][0]['grade']);
 
         // Test for user2 for comp2.
         $result = external::get_competency_detail($this->user2->id, $this->comp2->get('id'), $planuser2->get('id'));
@@ -378,14 +421,17 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $this->assertCount(4, $result->listtotalcms);
         $this->assertEquals(0, $result->nbcmsrated);
         $this->assertEquals(4, $result->nbcmstotal);
-        $this->assertEquals('Page 1', $result->listtotalcms[0]['cmname']);
-        $this->assertEquals('Page 2', $result->listtotalcms[1]['cmname']);
-        $this->assertEquals('Page 3', $result->listtotalcms[2]['cmname']);
-        $this->assertEquals('Page 4', $result->listtotalcms[3]['cmname']);
+        $this->assertEquals('Data 1', $result->listtotalcms[0]['cmname']);
+        $this->assertEquals('Data 2', $result->listtotalcms[1]['cmname']);
+        $this->assertEquals('Data 11', $result->listtotalcms[2]['cmname']);
+        $this->assertEquals('Data 22', $result->listtotalcms[3]['cmname']);
         $this->assertFalse($result->listtotalcms[0]['rated']);
         $this->assertFalse($result->listtotalcms[1]['rated']);
         $this->assertFalse($result->listtotalcms[2]['rated']);
         $this->assertFalse($result->listtotalcms[3]['rated']);
+        $this->assertCount(2, $result->scalecompetencyitems);
+        $this->assertCount(0, $result->scalecompetencyitems[0]['listcms']);
+        $this->assertEquals(0, $result->scalecompetencyitems[0]['nbcm']);
     }
 
 }

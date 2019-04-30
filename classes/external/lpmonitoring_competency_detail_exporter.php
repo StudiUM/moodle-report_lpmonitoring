@@ -214,7 +214,7 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
             $relatedinfo->competencyid = $data->competency->get('id');
 
             $scalecompetencyitemexporter = new scale_competency_item_exporter($scaleinfo, array('courses' => $data->courses,
-                'relatedinfo' => $relatedinfo));
+                'relatedinfo' => $relatedinfo, 'cms' => $data->cms));
             $result->scalecompetencyitems[] = $scalecompetencyitemexporter->export($output);
         }
 

@@ -774,17 +774,31 @@ class api {
 
             foreach ($cms as $cm) {
                 $cminfo = new \stdClass();
-                $cminfo->cmid = $cm;
+                $cmid = $cm;
+                $cminfo->cmid = $cmid;
 
                 // Find rating in course module.
-                $cminfo->usecompetencyincm = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cm, $userid,
+                $cminfo->usecompetencyincm = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cmid, $userid,
                         $competencyid);
 
                 // Find most recent course module evidences.
                 $sort = 'timecreated';
                 $order = 'DESC';
-                $cminfo->cmevidences = \tool_cmcompetency\api::list_evidence_in_coursemodule($userid, $cm, $competencyid,
+                $cminfo->cmevidences = \tool_cmcompetency\api::list_evidence_in_coursemodule($userid, $cmid, $competencyid,
                         $sort, $order);
+
+                // Calculate grade if exist.
+                $cm = get_coursemodule_from_id('', $cmid, 0, true);
+                $cminfo->cm = $cm;
+                $gradeitems = \grade_item::fetch_all(array('itemtype' => 'mod', 'itemmodule' => $cm->modname,
+                        'iteminstance' => $cm->instance, 'courseid' => $cm->course));
+                if (!empty($gradeitems)) {
+                    $gradeitem = reset($gradeitems);
+                    $gradegrade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $userid));
+                    $cminfo->grade = grade_format_gradevalue($gradegrade->finalgrade, $gradeitem, true, GRADE_DISPLAY_TYPE_LETTER);
+                } else {
+                    $cminfo->grade = '-';
+                }
 
                 $competencydetails->cms[] = $cminfo;
             }

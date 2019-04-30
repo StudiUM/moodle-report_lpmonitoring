@@ -26,6 +26,7 @@ namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
 use report_lpmonitoring\external\scale_value_course_exporter;
+use report_lpmonitoring\external\scale_value_cm_exporter;
 use renderer_base;
 
 /**
@@ -39,6 +40,7 @@ class scale_competency_item_exporter extends \core\external\exporter {
 
     protected static function define_related() {
         return array('courses' => '\\stdClass[]',
+                     'cms' => '\\stdClass[]',
                      'relatedinfo' => '\\stdClass');
     }
 
@@ -64,6 +66,13 @@ class scale_competency_item_exporter extends \core\external\exporter {
             'listcourses' => array(
                 'type' => scale_value_course_exporter::read_properties_definition(),
                 'multiple' => true
+            ),
+            'nbcm' => array(
+                'type' => PARAM_INT
+            ),
+            'listcms' => array(
+                'type' => scale_value_cm_exporter::read_properties_definition(),
+                'multiple' => true
             )
         );
     }
@@ -80,6 +89,16 @@ class scale_competency_item_exporter extends \core\external\exporter {
                 $courseexporter = new scale_value_course_exporter($course, array('relatedinfo' => $this->related['relatedinfo']));
                 $result->listcourses[] = $courseexporter->export($output);
                 $result->nbcourse++;
+            }
+        }
+
+        $result->nbcm = 0;
+        $result->listcms = array();
+        foreach ($this->related['cms'] as $cm) {
+            if ($this->data->value == $cm->usecompetencyincm->get('grade')) {
+                $cmexporter = new scale_value_cm_exporter($cm, array('relatedinfo' => $this->related['relatedinfo']));
+                $result->listcms[] = $cmexporter->export($output);
+                $result->nbcm++;
             }
         }
 
