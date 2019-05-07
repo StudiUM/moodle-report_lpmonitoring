@@ -1404,17 +1404,23 @@
         max-width: 100%;
         width: 100%;
     }
+    [data-region="blocks-lp-list-users"].lp-list-users-closed {
+        margin-left: 0;
+    }
     .drawer-open-left .plan-info-detail,
     .plan-info-detail {
         width: 100%;
     }
 }
-@media (max-width: 1500px) and (min-width: 1200px) {
+@media (max-width: 1500px) and (min-width: 1199px) {
     .plan-info-detail {
         width: 70%;
     }
     .drawer-open-left .plan-info-detail {
         width: 65%;
+    }
+    .plan-info-container.closed .plan-info-detail {
+        width: 90%;
     }
 }
 @media (min-width: 1800px) {
