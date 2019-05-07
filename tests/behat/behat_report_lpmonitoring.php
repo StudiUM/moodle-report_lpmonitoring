@@ -27,6 +27,7 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
+use report_lpmonitoring\api;
 
 /**
  * Step definition for learning plan report.
@@ -42,18 +43,19 @@ class behat_report_lpmonitoring extends behat_base {
     /**
      * Checks, that the specified element contains the specified text in the competency detail rating.
      *
-     * @Then /^I should see "(?P<rating>[^"]*)" for "(?P<text>[^"]*)" in the row "(?P<row>[^"]*)" of "(?P<element>[^"]*)" rating$/
+     * @Then /^I should see "(?P<nb>[^"]*)" for "(?P<txt>[^"]*)" in the row "(?P<r>[^"]*)" of "(?P<c>[^"]*)" "(?P<t>[^"]*)" rating$/
      * @throws ElementNotFoundException
      * @throws ExpectationException
      * @param int $numberrating
      * @param string $scalevalue
      * @param int $rownumber
      * @param string $competencyname
+     * @param string $type data-type value, for example 'incourse', 'incm'
      */
-    public function i_see_nbrating_of_the_scalevalue_in_the_competency($numberrating, $scalevalue, $rownumber, $competencyname) {
-
+    public function i_see_nbrating_of_the_scalevalue_in_the_competency($numberrating, $scalevalue, $rownumber, $competencyname,
+            $type) {
         // Building xpath.
-        $xpath = "//table[contains(@class, 'tile_info') and "
+        $xpath = "//table[contains(@class, 'tile_info') and contains(@data-type, '$type') and "
                 . "ancestor-or-self::div[contains(., '$competencyname')]]/"
                 . "tbody/tr[$rownumber]/td[contains(., '$scalevalue')]/following-sibling::td[1]";
         $this->execute("behat_general::assert_element_contains_text",
@@ -76,15 +78,6 @@ class behat_report_lpmonitoring extends behat_base {
         // Building xpath.
         $xpath = '';
         switch ($targetclass) {
-            case 'totalnbcourses':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$compname')]]";
-                break;
-            case 'totalnbusers':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$compname')]]";
-                break;
-            case 'listevidence':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$compname')]]";
-                break;
             case 'level-proficiency':
                 $xpath = "//div[contains(., '$compname')]/div/div/div/div/div[contains(@class, '$targetclass')]";
                 break;
@@ -100,6 +93,9 @@ class behat_report_lpmonitoring extends behat_base {
                 break;
             case 'incourse':
                 $xpath = "//div[contains(@class, '$targetclass') and ancestor-or-self::div/div/h4/a[contains(., '$compname')]]";
+                break;
+            default:
+                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$compname')]]";
                 break;
         }
 
@@ -122,17 +118,11 @@ class behat_report_lpmonitoring extends behat_base {
         // Building xpath.
         $xpath = '';
         switch ($targetclass) {
-            case 'totalnbcourses':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
-                break;
-            case 'totalnbusers':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
-                break;
-            case 'listevidence':
-                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
-                break;
             case 'rate-competency':
                 $xpath = "//div[contains(., '$competencyname')]/div/div/div/div/button[contains(@class, '$targetclass')]";
+                break;
+            default:
+                $xpath = "//a[contains(@class, '$targetclass') and ancestor-or-self::div[contains(., '$competencyname')]]";
                 break;
         }
 
@@ -142,18 +132,19 @@ class behat_report_lpmonitoring extends behat_base {
     /**
      * Click on the specified element contains the specified text in the competency detail rating.
      *
-     * @Then /^I click on "(?P<rating>[^"]*)" for "(?P<text>[^"]*)" in the row "(?P<row>[^"]*)" of "(?P<element>[^"]*)" rating$/
+     * @Then /^I click on "(?P<nb>[^"]*)" for "(?P<txt>[^"]*)" in the row "(?P<r>[^"]*)" of "(?P<c>[^"]*)" "(?P<t>[^"]*)" rating$/
      * @throws ElementNotFoundException
      * @throws ExpectationException
      * @param int $numberrating
      * @param string $scalevalue
      * @param int $rownumber
      * @param string $competencyname
+     * @param string $type data-type value, for example 'incourse', 'incm'
      */
-    public function i_click_on_rating_of_the_scalevalue_in_the_competency($numberrating, $scalevalue, $rownumber, $competencyname) {
-
+    public function i_click_on_rating_of_the_scalevalue_in_the_competency($numberrating, $scalevalue, $rownumber,
+            $competencyname, $type) {
         // Building xpath.
-        $xpath = "//table[contains(@class, 'tile_info') and "
+        $xpath = "//table[contains(@class, 'tile_info') and contains(@data-type, '$type') and "
                 . "ancestor-or-self::div[contains(., '$competencyname')]]/tbody/"
                 . "tr[$rownumber]/td[contains(., '$scalevalue')]/following-sibling::td[1]/a[contains(., '$numberrating')]";
         $this->execute('behat_general::i_click_on', array($xpath, "xpath_element"));
@@ -273,6 +264,17 @@ class behat_report_lpmonitoring extends behat_base {
         $xpathtarget = "//dt[contains(., $dtliteral)]/following-sibling::dd[contains(., $ddliteral)]";
 
         $this->execute('behat_general::should_exist', [$xpathtarget, 'xpath_element']);
+    }
+
+    /**
+     * If course module competency grading is not enabled, skip the test.
+     *
+     * @Given /^course module competency grading is enabled$/
+     */
+    public function course_module_competency_grading_is_enabled() {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            throw new \Moodle\BehatExtension\Exception\SkippedException;
+        }
     }
 
 }

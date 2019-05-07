@@ -32,15 +32,15 @@ Feature: Display learning plan template statistics
     And I should not see "Robert Smith" in the "User list" "dialogue"
     And I should not see "Frederic Simson" in the "User list" "dialogue"
     And I click on "Close" "button" in the "User list" "dialogue"
-    And I should see "2" for "not good" in the row "2" of "Competency A" rating
-    And I should see "1" for "good" in the row "3" of "Competency A" rating
-    And I click on "2" for "not good" in the row "2" of "Competency A" rating
+    And I should see "2" for "not good" in the row "2" of "Competency A" "final" rating
+    And I should see "1" for "good" in the row "3" of "Competency A" "final" rating
+    And I click on "2" for "not good" in the row "2" of "Competency A" "final" rating
     And "Linked users" "dialogue" should be visible
     And I should see "Frederic Simson" in the "Linked users" "dialogue"
     And I should see "Robert Smith" in the "Linked users" "dialogue"
     And I should not see "William Presley" in the "Linked users" "dialogue"
     And I click on "Close" "button" in the "Linked users" "dialogue"
-    And I click on "1" for "good" in the row "3" of "Competency A" rating
+    And I click on "1" for "good" in the row "3" of "Competency A" "final" rating
     And "Linked users" "dialogue" should be visible
     And I should not see "Frederic Simson" in the "Linked users" "dialogue"
     And I should not see "Robert Smith" in the "Linked users" "dialogue"
@@ -55,8 +55,8 @@ Feature: Display learning plan template statistics
     Then I should see "Competency A"
     And I should see "Competency B"
     And I should see "11/26" in "incourse" of the competency "Competency A"
-    And I should see "7" for "not good" in the row "2" of "Competency A" rating
-    And I should see "4" for "good" in the row "3" of "Competency A" rating
+    And I should see "7" for "not good" in the row "2" of "Competency A" "incourse" rating
+    And I should see "4" for "good" in the row "3" of "Competency A" "incourse" rating
     And I should see "5/26" in "incourse" of the competency "Competency B"
-    And I should see "3" for "not qualified" in the row "2" of "Competency B" rating
-    And I should see "2" for "qualified" in the row "3" of "Competency B" rating
+    And I should see "3" for "not qualified" in the row "2" of "Competency B" "incourse" rating
+    And I should see "2" for "qualified" in the row "3" of "Competency B" "incourse" rating

@@ -355,7 +355,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $e = $cpg->create_user_evidence(array('userid' => $user4->id, 'name' => 'My evidence'));
         $cpg->create_user_evidence_competency(array('competencyid' => $c1->get('id'), 'userevidenceid' => $e->get('id')));
 
-        // Rate some comptency c1 in course for Donald.
+        // Rate competency c1 in courses for Donald.
         core_competency_api::grade_competency_in_course($course1->id, $user2->id, $c1->get('id'), 1);
         core_competency_api::grade_competency_in_course($course2->id, $user2->id, $c1->get('id'), 2);
         core_competency_api::grade_competency_in_course($course3->id, $user2->id, $c1->get('id'), 2);
@@ -382,7 +382,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $gradegrade->timemodified = time();
         $gradegrade->insert();
 
-        // Assign final grade for the course C1.
+        // Assign final grade for the course C1..
         $courseitem = \grade_item::fetch_course_item($course1->id);
         $courseitem->update_final_grade($user4->id, 67, 'import', null);
 
@@ -432,5 +432,95 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $context3 = \context_user::instance($user3->id)->id;
         $commentarea3 = $plan3->get_comment_object($context3, $plan3);
         $commentarea3->add('This is the comment #1 for Stepanie');
+
+        // Create course modules.
+        $module1 = $datagenerator->create_module('assign', array('course' => $course3->id, 'name' => 'Activity Ps1'));
+        $cmps1 = get_coursemodule_from_id('assign', $module1->cmid);
+        $module2 = $datagenerator->create_module('assign', array('course' => $course3->id, 'name' => 'Activity Ps2'));
+        $cmps2 = get_coursemodule_from_id('assign', $module2->cmid);
+        $module3 = $datagenerator->create_module('assign', array('course' => $course2->id, 'name' => 'Activity G1'));
+        $cmg1 = get_coursemodule_from_id('assign', $module3->cmid);
+        $module4 = $datagenerator->create_module('assign', array('course' => $course4->id, 'name' => 'Activity Ph1'));
+        $cmph1 = get_coursemodule_from_id('assign', $module4->cmid);
+        $module5 = $datagenerator->create_module('assign', array('course' => $course5->id, 'name' => 'Activity Pa1'));
+        $cmpa1 = get_coursemodule_from_id('assign', $module5->cmid);
+        $module6 = $datagenerator->create_module('assign', array('course' => $course6->id, 'name' => 'Activity N1'));
+        $cmn1 = get_coursemodule_from_id('assign', $module6->cmid);
+        $module7 = $datagenerator->create_module('assign', array('course' => $course6->id, 'name' => 'Activity N2'));
+        $cmn2 = get_coursemodule_from_id('assign', $module7->cmid);
+        $module8 = $datagenerator->create_module('assign', array('course' => $course6->id, 'name' => 'Activity N3'));
+        $cmn3 = get_coursemodule_from_id('assign', $module8->cmid);
+
+        // Link competencies to course modules.
+        $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmps1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmg1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmph1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmn1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmn2->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmn3->id));
+
+        $cpg->create_course_module_competency(array('competencyid' => $c2->get('id'), 'cmid' => $cmps1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c2->get('id'), 'cmid' => $cmg1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c2->get('id'), 'cmid' => $cmph1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c2->get('id'), 'cmid' => $cmpa1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c2->get('id'), 'cmid' => $cmn1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c2->get('id'), 'cmid' => $cmn2->id));
+
+        // Grade some activities.
+        $gi = \grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign', 'iteminstance' => $module3->id,
+            'courseid' => $course2->id));
+        $datagrade = 85;
+        $gradegrade = new grade_grade();
+        $gradegrade->itemid = $gi->id;
+        $gradegrade->userid = $user4->id;
+        $gradegrade->rawgrade = $datagrade;
+        $gradegrade->finalgrade = $datagrade;
+        $gradegrade->rawgrademax = 100;
+        $gradegrade->rawgrademin = 0;
+        $gradegrade->timecreated = time();
+        $gradegrade->timemodified = time();
+        $gradegrade->insert();
+
+        $gi = \grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign', 'iteminstance' => $module8->id,
+            'courseid' => $course6->id));
+        $datagrade = 65;
+        $gradegrade = new grade_grade();
+        $gradegrade->itemid = $gi->id;
+        $gradegrade->userid = $user4->id;
+        $gradegrade->rawgrade = $datagrade;
+        $gradegrade->finalgrade = $datagrade;
+        $gradegrade->rawgrademax = 100;
+        $gradegrade->rawgrademin = 0;
+        $gradegrade->timecreated = time();
+        $gradegrade->timemodified = time();
+        $gradegrade->insert();
+
+        if (api::is_cm_comptency_grading_enabled()) {
+            // Rate competency A in course modules.
+            // For Rebecca.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmps1, $user1->id, $c1->get('id'), 1);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmph1, $user1->id, $c1->get('id'), 1);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn1, $user1->id, $c1->get('id'), 1);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn3, $user1->id, $c1->get('id'), 1);
+            // For Pablo.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmps1, $user4->id, $c1->get('id'), 2);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmg1, $user4->id, $c1->get('id'), 2, 'My note Data 1');
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn1, $user4->id, $c1->get('id'), 1, 'My note Data 2');
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn3, $user4->id, $c1->get('id'), 2);
+            // For Cynthia.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmg1, $user5->id, $c1->get('id'), 2);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn3, $user5->id, $c1->get('id'), 2);
+            // Rate competency B in course modules.
+            // For Rebecca.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmps1, $user1->id, $c2->get('id'), 1);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn2, $user1->id, $c2->get('id'), 1);
+            // For Pablo.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmps1, $user4->id, $c2->get('id'), 1, 'My note Data 3');
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmg1, $user4->id, $c2->get('id'), 1, 'My note Data 4');
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmpa1, $user4->id, $c2->get('id'), 2);
+            // For Cynthia.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmg1, $user5->id, $c2->get('id'), 2);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn2, $user5->id, $c2->get('id'), 2);
+        }
     }
 }

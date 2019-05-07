@@ -1,5 +1,5 @@
 @report @javascript @report_lpmonitoring
-Feature: Display plearning plan ratings details
+Feature: Display learning plan ratings details
   As a learning plan admin
   In order to display competencies ratings on learning plan
   I need to rate a competency in a learning plan
@@ -265,9 +265,9 @@ Feature: Display plearning plan ratings details
     And I set the field with xpath "//div[@class='lpmonitoringdialogue']//input[@type='search']" to "Nothing"
     And I should see "No matching records found" in the "List of evidence" "dialogue"
     And I click on "Close" "button" in the "List of evidence" "dialogue"
-    And I should see "4" for "not good" in the row "1" of "Competency A" rating
-    And I should see "2" for "good" in the row "2" of "Competency A" rating
-    And I click on "4" for "not good" in the row "1" of "Competency A" rating
+    And I should see "4" for "not good" in the row "1" of "Competency A" "incourse" rating
+    And I should see "2" for "good" in the row "2" of "Competency A" "incourse" rating
+    And I click on "4" for "not good" in the row "1" of "Competency A" "incourse" rating
     And "Linked courses" "dialogue" should be visible
     And I should see "Search"
     And "Anatomy" row "Comment" column of "coursesbyscalevalue" table should contain "1"
@@ -281,7 +281,7 @@ Feature: Display plearning plan ratings details
     And I should not see "Neuroscience" in the "Linked courses" "dialogue"
     And I should not see "Pathology" in the "Linked courses" "dialogue"
     And I click on "Close" "button" in the "Linked courses" "dialogue"
-    And I click on "2" for "good" in the row "2" of "Competency A" rating
+    And I click on "2" for "good" in the row "2" of "Competency A" "incourse" rating
     And "Linked courses" "dialogue" should be visible
     And "Psychology" row "Comment" column of "coursesbyscalevalue" table should contain "0"
     And "Psychology" row "Grade" column of "coursesbyscalevalue" table should contain "-"

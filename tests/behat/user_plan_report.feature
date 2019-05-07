@@ -36,9 +36,9 @@ Feature: Display learning plan ratings details
     And "List of evidence" "dialogue" should be visible
     And I should see "My evidence" in the "List of evidence" "dialogue"
     And I click on "Close" "button" in the "List of evidence" "dialogue"
-    And I should see "4" for "not good" in the row "1" of "Competency A" rating
-    And I should see "2" for "good" in the row "2" of "Competency A" rating
-    And I click on "4" for "not good" in the row "1" of "Competency A" rating
+    And I should see "4" for "not good" in the row "1" of "Competency A" "incourse" rating
+    And I should see "2" for "good" in the row "2" of "Competency A" "incourse" rating
+    And I click on "4" for "not good" in the row "1" of "Competency A" "incourse" rating
     And "Linked courses" "dialogue" should be visible
     And "Anatomy" row "Comment" column of "coursesbyscalevalue" table should contain "1"
     And "Anatomy" row "Grade" column of "coursesbyscalevalue" table should contain "D+"
@@ -46,7 +46,7 @@ Feature: Display learning plan ratings details
     And "Pathology" row "Grade" column of "coursesbyscalevalue" table should contain "-"
     And "Neuroscience" row "Grade" column of "coursesbyscalevalue" table should contain "-"
     And I click on "Close" "button" in the "Linked courses" "dialogue"
-    And I click on "2" for "good" in the row "2" of "Competency A" rating
+    And I click on "2" for "good" in the row "2" of "Competency A" "incourse" rating
     And "Linked courses" "dialogue" should be visible
     And "Psychology" row "Comment" column of "coursesbyscalevalue" table should contain "0"
     And "Psychology" row "Grade" column of "coursesbyscalevalue" table should contain "-"
