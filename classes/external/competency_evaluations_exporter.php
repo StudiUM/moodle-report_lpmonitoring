@@ -71,6 +71,7 @@ class competency_evaluations_exporter extends \core\external\exporter {
             // Evaluation for the course.
             $data = new \stdClass();
             $data->iscourse = true;
+            $data->elementid = $courseid;
             if (isset($competencydetailinfos->tmpevalincourse[$courseid])) {
                 $data->grade = $competencydetailinfos->tmpevalincourse[$courseid];
             } else {
@@ -85,6 +86,7 @@ class competency_evaluations_exporter extends \core\external\exporter {
                 foreach ($course['modulesinfo'] as $cmid => $module) {
                     $data = new \stdClass();
                     $data->iscourse = false;
+                    $data->elementid = $cmid;
                     if (isset($competencydetailinfos->tmpevalinmodule[$cmid])) {
                         $data->grade = $competencydetailinfos->tmpevalinmodule[$cmid];
                     } else {

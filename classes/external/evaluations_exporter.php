@@ -42,6 +42,9 @@ class evaluations_exporter extends \core\external\exporter {
             'iscourse' => array(
                 'type' => PARAM_BOOL
             ),
+            'elementid' => array(
+                'type' => PARAM_INT
+            ),
             'color' => array(
                 'type' => PARAM_TEXT
             ),

@@ -42,6 +42,7 @@
                     * nbevidence
                 * evaluationslist - array of following elements
                     * iscourse
+                    * elementid
                     * color
                     * name
     * plan
@@ -132,10 +133,10 @@
                         </td>
                         {{#evaluationslist}}
                             {{#iscourse}}
-                                <td class="course evaluation searchable" style="background-color: {{color}};"><a href="#">{{name}}</a></td>
+                                <td class="course evaluation searchable" style="background-color: {{color}};"><a href="#" data-type="course" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{name}}</a></td>
                             {{/iscourse}}
                             {{^iscourse}}
-                                <td class="cm-cell evaluation searchable" style="background-color: {{color}};"><a href="#">{{name}}</a></td>
+                                <td class="cm-cell evaluation searchable" style="background-color: {{color}};"><a href="#" data-type="cm" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{name}}</a></td>
                             {{/iscourse}}
                        {{/evaluationslist}}
                     </tr>
@@ -145,9 +146,19 @@
         </div>
 
         {{#js}}
-        require(['jquery', 'report_lpmonitoring/report_datatable'], function($, Rdt) {
-            Rdt.init('#main-table', 'reportfilter', '#table-search', '#report-content .course', '#report-content .cm-cell');
-        });
+            require(['jquery', 'report_lpmonitoring/report_datatable'], function($, Rdt) {
+                Rdt.init('#main-table', 'reportfilter', '#table-search', '#report-content .course', '#report-content .cm-cell');
+            });
+
+            require(['report_lpmonitoring/datatable_popup'], function(Popup) {
+                (new Popup('[data-region=report-competencies-section]', '.course.evaluation a'));
+            });
+
+            {{#iscmcompetencygradingenabled}}
+                require(['report_lpmonitoring/datatable_popup'], function(Popup) {
+                    (new Popup('[data-region=report-competencies-section]', '.cm-cell.evaluation a'));
+                });
+            {{/iscmcompetencygradingenabled}}
         {{/js}}
     {{/reportinfos}}
 {{/hascompetencies}}
