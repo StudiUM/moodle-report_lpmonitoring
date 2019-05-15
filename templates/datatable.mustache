@@ -87,7 +87,18 @@
                 </div>
             {{/iscmcompetencygradingenabled}}
             <div class="felement col-md-3 form-inline" >
-                <input type="text" placeholder="{{#str}}searchplaceholder, report_lpmonitoring{{/str}}" id="table-search" class="form-control" {{#tablesearchvalue}}value="{{tablesearchvalue}}"{{/tablesearchvalue}}>
+                <input type="text" 
+                       placeholder="{{#iscmcompetencygradingenabled}}{{#str}}searchincoursesactivities, report_lpmonitoring{{/str}}{{/iscmcompetencygradingenabled}}
+                       {{^iscmcompetencygradingenabled}}{{#str}}searchincourses, report_lpmonitoring{{/str}}{{/iscmcompetencygradingenabled}}"
+                       id="table-search-columns" class="form-control" 
+                       {{#tablesearchvaluecolumn}}value="{{tablesearchvaluecolumn}}"{{/tablesearchvaluecolumn}}
+                       >
+                <div class="datatablescalefilter">
+                    <label for="scale-filter-report">{{#str}}filterbyscalevalue, report_lpmonitoring{{/str}}</label>
+                    <select id="scale-filter-report" class="report-filterscale form-control">
+                        <option value=""></option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -97,16 +108,22 @@
             <thead>
 
               <tr>
-                <th scope="col" class="searchable">{{#str}}competencies, core_competency{{/str}}</th>
+                <th scope="col" class="searchable">
+                    {{#str}}competencies, core_competency{{/str}}
+                    <input id="table-search-competency"
+                           {{#tablesearchvalue}}value="{{tablesearchvalue}}"{{/tablesearchvalue}}
+                           class="filtercolumn form-control"
+                           type="text" placeholder="{{#str}}searchincompetencies, report_lpmonitoring{{/str}}"/>
+                </th>
                 <th scope="col" class="searchable">{{#str}}userevidence, tool_lp{{/str}}</th>
                 {{#courses}}
                     {{#course}}
-                        <th scope="col" class="course searchable"><a href="{{{url}}}" target="_blank">{{coursename}}</a></th>
+                        <th scope="col" class="course-cell searchable"><a href="{{{url}}}" target="_blank">{{coursename}}</a></th>
                     {{/course}}
                     {{#modules}}
                         <th scope="col" class="cm-cell searchable">
                             {{coursename}}<br>
-                            <a href="{{{url}}}" target="_blank"><img src="{{cmicon}}" class="iconlarge activityicon" role="presentation"><span class="instancename">{{cmname}}</span></a>
+                            <a href="{{{url}}}" class="nowrapcm" title="{{cmname}}" target="_blank"><img src="{{cmicon}}" class="iconlarge activityicon" role="presentation"><span class="instancename">{{cmname}}</span></a>
                         </th>
                     {{/modules}}
                 {{/courses}}
@@ -115,7 +132,7 @@
             <tbody>
                 {{#competencies_list}}
                     <tr>
-                        <th class='searchable'>
+                        <td class='searchable'>
                             {{competency.idnumber}} - 
                             <a href="#" data-user-competency="true" data-userid="{{plan.user.id}}" data-competencyid="{{competency.id}}" 
                                 data-planid="{{plan.id}}" title="{{competency.shortname}}" role="button">
@@ -125,7 +142,7 @@
                             {{#competencydetail}}
                                 {{> report_lpmonitoring/competency_path }}
                             {{/competencydetail}}
-                        </th>
+                        </td>
                         <td class='searchable'>
                             {{#competencydetail.hasevidence}}
                                 <a class="listevidence" title="{{#str}}userevidence, tool_lp{{/str}}" data-competencyid="{{competency.id}}" href="#">{{competencydetail.nbevidence}}</a>
@@ -133,8 +150,8 @@
                         </td>
                         {{#evaluationslist}}
                             {{#iscourse}}
-                                {{#isnotrated}}<td class="course evaluation searchable notrated"><a href="#" data-type="course" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{#str}}notrated, report_lpmonitoring{{/str}}{{/isnotrated}}</a></td>
-                                {{^isnotrated}}<td class="course evaluation searchable" style="background-color: {{color}};"><a href="#" data-type="course" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{name}}</a></td>{{/isnotrated}}
+                                {{#isnotrated}}<td class="course-cell evaluation searchable notrated"><a href="#" data-type="course" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{#str}}notrated, report_lpmonitoring{{/str}}{{/isnotrated}}</a></td>
+                                {{^isnotrated}}<td class="course-cell evaluation searchable" style="background-color: {{color}};"><a href="#" data-type="course" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{name}}</a></td>{{/isnotrated}}
                             {{/iscourse}}
                             {{^iscourse}}
                                 {{#isnotrated}}<td class="cm-cell evaluation searchable notrated"><a href="#" data-type="cm" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{#str}}notrated, report_lpmonitoring{{/str}}</a></td>{{/isnotrated}}
@@ -149,11 +166,12 @@
 
         {{#js}}
             require(['jquery', 'report_lpmonitoring/report_datatable'], function($, Rdt) {
-                Rdt.init('#main-table', 'reportfilter', '#table-search', '#report-content .course', '#report-content .cm-cell');
+                Rdt.init('#main-table', 'reportfilter', '#table-search-competency', '#table-search-columns',
+                '#scale-filter-report', '#report-content .course-cell', '#report-content .cm-cell', '{{scalefilterreport}}');
             });
 
             require(['report_lpmonitoring/datatable_popup'], function(Popup) {
-                (new Popup('[data-region=report-competencies-section]', '.course.evaluation a'));
+                (new Popup('[data-region=report-competencies-section]', '.course-cell.evaluation a'));
             });
 
             {{#iscmcompetencygradingenabled}}

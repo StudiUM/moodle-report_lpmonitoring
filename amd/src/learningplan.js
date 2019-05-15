@@ -761,7 +761,9 @@ define(['jquery',
                         competencies.filterchecked_both = true;
                     }
 
-                    competencies.tablesearchvalue = $('#table-search').val();
+                    competencies.tablesearchvalue = $('#table-search-competency').val();
+                    competencies.tablesearchvaluecolumn = $('#table-search-columns').val();
+                    competencies.scalefilterreport = $('#scale-filter-report option:selected').val();
 
                     // Render the "Report" data table template.
                     templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {

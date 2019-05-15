@@ -1247,7 +1247,8 @@
   top: 0;
   min-width: 150px;
 }
-.competencyreport .table-scroll th:first-child {
+.competencyreport .table-scroll th:first-child,
+.competencyreport .table-scroll td:first-child {
   position: -webkit-sticky;
   position: sticky;
   left: 0;
@@ -1275,12 +1276,56 @@
     margin-top: 2px;
     font-weight: lighter;
 }
+#report-content #table-search-column,
 #report-content #table-search {
     float: right;
+}
+#report-content #table-search-column {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    clear: both;
+}
+#main-table .filtersearchhidden,
+#main-table .switchsearchhidden {
+    display: none !important;
 }
 #report-content .table-scroll td {
     vertical-align: middle;
     padding: 6px;
+}
+#report-content  .filtercolumn {
+    position: absolute;
+    bottom: 05px;
+    clear: both;
+    display: block;
+    margin-top: 5px;
+    font-weight: normal;
+}
+#report-content  select.filtercolumn {
+    width: 130px;
+}
+#report-content .datatablescalefilter {
+    float: right;
+    clear: both;
+}
+#report-content .datatablescalefilter label {
+    float: right;
+    margin-bottom: 0.1rem;
+    margin-top: 1rem;
+}
+#report-content input.filtercolumn {
+    width: 240px;
+    position: relative;
+    margin-bottom: 5px;
+    margin-top: 15px
+}
+#report-content a.nowrapcm {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+    vertical-align: bottom;
+    white-space: nowrap;
 }
 #report-content .table-scroll td.evaluation {
     color: #fff;
@@ -1459,4 +1504,19 @@ ul.detail-comp-tab li a::first-letter {
 }
 .competencyreport .nav-tabs.detail-comp-tab {
     margin-top: 10px;
+}
+.filter-report-custom .report-filterscale {
+    float: right;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    height: auto;
+    padding: .5rem .5rem;
+    clear: both;
+}
+#table-search-columns,
+#filter-report-data {
+    float: right;
+}
+#table-search-columns {
+    width: 245px;
 }
