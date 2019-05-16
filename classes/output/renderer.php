@@ -28,6 +28,7 @@ namespace report_lpmonitoring\output;
 defined('MOODLE_INTERNAL') || die;
 
 use plugin_renderer_base;
+use report_lpmonitoring\api;
 
 /**
  * Renderer class for competency breakdown report
@@ -70,6 +71,7 @@ class renderer extends plugin_renderer_base {
     public function render_stats_page($contextpageid) {
         $data = new \stdClass();
         $data->contextpageid = $contextpageid;
+        $data->iscmcompetencygradingenabled = api::is_cm_comptency_grading_enabled();
         return parent::render_from_template('report_lpmonitoring/stats', $data);
     }
 

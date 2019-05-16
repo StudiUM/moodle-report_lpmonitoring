@@ -22,6 +22,7 @@
 
     Context variables required for this template:
     * contextpageid
+    * iscmcompetencygradingenabled
 }}
 <form class="mform" id="statstFilter" accept-charset="utf-8" method="post" autocomplete="off">
     <fieldset id="id_displayinfo" class="clearfix collapsible">
@@ -57,6 +58,14 @@
                                         <label for="ratingincourseoption">{{#str}}finalratingcourse, report_lpmonitoring{{/str}}</label>
                                     </span>
                                 </div>
+                                {{#iscmcompetencygradingenabled}}
+                                    <div class="radio radio-primary">
+                                        <span>
+                                            <input type="radio" name="ratingoptions" id="ratingincoursemoduleoption" value="1" aria-labelledby="ratingtargetbytemplate">
+                                            <label for="ratingincoursemoduleoption">{{#str}}finalratingcoursemodule, report_lpmonitoring{{/str}}</label>
+                                        </span>
+                                    </div>
+                                {{/iscmcompetencygradingenabled}}
                         </div>
                     </div>
                 </div>

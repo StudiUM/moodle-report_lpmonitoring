@@ -101,11 +101,12 @@ define(['jquery',
          * @function
          */
         LearningplanStats.prototype.loadListCompetencies = function(templateid) {
-            var self = this,
-                ratingincourse = true;
+            var self = this, ratingtype = 'course';
 
             if ($("#ratinginplanoption").is(':checked')) {
-                ratingincourse = false;
+                ratingtype = 'plan';
+            } else if ($("#ratingincoursemoduleoption").is(':checked')) {
+                ratingtype = 'coursemodule';
             }
 
             var promiselistCompetencies = ajax.call([{
@@ -123,7 +124,7 @@ define(['jquery',
                         $("#list-competencies-template").html(html);
                         templates.runTemplateJS(js);
                         elementloading.removeClass('loading');
-                        self.loadCompetenciesDetails(results, templateid, ratingincourse);
+                        self.loadCompetenciesDetails(results, templateid, ratingtype);
                     });
                 } else {
                     elementloading.removeClass('loading');
@@ -146,11 +147,11 @@ define(['jquery',
          * @name  getCompetencyDetailDeferred
          * @param {Object} request
          * @param {Number} templateid
-         * @param {Boolean} ratingincourse
+         * @param {String} ratingtype 'course', 'coursemodule' or 'plan'
          * @return {Object} promise
          * @function
          */
-        LearningplanStats.prototype.getCompetencyDetailDeferred = function(request, templatename, ratingincourse) {
+        LearningplanStats.prototype.getCompetencyDetailDeferred = function(request, templatename, ratingtype) {
             var self = this;
             return function() {
                 // Wrap with a deferred.
@@ -172,14 +173,14 @@ define(['jquery',
                         var colors = [];
                         var datascales = [];
                         var applygraph = false;
-                        if (ratingincourse === false && context.nbuserrated !== 0) {
+                        if (ratingtype === 'plan' && context.nbuserrated !== 0) {
                             $.each(context.scalecompetencyitems, function(index, record) {
                                 colors.push(record.color);
                                 datascales.push(record.nbusers);
                             });
                             applygraph = true;
                         }
-                        if (ratingincourse === true && context.nbratings !== 0) {
+                        if ( (ratingtype === 'course' || ratingtype === 'coursemodule') && context.nbratings !== 0) {
                             $.each(context.scalecompetencyitems, function(index, record) {
                                 colors.push(record.color);
                                 datascales.push(record.nbratings);
@@ -219,16 +220,19 @@ define(['jquery',
          * @name  loadCompetenciesDetails
          * @param {Object[]} competencies
          * @param {Number} templateid
-         * @param {Boolean} ratingincourse
+         * @param {String} ratingtype 'course', 'coursemodule' or 'plan'
          * @return {Void}
          * @function
          */
-        LearningplanStats.prototype.loadCompetenciesDetails = function(competencies, templateid, ratingincourse) {
+        LearningplanStats.prototype.loadCompetenciesDetails = function(competencies, templateid, ratingtype) {
             var self = this;
             var servicename = 'report_lpmonitoring_get_competency_statistics';
             var templatename = 'report_lpmonitoring/competency_detail_stats';
-            if (ratingincourse) {
+            if (ratingtype == 'course') {
                 servicename = 'report_lpmonitoring_get_competency_statistics_incourse';
+                templatename = 'report_lpmonitoring/competency_detail_stats_incourse';
+            } else if (ratingtype == 'coursemodule') {
+                servicename = 'report_lpmonitoring_get_competency_statistics_incoursemodules';
                 templatename = 'report_lpmonitoring/competency_detail_stats_incourse';
             }
             var base = $.when({});
@@ -243,7 +247,7 @@ define(['jquery',
                         templateid: templateid
                     }
                 }];
-                base = base.then(self.getCompetencyDetailDeferred(req, templatename, ratingincourse));
+                base = base.then(self.getCompetencyDetailDeferred(req, templatename, ratingtype));
             });
         };
 

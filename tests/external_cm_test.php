@@ -434,4 +434,81 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $this->assertEquals(0, $result->scalecompetencyitems[0]['nbcm']);
     }
 
+    /**
+     * Test get competency statistics in course modules for lpmonitoring report.
+     */
+    public function test_get_lp_monitoring_competency_statistics_incoursemodules() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
+        // Create courses.
+        $course1 = $dg->create_course();
+        $course2 = $dg->create_course();
+        // Create course modules.
+        $data = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course1->id));
+        $data2 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course1->id));
+        $data11 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course2->id));
+        $data22 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course2->id));
+        $cm1 = get_coursemodule_from_id('data', $data->cmid);
+        $cm2 = get_coursemodule_from_id('data', $data2->cmid);
+        $cm11 = get_coursemodule_from_id('data', $data11->cmid);
+        $cm22 = get_coursemodule_from_id('data', $data22->cmid);
+
+        // Enrol users in courses.
+        $dg->enrol_user($this->user1->id, $course1->id);
+        $dg->enrol_user($this->user1->id, $course2->id);
+        $dg->enrol_user($this->user2->id, $course1->id);
+        $dg->enrol_user($this->user2->id, $course2->id);
+        $dg->enrol_user($this->user3->id, $course1->id);
+
+        // Create some course competencies.
+        $cpg->create_course_competency(array('competencyid' => $this->comp1->get('id'), 'courseid' => $course1->id));
+        $cpg->create_course_competency(array('competencyid' => $this->comp2->get('id'), 'courseid' => $course1->id));
+        $cpg->create_course_competency(array('competencyid' => $this->comp1->get('id'), 'courseid' => $course2->id));
+        $cpg->create_course_competency(array('competencyid' => $this->comp2->get('id'), 'courseid' => $course2->id));
+        // Link competencies to course modules.
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp1->get('id'), 'cmid' => $cm1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp1->get('id'), 'cmid' => $cm2->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm2->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp1->get('id'), 'cmid' => $cm11->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm11->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp1->get('id'), 'cmid' => $cm22->id));
+        $cpg->create_course_module_competency(array('competencyid' => $this->comp2->get('id'), 'cmid' => $cm22->id));
+
+        // Rate user1 in course modules cm1, cm2 and cm11 for competency 1.
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user1->id, $this->comp1->get('id'), 1);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm2, $this->user1->id, $this->comp1->get('id'), 2);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm11, $this->user1->id, $this->comp1->get('id'), 1);
+        // Rate user2 in course module cm1 for competency 1.
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user2->id, $this->comp1->get('id'), 1);
+        $this->setUser($this->appreciator);
+
+        // Check info for competency 1.
+        $result = external::get_competency_statistics_incoursemodules($this->comp1->get('id'),
+            $this->templateincategory->get('id'));
+        $result = external::clean_returnvalue(external::get_competency_statistics_incoursemodules_returns(), $result);
+
+        // Check info returned.
+        $this->assertEquals($this->comp1->get('id'), $result['competencyid']);
+        $this->assertEquals(8, $result['nbratingtotal']);
+        $this->assertEquals(4, $result['nbratings']);
+        $this->assertEquals(1, $result['scalecompetencyitems'][0]['value']);
+        $this->assertEquals(2, $result['scalecompetencyitems'][1]['value']);
+        // Test we have 3 rating for the scale value 1 (A).
+        $this->assertEquals(3, $result['scalecompetencyitems'][0]['nbratings']);
+        // Test we have 1 rating for the scale value 2 (B).
+        $this->assertEquals(1, $result['scalecompetencyitems'][1]['nbratings']);
+
+        // Test no rating for the competency 2.
+        $result = external::get_competency_statistics_incoursemodules($this->comp2->get('id'),
+            $this->templateincategory->get('id'));
+        $result = external::clean_returnvalue(external::get_competency_statistics_incourse_returns(), $result);
+        $this->assertEquals($this->comp2->get('id'), $result['competencyid']);
+        $this->assertEquals(8, $result['nbratingtotal']);
+        $this->assertEquals(0, $result['nbratings']);
+        $this->assertEquals(0, $result['scalecompetencyitems'][0]['nbratings']);
+        $this->assertEquals(0, $result['scalecompetencyitems'][1]['nbratings']);
+    }
 }

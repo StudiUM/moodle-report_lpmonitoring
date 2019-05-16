@@ -54,6 +54,7 @@ use report_lpmonitoring\external\list_plan_competency_report_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_detail_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_incourse_exporter;
+use report_lpmonitoring\external\lpmonitoring_competency_statistics_incoursemodule_exporter;
 use report_lpmonitoring\external\stats_plan_exporter;
 use context_system;
 use moodle_exception;
@@ -1078,12 +1079,73 @@ class external extends external_api {
     }
 
     /**
-     * Returns description of get_competency_statistics() result value.
+     * Returns description of get_competency_statistics_incourse() result value.
      *
      * @return \external_description
      */
     public static function get_competency_statistics_incourse_returns() {
         return lpmonitoring_competency_statistics_incourse_exporter::get_read_structure();
+    }
+
+    /**
+     * Returns description of get_competency_statistics_incoursemodules.
+     *
+     * @return \external_function_parameters
+     */
+    public static function get_competency_statistics_incoursemodules_parameters() {
+
+        $competencyid = new external_value(
+            PARAM_INT,
+            'The competency id',
+            VALUE_REQUIRED
+        );
+
+        $templateid = new external_value(
+            PARAM_INT,
+            'The template id',
+            VALUE_REQUIRED
+        );
+
+        $params = array(
+            'competencyid' => $competencyid,
+            'templateid' => $templateid
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Returns the competency statistics in course modules.
+     *
+     * @param int $competencyid Competency id.
+     * @param int $templateid Template id.
+     * @return array
+     */
+    public static function get_competency_statistics_incoursemodules($competencyid, $templateid) {
+        global $PAGE;
+
+        $params = self::validate_parameters(self::get_competency_statistics_incoursemodules_parameters(), array(
+            'competencyid' => $competencyid,
+            'templateid' => $templateid
+        ));
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        $result = api::get_competency_statistics_in_coursemodules($params['competencyid'], $params['templateid']);
+
+        $output = $PAGE->get_renderer('report_lpmonitoring');
+        $exporter = new lpmonitoring_competency_statistics_incoursemodule_exporter($result);
+        $record = $exporter->export($output);
+
+        return $record;
+    }
+
+    /**
+     * Returns description of get_competency_statistics_incoursemodules() result value.
+     *
+     * @return \external_description
+     */
+    public static function get_competency_statistics_incoursemodules_returns() {
+        return lpmonitoring_competency_statistics_incoursemodule_exporter::get_read_structure();
     }
 
     /**

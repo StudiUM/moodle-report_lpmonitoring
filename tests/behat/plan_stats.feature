@@ -21,6 +21,9 @@ Feature: Display learning plan template statistics
     When I press "Apply"
     Then I should see "Competency A"
     And I should see "Competency B"
+    And I click on "Competency A" "link"
+    And "Competency A" "dialogue" should be visible
+    And I click on "Close" "button" in the "Competency A" "dialogue"
     And I should see "3/3" in "totalnbusers" of the competency "Competency A"
     And I click on "totalnbusers" of the competency "Competency A"
     And "User list" "dialogue" should be visible
@@ -54,6 +57,9 @@ Feature: Display learning plan template statistics
     When I press "Apply"
     Then I should see "Competency A"
     And I should see "Competency B"
+    And I click on "Competency A" "link"
+    And "Competency A" "dialogue" should be visible
+    And I click on "Close" "button" in the "Competency A" "dialogue"
     And I should see "11/26" in "incourse" of the competency "Competency A"
     And I should see "7" for "not good" in the row "2" of "Competency A" "incourse" rating
     And I should see "4" for "good" in the row "3" of "Competency A" "incourse" rating

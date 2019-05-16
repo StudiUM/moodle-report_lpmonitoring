@@ -866,13 +866,47 @@ class api {
             $courses = course_competency::get_courses_with_competency_and_user($competencyid, $userid);
 
             foreach ($courses as $course) {
-                $courseinfo = new \stdClass();
-                $courseinfo->course = $course;
-
                 // Find ratings in course.
-                $ucc = core_competency_api::get_user_competency_in_course($course->id, $userid,
-                        $competencyid);
+                $ucc = core_competency_api::get_user_competency_in_course($course->id, $userid, $competencyid);
                 $competencystatistics->listratings[] = $ucc;
+            }
+        }
+
+        return $competencystatistics;
+    }
+
+    /**
+     * Get competency statistics in course modules.
+     *
+     * @param int $competencyid Competency id.
+     * @param int $templateid Template id.
+     * @return \stdClass The record of competency statistics.
+     */
+    public static function get_competency_statistics_in_coursemodules($competencyid, $templateid) {
+        if (!self::is_cm_comptency_grading_enabled()) {
+            throw new \coding_exception('Grading competency in course module is disabled');
+        }
+
+        // Prepare some data for competency stats (scale, colors configuration, ...).
+        $competencystatistics = self::prepare_competency_stats_data($competencyid, $templateid);
+
+        // Get course competency by template.
+        $userplans = plan::get_records_for_template($templateid);
+
+        // Find rate for each user in the plan for the the competency.
+        $competencystatistics->listratings = array();
+        foreach ($userplans as $plan) {
+            $userid = $plan->get('userid');
+            $courses = course_competency::get_courses_with_competency_and_user($competencyid, $userid);
+
+            foreach ($courses as $course) {
+                $modules = course_module_competency::list_course_modules($competencyid, $course->id);
+
+                foreach ($modules as $cmid) {
+                    // Find ratings in course modules.
+                    $ucc = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cmid, $userid, $competencyid);
+                    $competencystatistics->listratings[] = $ucc;
+                }
             }
         }
 
