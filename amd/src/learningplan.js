@@ -67,6 +67,7 @@ define(['jquery',
             $(this.studentPlansSelector).on('change', this.studentPlansChangeHandler.bind(this)).change();
             $(this.tagSelector).on('change', this.tagChangeHandler.bind(this)).change();
             $(this.learningplanTagSelector).on('change', this.learningplanTagChangeHandler.bind(this)).change();
+            $(this.learningplanTagCommentsSelector).on('change', this.learningplanTagChangeHandler.bind(this)).change();
 
             $('.competencyreport').on('change',
                 '.scalefiltercontainer input[name="optionscalefilter"]',
@@ -86,6 +87,10 @@ define(['jquery',
             $('.competencyreport').on('change','#filter-plan' ,this.changeWithplansHandler.bind(this)).change();
             // When the tags are modified we reload the tags filter.
             $(".competencyreport").on('DOMSubtreeModified', ".tags-stats", this.reloadTagsIfNeeded.bind(this));
+            // When the comments is checked we modify the tags filter.
+            // Only plans with comments filter and tags.
+            $('.competencyreport').on('change','#filter-comments',this.reloadTagsIfNeeded.bind(this));
+
         };
 
         /** @var {Number} The template ID. */
@@ -135,6 +140,8 @@ define(['jquery',
         LearningplanReport.prototype.tagSelector = "#tagSelectorReport";
         /** @var {String} The learning plan with this tag select box selector. */
         LearningplanReport.prototype.learningplanTagSelector = '#learningplanTagSelectorReport';
+        /** @var {String} */
+        LearningplanReport.prototype.learningplanTagCommentsSelector = '#filter-comments';
 
         /** @var {Boolean} Indicate that the tags are currently loading, to prevent loading them twice at the same time. */
         LearningplanReport.prototype.tagsAreLoading = false;
@@ -248,13 +255,16 @@ define(['jquery',
         LearningplanReport.prototype.tagChangeHandler = function(e) {
             var self = this;
             self.tagId = $(e.target).val();
+            self.withcomments = $("#filter-comments").is(':checked');
+
             if (self.tagId == '') {
                 self.tagId = null;
             }
             var promise = ajax.call([{
                 methodname: 'report_lpmonitoring_search_plans_with_tag',
                 args: {
-                    tagid: self.tagId
+                    tagid: self.tagId,
+                    withcomments: self.withcomments
                 }
             }]);
 
@@ -263,6 +273,7 @@ define(['jquery',
                 // Render the options of the select for learning plans.
                 var oldTagLearningplanId = self.tagLearningplanId;
                 $(self.learningplanTagSelector + ' option').remove();
+
                 if (results.length > 0) {
                     str.get_string('selectlearningplan', 'report_lpmonitoring').done(
                         function(selectlearningplan) {
@@ -957,8 +968,6 @@ define(['jquery',
             var templateid = null;
             var planid = null;
             var tagid = null;
-            self.withcomments = false;
-            self.withplans = false;
             if (templateSelected === true) {
                 templateid = self.templateId;
                 planid = self.learningplanId;

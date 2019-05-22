@@ -2371,41 +2371,41 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Test with the appreciator who see all plans.
         $this->setUser($this->appreciator);
-        $plans = api::search_plans_with_tag($tag1id);
+        $plans = api::search_plans_with_tag($tag1id, false);
         $this->assertCount(3, $plans);
-        $plans = api::search_plans_with_tag($tag2id);
+        $plans = api::search_plans_with_tag($tag2id, false);
         $this->assertCount(1, $plans);
-        $plans = api::search_plans_with_tag($tag3id);
+        $plans = api::search_plans_with_tag($tag3id, false);
         $this->assertCount(1, $plans);
-        $plans = api::search_plans_with_tag($tag4id);
+        $plans = api::search_plans_with_tag($tag4id, false);
         $this->assertCount(2, $plans);
-        $plans = api::search_plans_with_tag($tag5id);
+        $plans = api::search_plans_with_tag($tag5id, false);
         $this->assertCount(1, $plans);
 
         // Test with the appreciator for cohort 1.
         $this->setUser($this->appreciatorforcategory);
-        $plans = api::search_plans_with_tag($tag1id);
+        $plans = api::search_plans_with_tag($tag1id, false);
         $this->assertCount(2, $plans);
-        $plans = api::search_plans_with_tag($tag2id);
+        $plans = api::search_plans_with_tag($tag2id, false);
         $this->assertCount(1, $plans);
-        $plans = api::search_plans_with_tag($tag3id);
+        $plans = api::search_plans_with_tag($tag3id, false);
         $this->assertCount(1, $plans);
-        $plans = api::search_plans_with_tag($tag4id);
+        $plans = api::search_plans_with_tag($tag4id, false);
         $this->assertCount(0, $plans);
-        $plans = api::search_plans_with_tag($tag5id);
+        $plans = api::search_plans_with_tag($tag5id, false);
         $this->assertCount(0, $plans);
 
         // Test with the appreciator for cohort 2.
         $this->setUser($appreciator2);
-        $plans = api::search_plans_with_tag($tag1id);
+        $plans = api::search_plans_with_tag($tag1id, false);
         $this->assertCount(1, $plans);
-        $plans = api::search_plans_with_tag($tag2id);
+        $plans = api::search_plans_with_tag($tag2id, false);
         $this->assertCount(0, $plans);
-        $plans = api::search_plans_with_tag($tag3id);
+        $plans = api::search_plans_with_tag($tag3id, false);
         $this->assertCount(0, $plans);
-        $plans = api::search_plans_with_tag($tag4id);
+        $plans = api::search_plans_with_tag($tag4id, false);
         $this->assertCount(2, $plans);
-        $plans = api::search_plans_with_tag($tag5id);
+        $plans = api::search_plans_with_tag($tag5id, false);
         $this->assertCount(1, $plans);
     }
 }

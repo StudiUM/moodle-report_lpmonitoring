@@ -609,7 +609,7 @@ class api {
         $currentplanid = $planid;
         if ( !empty($templateid) || !empty($tagid) ) {
             if (!empty($tagid)) {
-                $userplans = self::search_plans_with_tag($tagid);
+                $userplans = self::search_plans_with_tag($tagid, $withcomments);
             } else {
                 $userplans = array_values(self::search_users_by_templateid($templateid , '', $scalesvalues, $scalefilterin,
                         $sortorder, $withcomments, $withplans));
@@ -1110,7 +1110,7 @@ class api {
      *                      )
      *              )
      */
-    public static function search_plans_with_tag($tagid) {
+    public static function search_plans_with_tag($tagid, $withcomments) {
         $tag = core_tag_tag::get($tagid);
         $records = array();
         // Important to check if tag exists and not have just been removed.
@@ -1120,6 +1120,17 @@ class api {
             foreach ($plans as $index => $planinfos) {
                 $plan = new plan($planinfos->id);
                 if ($plan->can_read()) {
+                    // Return only plans with comments.
+                    // We cannot filter easily the comments by sql so we do it afterwards.
+                    if ($withcomments) {
+                        $nbcomments = $plan->get_comment_object()->count();
+                        if ($nbcomments == 0) {
+                            continue;
+                        }
+                    } else {
+                        $nbcomments = 0;
+                    }
+
                     $users = user_get_users_by_id( array($planinfos->userid) );
                     $user = array_shift($users);
 
@@ -1133,6 +1144,7 @@ class api {
                     $record['email'] = $user->email;
                     $record['planid'] = $planinfos->id;
                     $record['planname'] = $planinfos->name;
+                    $record['nbcomments'] = $nbcomments;
 
                     $records[] = $record;
                 }

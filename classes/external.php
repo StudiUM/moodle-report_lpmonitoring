@@ -1214,7 +1214,8 @@ class external extends external_api {
     public static function search_plans_with_tag_parameters() {
         return new external_function_parameters(
             array(
-                'tagid' => new external_value(PARAM_INT, 'The tag ID')
+                'tagid' => new external_value(PARAM_INT, 'The tag ID'),
+                'withcomments' => new external_value(PARAM_BOOL, 'Only plans with comments')
             )
         );
     }
@@ -1223,15 +1224,16 @@ class external extends external_api {
      * Get the plans with a specific tag (but only plans that the user can view).
      *
      * @param int $tagid The tag id.
+     * @param bool $withcomments The tag with comments.
      * @return array
      */
-    public static function search_plans_with_tag($tagid) {
+    public static function search_plans_with_tag($tagid, $withcomments) {
         global $PAGE;
 
         $context = context_system::instance();
         self::validate_context($context);
 
-        $plans = api::search_plans_with_tag($tagid);
+        $plans = api::search_plans_with_tag($tagid, $withcomments);
         foreach ($plans as $index => $plan) {
             // Return profileimage as url instead of object.
             $plans[$index]['profileimage'] = $plans[$index]['profileimage']->get_url($PAGE)->out(false);
