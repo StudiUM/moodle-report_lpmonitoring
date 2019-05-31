@@ -82,7 +82,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $this->rolecreator, $syscontext->id);
-        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         assign_capability('moodle/competency:templateview', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $this->rolecreator, $syscontext->id);
@@ -92,7 +91,6 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         assign_capability('moodle/competency:competencyview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
-        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:templateview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
@@ -2044,7 +2042,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
 
                     $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][1]['color']);
-                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][1]['name']);
 
                     $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][2]['color']);
@@ -2052,7 +2050,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
 
                     $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][3]['color']);
-                    $this->assertEmpty($competency['evaluationslist'][3]['name']);
+                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][3]['name']);
 
                     $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
                     $this->assertEquals('#CCCCCC', $competency['evaluationslist'][4]['color']);
@@ -2063,7 +2061,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
 
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][0]['color']);
-                    $this->assertEmpty($competency['evaluationslist'][0]['name']);
+                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][0]['name']);
 
                     $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEquals('#CCCCCC', $competency['evaluationslist'][1]['color']);
@@ -2141,14 +2139,14 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
 
                     $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][1]['color']);
-                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][1]['name']);
                 } else if ($competency['competency']['id'] == $c1c->get('id')) {
                     $this->assertEquals(0, $competency['competencydetail']['nbevidence']);
                     $this->assertCount(2, $competency['evaluationslist']);
 
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][0]['color']);
-                    $this->assertEmpty($competency['evaluationslist'][0]['name']);
+                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][0]['name']);
 
                     $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEquals('#AAAAAA', $competency['evaluationslist'][1]['color']);

@@ -299,7 +299,6 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);

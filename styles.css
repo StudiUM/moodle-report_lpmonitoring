@@ -1289,6 +1289,13 @@
 #report-content .table-scroll td.evaluation a {
     color: #fff;
 }
+#report-content .table-scroll td.evaluation.notrated {
+    color: #000;
+    text-shadow: none;
+}
+#report-content .table-scroll td.evaluation.notrated a {
+    color: #000;
+}
 
 
 /** full navigation **/

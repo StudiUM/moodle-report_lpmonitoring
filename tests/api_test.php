@@ -105,7 +105,6 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $this->rolecreator, $syscontext->id);
-        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $this->rolecreator, $syscontext->id);
         role_assign($this->rolecreator, $creator->id, $syscontext->id);
 
@@ -113,7 +112,6 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         assign_capability('moodle/competency:competencyview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
-        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $this->roleappreciator, $syscontext->id);
         role_assign($this->roleappreciator, $appreciator->id, $syscontext->id);
         $this->creator = $creator;
@@ -209,7 +207,6 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
-        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);
@@ -1315,7 +1312,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $plan2 = api::read_plan($plans->next->planid)->current;
 
         // All users - at the beginning none of them have plans.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false, false);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', false, false);
         $this->assertCount(2, $users);
         $this->assertEquals(0, reset($users)['nbplans']);
         $this->assertEquals(0, next($users)['nbplans']);
@@ -1331,7 +1328,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $planc = $lpg->create_plan(array('userid' => $this->user1->id, 'status' => plan::STATUS_ACTIVE));
 
         // User : Only user1 has three learning plan.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false, true);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', false, true);
         $this->assertCount(1, $users);
         $this->assertEquals(4, reset($users)['nbplans']);
         $this->assertEquals(0, reset($users)['nbcomments']);
@@ -1343,7 +1340,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $commentarea1->add('This is the comment #3 for user 1');
 
         // User : Only user1 has two learning plan with comments each.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true, true);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', true, true);
         $this->assertCount(1, $users);
         $this->assertEquals(4, reset($users)['nbplans']);
         $this->assertEquals(3, reset($users)['nbcomments']);
@@ -1354,7 +1351,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $commentarea2->add('This is the comment #1 for user 2');
 
         // Only users with comments and one learning plan.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true, false);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', true, false);
         $this->assertCount(2, $users);
         $this->assertEquals(0, reset($users)['nbplans']);
         $this->assertEquals(0, next($users)['nbplans']);

@@ -23,92 +23,92 @@
  */
 
 define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates', 'tool_lp/dialogue'],
-       function($, notification, str, ajax, templates, Dialogue) {
+        function($, notification, str, ajax, templates, Dialogue) {
 
-    /**
-     * DatatablePopup
-     *
-     * @param {String} regionSelector The regionSelector
-     * @param {String} userCompetencySelector The userCompetencySelector
-     */
-    var DatatablePopup = function(regionSelector, userCompetencySelector) {
-        $(regionSelector).on('click', userCompetencySelector, this._handleClick.bind(this));
-    };
+            /**
+             * DatatablePopup
+             *
+             * @param {String} regionSelector The regionSelector
+             * @param {String} userCompetencySelector The userCompetencySelector
+             */
+            var DatatablePopup = function(regionSelector, userCompetencySelector) {
+                $(regionSelector).on('click', userCompetencySelector, this._handleClick.bind(this));
+            };
 
-    /**
-     * Get the data from the clicked cell and open the popup.
-     *
-     * @method _handleClick
-     * @param {Event} e The event
-     */
-    DatatablePopup.prototype._handleClick = function(e) {
-        // Do not scroll to top.
-        e.preventDefault();
+            /**
+             * Get the data from the clicked cell and open the popup.
+             *
+             * @method _handleClick
+             * @param {Event} e The event
+             */
+            DatatablePopup.prototype._handleClick = function(e) {
+                // Do not scroll to top.
+                e.preventDefault();
 
-        var cell = $(e.target);
-        var competencyId = $(cell).data('competencyid');
-        var elementId = $(cell).data('elementid');
-        var userId = $(cell).data('userid');
-        var type = $(cell).data('type');
+                var cell = $(e.target);
+                var competencyId = $(cell).data('competencyid');
+                var elementId = $(cell).data('elementid');
+                var userId = $(cell).data('userid');
+                var type = $(cell).data('type');
 
-        if (type == 'cm') {
-            var requests = ajax.call([{
-                methodname: 'tool_cmcompetency_data_for_user_competency_summary_in_coursemodule',
-                args: {userid: userId, competencyid: competencyId, cmid: elementId},
-            }, {
-                methodname: 'tool_cmcompetency_user_competency_viewed_in_coursemodule',
-                args: {userid: userId, competencyid: competencyId, cmid: elementId},
-            }]);
-        } else {
-            var requests = ajax.call([{
-                methodname: 'tool_lp_data_for_user_competency_summary_in_course',
-                args: {userid: userId, competencyid: competencyId, courseid: elementId},
-            }, {
-                methodname: 'core_competency_user_competency_viewed_in_course',
-                args: {userid: userId, competencyid: competencyId, courseid: elementId},
-            }]);
-        }
+                if (type == 'cm') {
+                    var requests = ajax.call([{
+                        methodname: 'tool_cmcompetency_data_for_user_competency_summary_in_coursemodule',
+                        args: {userid: userId, competencyid: competencyId, cmid: elementId},
+                    }, {
+                        methodname: 'tool_cmcompetency_user_competency_viewed_in_coursemodule',
+                        args: {userid: userId, competencyid: competencyId, cmid: elementId},
+                    }]);
+                } else {
+                    var requests = ajax.call([{
+                        methodname: 'tool_lp_data_for_user_competency_summary_in_course',
+                        args: {userid: userId, competencyid: competencyId, courseid: elementId},
+                    }, {
+                        methodname: 'core_competency_user_competency_viewed_in_course',
+                        args: {userid: userId, competencyid: competencyId, courseid: elementId},
+                    }]);
+                }
 
-        $.when.apply($, requests).then(function(context) {
-            this._contextLoaded.bind(this)(context);
-            return;
-        }.bind(this)).catch(notification.exception);
-    };
+                $.when.apply($, requests).then(function(context) {
+                    this._contextLoaded.bind(this)(context);
+                    return;
+                }.bind(this)).catch(notification.exception);
+            };
 
-    /**
-     * We loaded the context, now render the template.
-     *
-     * @method _contextLoaded
-     * @param {Object} context
-     */
-    DatatablePopup.prototype._contextLoaded = function(context) {
-        var self = this;
-        // We have to display user info in popup.
-        context.displayuser = true;
-        // Impossible to grade course directly in this popup.
-        context.usercompetencysummary.cangrade = false;
+            /**
+             * We loaded the context, now render the template.
+             *
+             * @method _contextLoaded
+             * @param {Object} context
+             */
+            DatatablePopup.prototype._contextLoaded = function(context) {
+                var self = this;
+                // We have to display user info in popup.
+                context.displayuser = true;
+                // Impossible to grade course directly in this popup.
+                context.usercompetencysummary.cangrade = false;
 
-        var templatepath = 'tool_lp/user_competency_summary_in_course';
-        if (typeof context.coursemodule !== 'undefined') {
-            templatepath = 'report_cmcompetency/user_competency_summary_in_coursemodule';
-        }
-        templates.render(templatepath, context).done(function(html, js) {
-            str.get_string('usercompetencysummary', 'report_competency').done(function(title) {
-                (new Dialogue(title, html, templates.runTemplateJS.bind(templates, js), self.destroyDialogue, true));
-            }).fail(notification.exception);
-        }).fail(notification.exception);
-    };
+                var templatepath = 'tool_lp/user_competency_summary_in_course';
+                if (typeof context.coursemodule !== 'undefined') {
+                    templatepath = 'report_cmcompetency/user_competency_summary_in_coursemodule';
+                }
+                templates.render(templatepath, context).done(function(html, js) {
+                    str.get_string('usercompetencysummary', 'report_competency').done(function(title) {
+                        (new Dialogue(title, html, templates.runTemplateJS.bind(templates, js), self.destroyDialogue, true));
+                    }).fail(notification.exception);
+                }).fail(notification.exception);
+            };
 
-    /**
-     * Destroy DOM after close.
-     *
-     * @param Dialogue
-     * @function
-     */
-    DatatablePopup.prototype.destroyDialogue = function(dialg) {
-        dialg.close();
-    };
+            /**
+             * Destroy DOM after close.
+             *
+             * @param Dialogue
+             * @function
+             */
+            DatatablePopup.prototype.destroyDialogue = function(dialg) {
+                dialg.close();
+            };
 
-    return /** @alias module:report_lpmonitoring/datatable_popup */ DatatablePopup;
+            return DatatablePopup;
 
-});
+        });

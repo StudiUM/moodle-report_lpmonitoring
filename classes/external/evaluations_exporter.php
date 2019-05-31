@@ -45,6 +45,9 @@ class evaluations_exporter extends \core\external\exporter {
             'elementid' => array(
                 'type' => PARAM_INT
             ),
+            'isnotrated' => array(
+                'type' => PARAM_BOOL
+            ),
             'color' => array(
                 'type' => PARAM_TEXT
             ),
@@ -59,11 +62,16 @@ class evaluations_exporter extends \core\external\exporter {
         $result = new \stdClass();
         $result->name = null;
         $result->color = null;
-
-        foreach ($evaluationdata->competencydetail->reportscaleconfig as $scaleitem) {
-            if ($scaleitem->id == $evaluationdata->grade) {
-                $result->name = $evaluationdata->competencydetail->scale[$evaluationdata->grade];
-                $result->color = $scaleitem->color;
+        $result->isnotrated = false;
+        if ($evaluationdata->grade === 0) {
+            $result->isnotrated = true;
+        } else {
+            foreach ($evaluationdata->competencydetail->reportscaleconfig as $scaleitem) {
+                if ($scaleitem->id == $evaluationdata->grade) {
+                    $result->isnotrated = false;
+                    $result->name = $evaluationdata->competencydetail->scale[$evaluationdata->grade];
+                    $result->color = $scaleitem->color;
+                }
             }
         }
         return (array) $result;

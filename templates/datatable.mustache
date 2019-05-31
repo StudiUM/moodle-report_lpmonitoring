@@ -133,10 +133,12 @@
                         </td>
                         {{#evaluationslist}}
                             {{#iscourse}}
-                                <td class="course evaluation searchable" style="background-color: {{color}};"><a href="#" data-type="course" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{name}}</a></td>
+                                {{#isnotrated}}<td class="course evaluation searchable notrated"><a href="#" data-type="course" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{#str}}notrated, report_lpmonitoring{{/str}}{{/isnotrated}}</a></td>
+                                {{^isnotrated}}<td class="course evaluation searchable" style="background-color: {{color}};"><a href="#" data-type="course" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{name}}</a></td>{{/isnotrated}}
                             {{/iscourse}}
                             {{^iscourse}}
-                                <td class="cm-cell evaluation searchable" style="background-color: {{color}};"><a href="#" data-type="cm" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{name}}</a></td>
+                                {{#isnotrated}}<td class="cm-cell evaluation searchable notrated"><a href="#" data-type="cm" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{#str}}notrated, report_lpmonitoring{{/str}}</a></td>{{/isnotrated}}
+                                {{^isnotrated}}<td class="cm-cell evaluation searchable" style="background-color: {{color}};"><a href="#" data-type="cm" data-competencyid="{{competency.id}}" data-elementid="{{elementid}}" data-userid="{{plan.user.id}}">{{name}}</a></td>{{/isnotrated}}
                             {{/iscourse}}
                        {{/evaluationslist}}
                     </tr>
