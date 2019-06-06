@@ -1579,3 +1579,48 @@ ul.detail-comp-tab li a::first-letter {
 #table-search-columns {
     width: 245px;
 }
+
+/* button radio */
+#reportFilter #id_displayinfo .fcontainer .fitem_fradio .form-inline {
+    display: block !important;
+}
+
+/* round sahpe image */
+#plan-user-info .profile_img {
+    border-radius: 50% !important;
+}
+/*nav bar navigation of learning plan*/
+#page-report-lpmonitoring-index .plan-info-container .plan-info-detail #nav-tabs:not(.hidden)
+{
+    display: flex !important;
+}
+/* left arrow of navigation in learning plan */
+#page #page-content #region-main-box #users-list-full-navigation .fa-angle-double-left:before {
+    padding-left: 5px;
+}
+#page #page-content #region-main-box #users-list-full-navigation .fa-angle-double-right:before {
+    padding-left: 7px;
+}
+
+/* button close in messages of evidence in pop up of learning plans*/
+.evidence .pull-xs-right a img {
+    float: right;
+    padding-top: 15px;
+    padding-right: 5px;
+}
+
+/* list of student's learning plan accordion */
+#page-report-lpmonitoring-index #region-main {
+    padding: 0.5rem !important;
+}
+
+/* pop up message evidence */
+.moodle-dialogue-base .evidence {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    padding-left: 25px;
+}
+/* search filter */
+.filter-report-custom > .col-md-3 {
+    float: right;
+}

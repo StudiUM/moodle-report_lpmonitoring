@@ -638,7 +638,7 @@ define(['jquery',
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         self.loadCompetencyDetail(results, plan, elementloading);
-                        $("#nav-tabs").show();
+                        $("#nav-tabs").removeClass("hidden");
                     });
                 } else {
                     elementloading.removeClass('loading');
@@ -646,7 +646,7 @@ define(['jquery',
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         $("#report-content").empty();
-                        $("#nav-tabs").hide();
+                        $("#nav-tabs").addClass("hidden");
                     });
                 }
                 self.loadReportTab(plan);
