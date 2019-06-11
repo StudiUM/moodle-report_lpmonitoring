@@ -2405,4 +2405,167 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $plans = api::search_plans_with_tag($tag5id, false);
         $this->assertCount(1, $plans);
     }
+
+    /**
+     * Test reset grading of a single user competency.
+     */
+    public function test_reset_grading_one() {
+        $this->setUser($this->appreciatorforcategory);
+        $plans = api::read_plan(0, $this->templateincategory->get('id'));
+        $plan1 = $plans->current;
+
+        core_competency_api::grade_competency_in_plan($plan1, $this->comp1->get('id'), 1);
+        core_competency_api::grade_competency_in_plan($plan1, $this->comp2->get('id'), 2);
+
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $plan1->get('id'));
+        $this->assertEquals(1, $compdetail->usercompetency->get('grade'));
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp2->get('id'), $plan1->get('id'));
+        $this->assertEquals(2, $compdetail->usercompetency->get('grade'));
+
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $result = api::reset_grading($plan1->get('id'), 'This user quitted the university.', $this->comp1->get('id'));
+
+        // Check grade values.
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $plan1->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp2->get('id'), $plan1->get('id'));
+        $this->assertEquals(2, $compdetail->usercompetency->get('grade'));
+
+        // Get our events.
+        $events = $sink->get_events();
+        $this->assertCount(2, $events);
+        $eventevidence = $events[0];
+        $eventrating = $events[1];
+
+        // Check that the evidence event data is valid.
+        $uc = core_competency_api::get_user_competency($plan1->get('userid'), $this->comp1->get('id'));
+        $context = $uc->get_context();
+        $this->assertInstanceOf('\core\event\competency_evidence_created', $eventevidence);
+        $this->assertEquals($this->user1->id, $eventevidence->relateduserid);
+        $this->assertEquals($context->id, $eventevidence->contextid);
+        $this->assertEquals($this->comp1->get('id'), $eventevidence->other['competencyid']);
+        $this->assertEventContextNotUsed($eventevidence);
+        $this->assertDebuggingNotCalled();
+
+        $evidence = core_competency_api::list_evidence($this->user1->id, $this->comp1->get('id'));
+        $evidence = reset($evidence);
+        $this->assertEquals($evidence->get('note'), 'This user quitted the university.');
+
+        // Check that the competency resetted event data is valid.
+        $uc = core_competency_api::get_user_competency($plan1->get('userid'), $this->comp2->get('id'));
+        $context = $uc->get_context();
+        $this->assertInstanceOf('\report_lpmonitoring\event\user_competency_resetted', $eventrating);
+        $this->assertEquals($this->user1->id, $eventrating->relateduserid);
+        $this->assertEquals($context->id, $eventrating->contextid);
+        $this->assertEventContextNotUsed($eventrating);
+        $this->assertDebuggingNotCalled();
+
+        // Trigger and capture the event when the grade is already null.
+        $sink = $this->redirectEvents();
+        $result = api::reset_grading($plan1->get('id'), null, $this->comp1->get('id'));
+        // Check grade values.
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $plan1->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp2->get('id'), $plan1->get('id'));
+        $this->assertEquals(2, $compdetail->usercompetency->get('grade'));
+        // Get our events (no event as it was already null).
+        $events = $sink->get_events();
+        $this->assertCount(0, $events);
+    }
+
+    /**
+     * Test reset grading of all user competencies in a learning plan.
+     */
+    public function test_reset_grading_all() {
+        $this->setUser($this->appreciatorforcategory);
+        $plans = api::read_plan(0, $this->templateincategory->get('id'));
+        $plan1 = $plans->current;
+
+        core_competency_api::grade_competency_in_plan($plan1, $this->comp1->get('id'), 1);
+        core_competency_api::grade_competency_in_plan($plan1, $this->comp2->get('id'), 2);
+
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $plan1->get('id'));
+        $this->assertEquals(1, $compdetail->usercompetency->get('grade'));
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp2->get('id'), $plan1->get('id'));
+        $this->assertEquals(2, $compdetail->usercompetency->get('grade'));
+
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        $result = api::reset_grading($plan1->get('id'), 'This user quitted the university.');
+
+        // Check grade values.
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $plan1->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp2->get('id'), $plan1->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
+
+        // Get our events.
+        $events = $sink->get_events();
+        $this->assertCount(4, $events);
+        $eventevidence1 = $events[0];
+        $eventrating1 = $events[1];
+        $eventevidence2 = $events[2];
+        $eventrating2 = $events[3];
+
+        // Check that the evidence event data is valid for comp1.
+        $uc = core_competency_api::get_user_competency($plan1->get('userid'), $this->comp1->get('id'));
+        $context = $uc->get_context();
+        $this->assertInstanceOf('\core\event\competency_evidence_created', $eventevidence1);
+        $this->assertEquals($this->user1->id, $eventevidence1->relateduserid);
+        $this->assertEquals($context->id, $eventevidence1->contextid);
+        $this->assertEquals($this->comp1->get('id'), $eventevidence1->other['competencyid']);
+        $this->assertEventContextNotUsed($eventevidence1);
+        $this->assertDebuggingNotCalled();
+
+        $evidence = core_competency_api::list_evidence($plan1->get('userid'), $this->comp1->get('id'));
+        $evidence = reset($evidence);
+        $this->assertEquals($evidence->get('note'), 'This user quitted the university.');
+
+        // Check that the competency resetted event data is valid for comp1.
+        $uc = core_competency_api::get_user_competency($plan1->get('userid'), $this->comp1->get('id'));
+        $context = $uc->get_context();
+        $this->assertInstanceOf('\report_lpmonitoring\event\user_competency_resetted', $eventrating1);
+        $this->assertEquals($this->user1->id, $eventrating1->relateduserid);
+        $this->assertEquals($context->id, $eventrating1->contextid);
+        $this->assertContains("the user competency with id '".$uc->get('id')."'", $eventrating1->get_description());
+        $this->assertEventContextNotUsed($eventrating1);
+        $this->assertDebuggingNotCalled();
+
+        // Check that the evidence event data is valid for comp2.
+        $uc = core_competency_api::get_user_competency($plan1->get('userid'), $this->comp2->get('id'));
+        $context = $uc->get_context();
+        $this->assertInstanceOf('\core\event\competency_evidence_created', $eventevidence2);
+        $this->assertEquals($this->user1->id, $eventevidence2->relateduserid);
+        $this->assertEquals($context->id, $eventevidence2->contextid);
+        $this->assertEquals($this->comp2->get('id'), $eventevidence2->other['competencyid']);
+        $this->assertEventContextNotUsed($eventevidence2);
+        $this->assertDebuggingNotCalled();
+
+        $evidence = core_competency_api::list_evidence($plan1->get('userid'), $this->comp2->get('id'));
+        $evidence = reset($evidence);
+        $this->assertEquals($evidence->get('note'), 'This user quitted the university.');
+
+        // Check that the competency resetted event data is valid for comp2.
+        $uc = core_competency_api::get_user_competency($plan1->get('userid'), $this->comp2->get('id'));
+        $context = $uc->get_context();
+        $this->assertInstanceOf('\report_lpmonitoring\event\user_competency_resetted', $eventrating2);
+        $this->assertEquals($this->user1->id, $eventrating2->relateduserid);
+        $this->assertEquals($context->id, $eventrating2->contextid);
+        $this->assertContains("the user competency with id '".$uc->get('id')."'", $eventrating2->get_description());
+        $this->assertEventContextNotUsed($eventrating2);
+        $this->assertDebuggingNotCalled();
+
+        // Trigger and capture the event when the grade is already null.
+        $sink = $this->redirectEvents();
+        $result = api::reset_grading($plan1->get('id'));
+        // Check grade values.
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $plan1->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
+        $compdetail = api::get_competency_detail($this->user1->id, $this->comp2->get('id'), $plan1->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
+        // Get our events (no event as it was already null).
+        $events = $sink->get_events();
+        $this->assertCount(0, $events);
+    }
 }

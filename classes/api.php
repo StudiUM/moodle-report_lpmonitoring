@@ -34,6 +34,7 @@ use core_competency\api as core_competency_api;
 use core_competency\course_competency;
 use core_competency\course_module_competency;
 use core_competency\competency;
+use core_competency\evidence;
 use core_competency\template;
 use core_competency\plan;
 use core_competency\template_competency;
@@ -43,6 +44,7 @@ use core_competency\user_competency_plan;
 use core_tag_area;
 use core_tag_tag;
 use report_lpmonitoring\report_competency_config;
+use report_lpmonitoring\event\user_competency_resetted;
 use report_lpmonitoring\external;
 use stdClass;
 use Exception;
@@ -1158,5 +1160,78 @@ class api {
      */
     public static function is_cm_comptency_grading_enabled() {
         return self::$iscmcompetencygradingenabled;
+    }
+
+    /**
+     * Reset a user competency grading.
+     *
+     * @param int $planid Plan id.
+     * @param string $note A note to attach to the evidence.
+     * @param int $competencyid Competency id.
+     * @return evidence
+     */
+    protected static function reset_competency_grading($planid, $note, $competencyid) {
+        global $USER;
+        $plan = new plan($planid);
+
+        $uc = core_competency_api::get_user_competency($plan->get('userid'), $competencyid);
+        $context = $uc->get_context();
+        if (!user_competency::can_grade_user($uc->get('userid'))) {
+            throw new required_capability_exception($context, 'moodle/competency:competencygrade', 'nopermissions', '');
+        }
+
+        // Throws exception if competency not in plan.
+        $competency = $uc->get_competency();
+        $competencycontext = $competency->get_context();
+        if (!has_any_capability(array('moodle/competency:competencyview', 'moodle/competency:competencymanage'),
+                $competencycontext)) {
+            throw new required_capability_exception($competencycontext, 'moodle/competency:competencyview', 'nopermissions', '');
+        }
+
+        // If there is actually a grade, we reset it.
+        $actualgrade = $uc->get('grade');
+        if (!is_null($actualgrade)) {
+            $action = evidence::ACTION_OVERRIDE;
+            $desckey = 'evidence_reset';
+
+            $result = core_competency_api::add_evidence($uc->get('userid'),
+                                      $competency,
+                                      $context->id,
+                                      $action,
+                                      $desckey,
+                                      'report_lpmonitoring',
+                                      $plan->get('name'),
+                                      false,
+                                      null,
+                                      null,
+                                      $USER->id,
+                                      $note);
+            if ($result) {
+                $uc->read();
+                $event = user_competency_resetted::create_from_user_competency($uc);
+                $event->trigger();
+            }
+            return $result;
+        }
+        return null;
+    }
+
+    /**
+     * Reset the grading of users competencies (one particular competency or all competencies of a plan).
+     *
+     * @param int $planid Plan id.
+     * @param string $note A note to attach to the evidence.
+     * @param int $competencyid Competency id (or null for all competencies of this plan).
+     */
+    public static function reset_grading($planid, $note = null, $competencyid = null) {
+        if (is_null($competencyid)) {
+            $plan = new plan($planid);
+            $competencies = $plan->get_competencies();
+            foreach ($competencies as $competency) {
+                self::reset_competency_grading($planid, $note, $competency->get('id'));
+            }
+        } else {
+            self::reset_competency_grading($planid, $note, $competencyid);
+        }
     }
 }
