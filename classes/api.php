@@ -1234,4 +1234,14 @@ class api {
             self::reset_competency_grading($planid, $note, $competencyid);
         }
     }
+
+    /**
+     * Check if task exist for learning plan template.
+     *
+     * @param int $templateid the learning plan template id
+     * @return boolean return true if task exist
+     */
+    public static function rating_task_exist($templateid) {
+        return false;
+    }
 }

@@ -54,6 +54,28 @@ class renderer extends plugin_renderer_base {
     /**
      * Defer to template.
      *
+     * @param template_selector $page
+     * @return string html for the page
+     */
+    public function render_template_selector(template_selector $page) {
+        $data = $page->export_for_template($this);
+        return parent::render_from_template('report_lpmonitoring/template_selector', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
+     * @param bulkrating $page
+     * @return string html for the page
+     */
+    public function render_bulkrating(bulkrating $page) {
+        $data = $page->export_for_template($this);
+        return parent::render_from_template('report_lpmonitoring/bulk_rating', $data);
+    }
+
+    /**
+     * Defer to template.
+     *
      * @param user_report_page $page
      * @return string html for the page
      */

@@ -195,5 +195,14 @@ $functions = array(
         'capabilities' => 'moodle/competency:planview',
         'ajax'         => true
     ),
+    'report_lpmonitoring_add_rating_task' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'add_rating_task',
+        'classpath'    => '',
+        'description'  => 'Add task for rating competencies in learning plan template',
+        'type'         => 'write',
+        'capabilities' => 'moodle/competency:templateview',
+        'ajax'         => true,
+    )
 );
 

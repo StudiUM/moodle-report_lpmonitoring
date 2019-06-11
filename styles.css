@@ -1505,6 +1505,65 @@ ul.detail-comp-tab li a::first-letter {
 .competencyreport .nav-tabs.detail-comp-tab {
     margin-top: 10px;
 }
+.template-selector {
+    display: flex;
+    flex-direction: row;
+    flex-flow: wrap;
+    justify-content: flex-start;
+}
+.template-selector .label-template-selector {
+    margin-right: 20px;
+}
+.scale-comp-container {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: row wrap;
+    -webkit-flex-flow: row wrap;
+}
+.scale-comp-container .scale-comp-item {
+    flex: 0 1 315px;
+    -webkit-flex: 0 1 315px;
+    -ms-flex: 0 1 315px;
+    margin-right: 15px;
+    min-width: 315px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    padding-left: 5px;
+    padding-right: 5px;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: column wrap;
+    -webkit-flex-flow: column wrap;
+    justify-content: space-between;
+}
+.scale-comp-container .scale-comp-item .donotapplybulk {
+    margin: 5px;
+}
+.scale-comp-container .scale-comp-item .donotapplybulk label {
+    color: #31708f;
+}
+.scale-comp-container .scale-comp-item .donotapplybulk label input {
+    margin-right: 5px;
+}
+#savescalesvalues [data-region="scale-buttons"] input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+#savescalesvalues input[type="submit"] {
+    float: right;
+}
+.scale-comp-container .scale-comp-item table caption {
+    font-size: 14px;
+    line-height: 20px;
+}
+.scale-comp-container .scale-comp-item table.disabled {
+    opacity: 0.5;
+}
 .filter-report-custom .report-filterscale {
     float: right;
     margin-bottom: 10px;

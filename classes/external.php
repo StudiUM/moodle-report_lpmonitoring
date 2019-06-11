@@ -1377,4 +1377,63 @@ class external extends external_api {
     public static function list_plan_competencies_report_returns() {
         return list_plan_competency_report_exporter::get_read_structure();
     }
+
+    /**
+     * Returns description of add_rating_task() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function add_rating_task_parameters() {
+        $templateid = new external_value(
+            PARAM_INT,
+            'The template id',
+            VALUE_REQUIRED
+        );
+        $defaultscalesvalues = new external_value(
+            PARAM_RAW,
+            'Default scales values',
+            VALUE_REQUIRED
+        );
+        $forcerating = new external_value(
+            PARAM_BOOL,
+            'Force rating on users already rated',
+            VALUE_DEFAULT,
+            false
+        );
+        $params = array(
+            'templateid' => $templateid,
+            'defaultscalesvalues' => $defaultscalesvalues,
+            'forcerating' => $forcerating
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Add task for rating competencies in template.
+     *
+     * @param int $templateid The template id
+     * @param string $defaultscalesvalues Default scales values
+     * @param boolean $forcerating Force rating on users already rated
+     * @return boolean
+     */
+    public static function add_rating_task($templateid, $defaultscalesvalues, $forcerating) {
+        $params = self::validate_parameters(
+            self::add_rating_task_parameters(),
+            array(
+                'templateid' => $templateid,
+                'defaultscalesvalues' => $defaultscalesvalues,
+                'forcerating' => $forcerating
+            )
+        );
+        return true;
+    }
+
+    /**
+     * Returns description of add_rating_task() result value.
+     *
+     * @return \external_description
+     */
+    public static function add_rating_task_returns() {
+        return new external_value(PARAM_BOOL, 'True if adding was successful');
+    }
 }

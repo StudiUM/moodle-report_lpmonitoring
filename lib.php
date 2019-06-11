@@ -45,8 +45,10 @@ function report_lpmonitoring_extend_navigation_category_settings($navigation, $c
     if ($canreadtemplate) {
         $url = new moodle_url('/report/lpmonitoring/index.php', array('pagecontextid' => $categorycontext->id));
         $urlstats = new moodle_url('/report/lpmonitoring/stats.php', array('pagecontextid' => $categorycontext->id));
+        $urlbulkrating = new moodle_url('/report/lpmonitoring/bulkrating.php', array('pagecontextid' => $categorycontext->id));
         $name = get_string('pluginname', 'report_lpmonitoring');
         $namestats = get_string('statslearningplan', 'report_lpmonitoring');
+        $namebulkratingnode = get_string('bulkdefaultrating', 'report_lpmonitoring');
         $settingsnodestats = navigation_node::create($namestats,
                                                 $urlstats,
                                                 navigation_node::TYPE_SETTING,
@@ -59,6 +61,15 @@ function report_lpmonitoring_extend_navigation_category_settings($navigation, $c
                                                 null,
                                                 null,
                                                 new pix_icon('i/report', ''));
+        $bulkratingnode = navigation_node::create($namebulkratingnode,
+                                                $urlbulkrating,
+                                                navigation_node::TYPE_SETTING,
+                                                null,
+                                                null,
+                                                new pix_icon('i/grades', ''));
+        if ($bulkratingnode->check_if_active(URL_MATCH_BASE)) {
+            $bulkratingnode->make_active();
+        }
 
         $reportsnode = navigation_node::create(get_string('reports'),
                                                null,
@@ -70,6 +81,7 @@ function report_lpmonitoring_extend_navigation_category_settings($navigation, $c
         if (isset($settingsnode) && isset($reportsnode)) {
             $reportnode = $navigation->add_node($reportsnode);
             $reportnode->add_node($settingsnode);
+            $reportnode->add_node($bulkratingnode);
             $reportnode->add_node($settingsnodestats);
         }
     }

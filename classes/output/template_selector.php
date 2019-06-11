@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class containing data for learning plan template competencies page
+ * Class containing data report for template selector template.
  *
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
- * @copyright  2016 Université de Montréal
+ * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace report_lpmonitoring\output;
@@ -28,33 +28,32 @@ use renderable;
 use templatable;
 use renderer_base;
 use stdClass;
-use context;
 use core_competency\api as core_competency_api;
-use core_competency\external\template_exporter;
-use report_lpmonitoring\api as report_lpmonitoring_api;
 
 /**
- * Class containing data for learning plan template competencies page
+ * Class containing data report for template selector template.
  *
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
- * @copyright  2016 Université de Montréal
+ * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report implements renderable, templatable {
+class template_selector implements renderable, templatable {
 
     /** @var context The context in which everything is happening. */
     protected $pagecontext;
 
-    /** @var array $learningplantemplates List of learning plan templates. */
-    protected $learningplantemplates = array();
+    /** @var int|null $templateid template ID. */
+    protected $templateid = null;
 
     /**
      * Construct this renderable.
      *
      * @param context $pagecontext The page context
+     * @param int $templateid The template id
      */
-    public function __construct(context $pagecontext) {
+    public function __construct($pagecontext, $templateid) {
+        $this->templateid = $templateid;
         $this->pagecontext = $pagecontext;
         $this->learningplantemplates = core_competency_api::list_templates('shortname', 'ASC', 0, 0, $this->pagecontext,
                 'children', true);
@@ -70,15 +69,16 @@ class report implements renderable, templatable {
         $url = new \moodle_url('/report/lpmonitoring/bulkrating.php', ['pagecontextid' => $this->pagecontext->id]);
         $data = new stdClass();
         $data->pagecontextid = $this->pagecontext->id;
-        $data->urlbulkrating = $url->out(true);
-        $data->cmcompgradingenabled = report_lpmonitoring_api::is_cm_comptency_grading_enabled();
-
         $data->templates = array();
+        $data->urlbulkrating = $url->out(true);
         foreach ($this->learningplantemplates as $template) {
-            $exporter = new template_exporter($template);
-            $data->templates[] = $exporter->export($output);
+            $temp = new stdClass();
+            $temp->id = $template->get('id');
+            $temp->shortname = $template->get('shortname');
+            $temp->selected = ($template->get('id') == $this->templateid) ? true : false;
+            $data->templates[] = $temp;
         }
-
+        $data->hastemplates = (empty($data->templates)) ? false : true;
         return $data;
     }
 }
