@@ -1425,6 +1425,7 @@ class external extends external_api {
                 'forcerating' => $forcerating
             )
         );
+        api::add_rating_task($params['templateid'], $params['forcerating'], $params['defaultscalesvalues']);
         return true;
     }
 

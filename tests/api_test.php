@@ -207,6 +207,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:coursecompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:usercompetencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
+        assign_capability('moodle/competency:usercompetencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $roleid, $cat1ctx->id);
         assign_capability('moodle/competency:planview', CAP_ALLOW, $roleid, $syscontext->id);
         assign_capability('moodle/competency:planviewdraft', CAP_ALLOW, $roleid, $syscontext->id);
@@ -1312,7 +1313,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $plan2 = api::read_plan($plans->next->planid)->current;
 
         // All users - at the beginning none of them have plans.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', false, false);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false, false);
         $this->assertCount(2, $users);
         $this->assertEquals(0, reset($users)['nbplans']);
         $this->assertEquals(0, next($users)['nbplans']);
@@ -1328,7 +1329,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $planc = $lpg->create_plan(array('userid' => $this->user1->id, 'status' => plan::STATUS_ACTIVE));
 
         // User : Only user1 has three learning plan.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', false, true);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', false, true);
         $this->assertCount(1, $users);
         $this->assertEquals(4, reset($users)['nbplans']);
         $this->assertEquals(0, reset($users)['nbcomments']);
@@ -1340,7 +1341,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $commentarea1->add('This is the comment #3 for user 1');
 
         // User : Only user1 has two learning plan with comments each.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', true, true);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true, true);
         $this->assertCount(1, $users);
         $this->assertEquals(4, reset($users)['nbplans']);
         $this->assertEquals(3, reset($users)['nbcomments']);
@@ -1351,7 +1352,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $commentarea2->add('This is the comment #1 for user 2');
 
         // Only users with comments and one learning plan.
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), 'course', 'ASC', true, false);
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), '', array(), true, 'ASC', true, false);
         $this->assertCount(2, $users);
         $this->assertEquals(0, reset($users)['nbplans']);
         $this->assertEquals(0, next($users)['nbplans']);
@@ -2567,5 +2568,75 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         // Get our events (no event as it was already null).
         $events = $sink->get_events();
         $this->assertCount(0, $events);
+    }
+
+    /*
+     * Test add_rating_task.
+     * @group addtask
+     */
+    public function test_add_rating_task() {
+        global $DB;
+        // Test read template permission for apreciator.
+        // Create templates in category.
+        $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
+        $syscontext = context_system::instance();
+        $template = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $syscontext->id));
+
+        // Set current user to appreciator.
+        $this->setUser($this->appreciatorforcategory);
+        try {
+            api::add_rating_task($template->get('id'), true, "");
+            $this->fail('Must fail user does not have permissions to view learning plan templates.');
+        } catch (\Exception $ex) {
+            $this->assertContains('Sorry, but you do not currently have permissions to do that (View learning plan templates)',
+                    $ex->getMessage());
+        }
+
+        $data = [['compid' => $this->comp1->get('id'), 'value' => 1], ['compid' => $this->comp2->get('id'), 'value' => 2]];
+        $forcerating = false;
+        \report_lpmonitoring\api::add_rating_task($this->templateincategory->get('id'), $forcerating, $data);
+        $taskexist = \report_lpmonitoring\api::rating_task_exist($this->templateincategory->get('id'));
+        $this->assertTrue($taskexist);
+        $tasks = \core\task\manager::get_adhoc_tasks('report_lpmonitoring\task\rate_users_in_templates');
+        $task = reset($tasks);
+        $cmdata = $task->get_custom_data();
+        $this->assertEquals($this->templateincategory->get('id'), $cmdata->cms->templateid);
+        $this->assertEquals($forcerating, $cmdata->cms->forcerating);
+        $datascales = $cmdata->cms->scalevalues;
+        $this->assertCount(2, $datascales);
+        $this->assertEquals($this->comp1->get('id'), $datascales[0]->compid);
+        $this->assertEquals(1, $datascales[0]->value);
+        $this->assertEquals($this->comp2->get('id'), $datascales[1]->compid);
+        $this->assertEquals(2, $datascales[1]->value);
+        // Test if save the same course module ratings.
+        try {
+            \report_lpmonitoring\api::add_rating_task($this->templateincategory->get('id'), $forcerating, $data);
+            $this->fail('Must fail scales values ratings for template already exist.');
+        } catch (\Exception $ex) {
+            $this->assertContains(get_string('taskratingrunning', 'report_lpmonitoring'), $ex->getMessage());
+        }
+        // Remove scheduled task.
+        $this->setAdminUser();
+        $tasks = \core\task\manager::get_adhoc_tasks('report_lpmonitoring\task\rate_users_in_templates');
+        $task = reset($tasks);
+        $DB->delete_records('task_adhoc', array('id' => $task->get_id()));
+        $taskexist = \report_lpmonitoring\api::rating_task_exist($this->templateincategory->get('id'));
+        $this->assertFalse($taskexist);
+
+        $this->setUser($this->appreciatorforcategory);
+        $data = [['compid' => $this->comp1->get('id'), 'value' => 2]];
+        $forcerating = true;
+        \report_lpmonitoring\api::add_rating_task($this->templateincategory->get('id'), $forcerating, $data);
+        $taskexist = \report_lpmonitoring\api::rating_task_exist($this->templateincategory->get('id'));
+        $this->assertTrue($taskexist);
+        $tasks = \core\task\manager::get_adhoc_tasks('report_lpmonitoring\task\rate_users_in_templates');
+        $task = reset($tasks);
+        $cmdata = $task->get_custom_data();
+        $this->assertEquals($this->templateincategory->get('id'), $cmdata->cms->templateid);
+        $this->assertEquals($forcerating, $cmdata->cms->forcerating);
+        $datascales = $cmdata->cms->scalevalues;
+        $this->assertCount(1, $datascales);
+        $this->assertEquals($this->comp1->get('id'), $datascales[0]->compid);
+        $this->assertEquals(2, $datascales[0]->value);
     }
 }

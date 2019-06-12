@@ -1242,6 +1242,47 @@ class api {
      * @return boolean return true if task exist
      */
     public static function rating_task_exist($templateid) {
-        return false;
+        $exist = false;
+        $tasks = \core\task\manager::get_adhoc_tasks('report_lpmonitoring\task\rate_users_in_templates');
+        foreach ($tasks as $task) {
+            $cmdata = $task->get_custom_data();
+            if ($cmdata->cms && $cmdata->cms->templateid == $templateid) {
+                $exist = true;
+                break;
+            }
+        }
+        return $exist;
+    }
+
+    /**
+     * Add rating task.
+     *
+     * @param int $templateid The learning plan template id
+     * @param boolean $forcerating Force rating
+     * @param string $scalesvalues json scale values
+     */
+    public static function add_rating_task($templateid, $forcerating, $scalesvalues) {
+        global $USER;
+        // Check if user can read template.
+        \core_competency\api::read_template($templateid);
+        // Check if there is current task for this learning plan template.
+        if (self::rating_task_exist($templateid)) {
+            throw new \moodle_exception('taskratingrunning', 'report_cmcompetency');
+        }
+
+        // Build custom data for adhoc task.
+        $customdata = [];
+        $customdata['templateid'] = $templateid;
+        $customdata['forcerating'] = $forcerating ? 1 : 0;
+        $customdata['scalevalues'] = $scalesvalues;
+
+        $task = new \report_lpmonitoring\task\rate_users_in_templates();
+        $task->set_custom_data(array(
+            'cms' => $customdata,
+        ));
+        $task->set_userid($USER->id);
+
+        // Queue the task for the next run.
+        \core\task\manager::queue_adhoc_task($task);
     }
 }
