@@ -296,7 +296,7 @@ define(['jquery', 'core/str', 'core/config', 'core/notification', 'report_lpmoni
                         // Because this approach is destroying and recreating the paging
                         // elements, focus is lost on the select button which is bad for
                         // accessibility. So we want to restore focus once the draw has
-                        // completed
+                        // completed.
                         activeEl = $(host).find(document.activeElement).data('dt-idx');
                     }
                     catch (e) {

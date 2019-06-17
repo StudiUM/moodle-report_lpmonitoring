@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Report competency mojitoring event handler definition.
+ * Report competency monitoring event handler definition.
  *
  * @package report_lpmonitoring
  * @category event
@@ -23,6 +23,7 @@
  * @copyright  2016 Université de Montréal
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 // List of observers.
 $observers = array(

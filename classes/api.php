@@ -61,7 +61,7 @@ use moodle_exception;
 class api {
 
     /** @var boolean iscmcompetencygradingenabled  **/
-    static $iscmcompetencygradingenabled = true;
+    static protected $iscmcompetencygradingenabled = true;
 
     /**
      * Get scales from frameworkid.
