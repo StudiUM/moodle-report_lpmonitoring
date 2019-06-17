@@ -203,6 +203,15 @@ $functions = array(
         'type'         => 'write',
         'capabilities' => 'moodle/competency:templateview',
         'ajax'         => true,
-    )
+    ),
+    'report_lpmonitoring_reset_grading' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'reset_grading',
+        'classpath'    => '',
+        'description'  => 'Reset the grade for one or all competencies of a learning plan',
+        'type'         => 'write',
+        'capabilities' => 'moodle/competency:competencygrade',
+        'ajax'         => true
+    ),
 );
 

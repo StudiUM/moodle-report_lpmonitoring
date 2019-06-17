@@ -28,6 +28,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
+use core_competency\api as core_competency_api;
 use core_competency\plan;
 use core_competency\user_competency;
 use report_lpmonitoring\api;
@@ -511,6 +512,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotrated']);
+        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesrated']);
         $this->assertEquals('Sharon Austin', $result['fullnavigation'][0]['fullname']);
         $this->assertFalse($result['fullnavigation'][0]['current']);
         $this->assertEquals('Jonathan Cortez', $result['fullnavigation'][1]['fullname']);
@@ -540,6 +542,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotproficient']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotrated']);
+        $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesrated']);
         $this->assertFalse($result['fullnavigation'][0]['current']);
         $this->assertEquals('Jonathan Cortez', $result['fullnavigation'][1]['fullname']);
         $this->assertFalse($result['fullnavigation'][1]['current']);
@@ -575,6 +578,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotproficient']);
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesproficient']);
         $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesnotrated']);
+        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesrated']);
         // Reset display rating of plan to be identical to template.
         $this->setAdminUser();
         \tool_lp\external::reset_display_rating_for_plan($plan2->get('id'));
@@ -585,6 +589,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotrated']);
+        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesrated']);
         // Template off , plan on.
         $this->setAdminUser();
         \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 0);
@@ -596,6 +601,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
         $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotrated']);
+        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesrated']);
         // Reset display rating of plan to be identical to template.
         $this->setAdminUser();
         \tool_lp\external::reset_display_rating_for_plan($plan2->get('id'));
@@ -606,6 +612,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotproficient']);
         $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesproficient']);
         $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesnotrated']);
+        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesrated']);
     }
 
     /**
@@ -2039,45 +2046,55 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEquals('#AAAAAA', $competency['evaluationslist'][0]['color']);
                     $this->assertEquals('A', $competency['evaluationslist'][0]['name']);
+                    $this->assertFalse($competency['evaluationslist'][0]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][1]['color']);
-                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][1]['name']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                    $this->assertTrue($competency['evaluationslist'][1]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][2]['color']);
                     $this->assertEmpty($competency['evaluationslist'][2]['name']);
+                    $this->assertFalse($competency['evaluationslist'][2]['isnotrated']);
 
                     $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][3]['color']);
-                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][3]['name']);
+                    $this->assertEmpty($competency['evaluationslist'][3]['name']);
+                    $this->assertTrue($competency['evaluationslist'][3]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
                     $this->assertEquals('#CCCCCC', $competency['evaluationslist'][4]['color']);
                     $this->assertEquals('C', $competency['evaluationslist'][4]['name']);
+                    $this->assertFalse($competency['evaluationslist'][4]['isnotrated']);
                 } else if ($competency['competency']['id'] == $c1c->get('id')) {
                     $this->assertEquals(0, $competency['competencydetail']['nbevidence']);
                     $this->assertCount(5, $competency['evaluationslist']);
 
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][0]['color']);
-                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][0]['name']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['name']);
+                    $this->assertTrue($competency['evaluationslist'][0]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEquals('#CCCCCC', $competency['evaluationslist'][1]['color']);
                     $this->assertEquals('C', $competency['evaluationslist'][1]['name']);
+                    $this->assertFalse($competency['evaluationslist'][1]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
                     $this->assertEquals('#BBBBBB', $competency['evaluationslist'][2]['color']);
                     $this->assertEquals('B', $competency['evaluationslist'][2]['name']);
+                    $this->assertFalse($competency['evaluationslist'][2]['isnotrated']);
 
                     $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
                     $this->assertEquals('#AAAAAA', $competency['evaluationslist'][3]['color']);
                     $this->assertEquals('A', $competency['evaluationslist'][3]['name']);
+                    $this->assertFalse($competency['evaluationslist'][3]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][4]['color']);
                     $this->assertEmpty($competency['evaluationslist'][4]['name']);
+                    $this->assertFalse($competency['evaluationslist'][4]['isnotrated']);
                 } else if ($competency['competency']['id'] == $c2b->get('id')) {
                     $this->assertEquals(2, $competency['competencydetail']['nbevidence']);
                     $this->assertCount(5, $competency['evaluationslist']);
@@ -2085,22 +2102,27 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEquals('#00FFFF', $competency['evaluationslist'][0]['color']);
                     $this->assertEquals('Bad', $competency['evaluationslist'][0]['name']);
+                    $this->assertFalse($competency['evaluationslist'][0]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][1]['color']);
                     $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                    $this->assertFalse($competency['evaluationslist'][1]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][2]['color']);
                     $this->assertEmpty($competency['evaluationslist'][2]['name']);
+                    $this->assertFalse($competency['evaluationslist'][2]['isnotrated']);
 
                     $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][3]['color']);
                     $this->assertEmpty($competency['evaluationslist'][3]['name']);
+                    $this->assertFalse($competency['evaluationslist'][3]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][4]['color']);
                     $this->assertEmpty($competency['evaluationslist'][4]['name']);
+                    $this->assertFalse($competency['evaluationslist'][4]['isnotrated']);
                 } else {
                     // Competency $c2c.
                     $this->assertEquals($c2c->get('id'), $competency['competency']['id']);
@@ -2110,22 +2132,27 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][0]['color']);
                     $this->assertEmpty($competency['evaluationslist'][0]['name']);
+                    $this->assertFalse($competency['evaluationslist'][0]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][1]['color']);
                     $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                    $this->assertFalse($competency['evaluationslist'][1]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][2]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][2]['color']);
                     $this->assertEmpty($competency['evaluationslist'][2]['name']);
+                    $this->assertFalse($competency['evaluationslist'][2]['isnotrated']);
 
                     $this->assertTrue($competency['evaluationslist'][3]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][3]['color']);
                     $this->assertEmpty($competency['evaluationslist'][3]['name']);
+                    $this->assertFalse($competency['evaluationslist'][3]['isnotrated']);
 
                     $this->assertFalse($competency['evaluationslist'][4]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][4]['color']);
                     $this->assertEmpty($competency['evaluationslist'][4]['name']);
+                    $this->assertFalse($competency['evaluationslist'][4]['isnotrated']);
                 }
             } else {
                 // Only courses, no modules.
@@ -2136,21 +2163,25 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEquals('#AAAAAA', $competency['evaluationslist'][0]['color']);
                     $this->assertEquals('A', $competency['evaluationslist'][0]['name']);
+                    $this->assertFalse($competency['evaluationslist'][0]['isnotrated']);
 
                     $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][1]['color']);
-                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][1]['name']);
+                    $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                    $this->assertTrue($competency['evaluationslist'][1]['isnotrated']);
                 } else if ($competency['competency']['id'] == $c1c->get('id')) {
                     $this->assertEquals(0, $competency['competencydetail']['nbevidence']);
                     $this->assertCount(2, $competency['evaluationslist']);
 
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][0]['color']);
-                    $this->assertEquals(get_string('notrated', 'report_lpmonitoring'), $competency['evaluationslist'][0]['name']);
+                    $this->assertEmpty($competency['evaluationslist'][0]['name']);
+                    $this->assertTrue($competency['evaluationslist'][0]['isnotrated']);
 
                     $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEquals('#AAAAAA', $competency['evaluationslist'][1]['color']);
                     $this->assertEquals('A', $competency['evaluationslist'][1]['name']);
+                    $this->assertFalse($competency['evaluationslist'][1]['isnotrated']);
                 } else if ($competency['competency']['id'] == $c2b->get('id')) {
                     $this->assertEquals(2, $competency['competencydetail']['nbevidence']);
                     $this->assertCount(2, $competency['evaluationslist']);
@@ -2158,10 +2189,12 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEquals('#00FFFF', $competency['evaluationslist'][0]['color']);
                     $this->assertEquals('Bad', $competency['evaluationslist'][0]['name']);
+                    $this->assertFalse($competency['evaluationslist'][0]['isnotrated']);
 
                     $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][1]['color']);
                     $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                    $this->assertFalse($competency['evaluationslist'][1]['isnotrated']);
                 } else {
                     // Competency $c2c.
                     $this->assertEquals($c2c->get('id'), $competency['competency']['id']);
@@ -2171,12 +2204,70 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
                     $this->assertTrue($competency['evaluationslist'][0]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][0]['color']);
                     $this->assertEmpty($competency['evaluationslist'][0]['name']);
+                    $this->assertFalse($competency['evaluationslist'][0]['isnotrated']);
 
                     $this->assertTrue($competency['evaluationslist'][1]['iscourse']);
                     $this->assertEmpty($competency['evaluationslist'][1]['color']);
                     $this->assertEmpty($competency['evaluationslist'][1]['name']);
+                    $this->assertFalse($competency['evaluationslist'][1]['isnotrated']);
                 }
             }
         }
+    }
+
+    /**
+     * Test reset grading of all user competencies in a learning plan.
+     */
+    public function test_reset_grading_one() {
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $cpg = $dg->get_plugin_generator('core_competency');
+
+        $user = $dg->create_user();
+        $framework = $cpg->create_framework();
+        $comp1 = $cpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $comp2 = $cpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $plan = $cpg->create_plan(array('userid' => $user->id, 'status' => plan::STATUS_ACTIVE));
+        $cpg->create_plan_competency(array('planid' => $plan->get('id'), 'competencyid' => $comp1->get('id')));
+        $cpg->create_plan_competency(array('planid' => $plan->get('id'), 'competencyid' => $comp2->get('id')));
+
+        core_competency_api::grade_competency_in_plan($plan, $comp1->get('id'), 1);
+        core_competency_api::grade_competency_in_plan($plan, $comp2->get('id'), 2);
+
+        $result = external::reset_grading($plan->get('id'), 'This user quitted the university.', $comp1->get('id'));
+
+        // Check grade values.
+        $compdetail = api::get_competency_detail($user->id, $comp1->get('id'), $plan->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
+        $compdetail = api::get_competency_detail($user->id, $comp2->get('id'), $plan->get('id'));
+        $this->assertEquals(2, $compdetail->usercompetency->get('grade'));
+    }
+
+    /**
+     * Test reset grading of a single user competency.
+     */
+    public function test_reset_grading_all() {
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $cpg = $dg->get_plugin_generator('core_competency');
+
+        $user = $dg->create_user();
+        $framework = $cpg->create_framework();
+        $comp1 = $cpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $comp2 = $cpg->create_competency(array('competencyframeworkid' => $framework->get('id')));
+        $plan = $cpg->create_plan(array('userid' => $user->id, 'status' => plan::STATUS_ACTIVE));
+        $cpg->create_plan_competency(array('planid' => $plan->get('id'), 'competencyid' => $comp1->get('id')));
+        $cpg->create_plan_competency(array('planid' => $plan->get('id'), 'competencyid' => $comp2->get('id')));
+
+        core_competency_api::grade_competency_in_plan($plan, $comp1->get('id'), 1);
+        core_competency_api::grade_competency_in_plan($plan, $comp2->get('id'), 2);
+
+        $result = external::reset_grading($plan->get('id'), 'This user quitted the university.', null);
+
+        // Check grade values.
+        $compdetail = api::get_competency_detail($user->id, $comp1->get('id'), $plan->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
+        $compdetail = api::get_competency_detail($user->id, $comp2->get('id'), $plan->get('id'));
+        $this->assertNull($compdetail->usercompetency->get('grade'));
     }
 }

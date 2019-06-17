@@ -33,9 +33,10 @@ define(['jquery',
     'tool_lp/grade_user_competency_inline',
     'report_lpmonitoring/fieldsettoggler',
     'report_lpmonitoring/colorcontrast',
-    'report_lpmonitoring/paginated_datatable'],
+    'report_lpmonitoring/paginated_datatable',
+    'report_lpmonitoring/resetgrade_dialogue'],
     function($, templates, ajax, notification, str, Chart, autocomplete, Dialogue, Popup, InlineGrader, fieldsettoggler,
-            colorcontrast, DataTable) {
+            colorcontrast, DataTable, ResetGradeDialogue) {
 
         /**
          * Learning plan report.
@@ -691,6 +692,7 @@ define(['jquery',
                     // Locally store competency information.
                     self.competencies[context.competencyid].competencydetail = context;
                     context.plan = plan;
+                    context.plan.userid = plan.user.id;
                     context.cmcompgradingenabled = self.cmcompgradingEnabled;
                     templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
                         var compid = context.competencyid;
@@ -1343,6 +1345,48 @@ define(['jquery',
         };
 
         /**
+         * Reset grade for one competency.
+         *
+         * @name   resetGrade
+         * @param  {Number} planid
+         * @param  {Number} userid
+         * @param  {Number} competencyid or null for all competencies of this plan
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.resetGrade = function(planid, userid, competencyid) {
+            var self = this;
+            var allcompetencies = false;
+            if (competencyid === null) {
+                allcompetencies = true;
+            }
+            var dialogue = new ResetGradeDialogue(allcompetencies);
+            dialogue.on('rated', function(e, data) {
+                var promise = ajax.call([{
+                    methodname: 'report_lpmonitoring_reset_grading',
+                    args: {
+                        planid: planid,
+                        competencyid: competencyid,
+                        note: data.note
+                    }
+                }]);
+
+                promise[0].then(function() {
+                    if (competencyid === null) {
+                        self.displayPlan(planid, self.templateId, self.tagId);
+                    } else {
+                        self.reloadCompetencyDetail(competencyid, userid, planid);
+                    }
+                }).fail(
+                    function(exp) {
+                        notification.exception(exp);
+                    }
+                );
+            });
+            dialogue.display();
+        };
+
+        /**
          * Init the differents page blocks and inputs form.
          *
          * @name   initPage
@@ -1544,6 +1588,23 @@ define(['jquery',
                 event.preventDefault();
                 var planid = $(this).data('canresetdisplayrating-plan');
                 self.resetDisplayRating(planid);
+            });
+
+            // Handle click on reset one competency.
+            $(".competencyreport").on('click', '.reset-grade a', function(event) {
+                event.preventDefault();
+                var planid = $(this).data('resetgrade-plan');
+                var competencyid = $(this).data('competencyid');
+                var userid = $(this).data('userid');
+                self.resetGrade(planid, userid, competencyid);
+            });
+
+            // Handle click on reset all competencies.
+            $(".competencyreport").on('click', '.reset-grade-all a', function(event) {
+                event.preventDefault();
+                var planid = $(this).data('resetgrade-plan');
+                var userid = $(this).data('userid');
+                self.resetGrade(planid, userid, null);
             });
 
             // Collapse/Expand all.

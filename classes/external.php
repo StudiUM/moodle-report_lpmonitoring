@@ -1437,4 +1437,64 @@ class external extends external_api {
     public static function add_rating_task_returns() {
         return new external_value(PARAM_BOOL, 'True if adding was successful');
     }
+
+    /**
+     * Returns description of reset_grading() parameter
+     *
+     * @return \external_function_parameters
+     */
+    public static function reset_grading_parameters() {
+        $planid = new external_value(
+            PARAM_INT,
+            'Plan ID',
+            VALUE_REQUIRED
+        );
+        $note = new external_value(
+            PARAM_NOTAGS,
+            'A note to attach to the evidence',
+            VALUE_DEFAULT
+        );
+        $competencyid = new external_value(
+            PARAM_INT,
+            'Competency ID (or null for all competencies)',
+            VALUE_REQUIRED
+        );
+
+        $params = array(
+            'planid' => $planid,
+            'note' => $note,
+            'competencyid' => $competencyid,
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Reset the grading of users competencies (one particular competency or all competencies of a plan).
+     *
+     * @param int $planid The learning plan ID.
+     * @param string $note A note to attach to the evidence
+     * @param int $competencyid The competency id (or null for all competencies of this plan).
+     * @return bool
+     */
+    public static function reset_grading($planid, $note, $competencyid) {
+        $params = self::validate_parameters(self::reset_grading_parameters(), array(
+            'planid' => $planid,
+            'note' => $note,
+            'competencyid' => $competencyid
+        ));
+
+        api::reset_grading($params['planid'], $params['note'], $params['competencyid']);
+
+        return true;
+    }
+
+    /**
+     * Returns description of reset_grading() result value.
+     *
+     * @return \external_value
+     */
+    public static function reset_grading_returns() {
+        return new external_value(PARAM_BOOL, 'True if grade(s) was resetted');
+    }
+
 }

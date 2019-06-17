@@ -54,6 +54,9 @@ class stats_plan_exporter extends exporter {
             'nbcompetenciestotal' => array(
                 'type' => PARAM_INT
             ),
+            'nbcompetenciesrated' => array(
+                'type' => PARAM_INT
+            ),
             'nbtags' => array(
                 'type' => PARAM_INT
             ),
@@ -77,6 +80,7 @@ class stats_plan_exporter extends exporter {
         $nbcompetenciesnotproficient = 0;
         $nbcompetenciesproficient = 0;
         $nbcompetenciesnotrated = 0;
+        $nbcompetenciesrated = 0;
         $shoulddisplay = \tool_lp\api::has_to_display_rating($this->related['plan']);
         if ($shoulddisplay) {
             foreach ($usercompetencies as $r) {
@@ -100,6 +104,7 @@ class stats_plan_exporter extends exporter {
         $result->nbcompetenciesnotproficient = $nbcompetenciesnotproficient;
         $result->nbcompetenciesproficient = $nbcompetenciesproficient;
         $result->nbcompetenciesnotrated = $nbcompetenciesnotrated;
+        $result->nbcompetenciesrated = $nbcompetenciestotal - $nbcompetenciesnotrated;
         $result->nbtags = count(core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $planid));
 
         $commentareaexporter = new comment_area_exporter($this->related['plan']->get_comment_object());

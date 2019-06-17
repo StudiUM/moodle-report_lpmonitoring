@@ -443,7 +443,7 @@
   background: #1453c7;
 }
 .competencyreport .tile-stats {
-    min-height: 95px;
+    min-height: 125px;
     position: relative;
     display: block;
     overflow: hidden;
@@ -468,6 +468,11 @@
     font-size: 38px;
     font-weight: bold;
     line-height: 1.65857;
+}
+.competencyreport .tile-stats .reset-grade {
+    position: absolute;
+    top: 100px;
+    right: 10px;
 }
 .competencyreport .tile-stats .count,
 .competencyreport .tile-stats h4,
@@ -819,11 +824,11 @@
 .competencyreport .plan-info-report .report-stats-competencies .stats-cmp-proficient {
     font-size: 12px;
 }
-.competencyreport .plan-info-report .report-stats-competencies .stats-display-rating{
+.competencyreport .plan-info-report .report-stats-competencies .stats-display-rating {
     position: relative;
     font-size: 12px;
 }
-.competencyreport .plan-info-report .report-stats-competencies .stats-display-rating .resetdisplayrating{
+.competencyreport .plan-info-report .report-stats-competencies .stats-display-rating .resetdisplayrating {
     position: absolute;
     top: -56px;
     left: 23px;
@@ -838,6 +843,12 @@
 }
 .competencyreport .plan-info-report .report-stats-competencies .empty-value {
     color: #cfd1d5;
+}
+.competencyreport .reset-grade a, .competencyreport .reset-grade-all a {
+    font-size: 12px;
+}
+.competencyreport .reset-grade-all {
+    text-align: right;
 }
 .competencyreport .collapsible-actions {
     text-align: right;
@@ -1208,7 +1219,7 @@
 .competencyreport:not(.boost) .row {
     margin-left: 0;
 }
-.button-dispayratinghelp {
+.button-dispayratinghelp, .button-resethelp {
     background: transparent;
     background-color: transparent;
     border: none;

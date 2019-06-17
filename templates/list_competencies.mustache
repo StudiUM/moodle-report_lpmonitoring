@@ -38,12 +38,27 @@
             * nbcompetenciesproficient
             * nbcompetenciesnotproficient
             * nbcompetenciesnotrated
+            * nbcompetenciesrated
 }}
 {{#hascompetencies}}
 <div class="borderbottom">
     <div id ="plan-stats-report" class="plan-info-report">
         {{ > report_lpmonitoring/plan_stats_report }}
     </div>
+    {{#plan.cangrade}}
+        {{#plan.stats.nbcompetenciesrated}}
+            <div class="reset-grade-all">
+                <a href="#" title="{{#str}}resetallratings_help, report_lpmonitoring{{/str}}" data-resetgrade-plan="{{plan.id}}" data-userid="{{plan.user.id}}">{{#str}}resetallratings, report_lpmonitoring{{/str}}</a>
+                <button class="fa fa-question-circle text-info fa-fw button-resethelp"
+                        data-container="body"
+                        data-trigger="focus"
+                        data-toggle="popover"
+                        data-placement="left"
+                        data-content="{{#str}}resetallratings_help, report_lpmonitoring{{/str}}">
+                </button>
+            </div>
+        {{/plan.stats.nbcompetenciesrated}}
+    {{/plan.cangrade}}
     <div class="collapsible-actions">
         <a role="button" href="#" class="collapseexpand expand-all" title="{{#str}}clicktohideshow{{/str}}">{{#str}}expandall{{/str}}</a>
     </div>

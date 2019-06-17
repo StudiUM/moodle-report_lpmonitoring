@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 use core_competency\plan;
-use report_lpmonitoring\api;
+use report_lpmonitoring\api as nontestable_api;
 use core_competency\api as core_competency_api;
 use tool_cohortroles\api as tool_cohortroles_api;
 use report_lpmonitoring\report_competency_config;
@@ -457,7 +457,7 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertCount(0, $users);
 
         // Test search_users_by_templateid when grading competency in course module is disabled.
-        api::$iscmcompetencygradingenabled = false;
+        api::set_is_cm_comptency_grading_enabled(false);
         try {
             api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'coursemodule', 'DESC');
             $this->fail('Must fail because grading competency in course module is disabled');
@@ -465,7 +465,7 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
             $this->assertContains('Grading competency in course module is disabled', $ex->getMessage());
         }
         // Enable grading competency in course module.
-        api::$iscmcompetencygradingenabled = true;
+        api::set_is_cm_comptency_grading_enabled(true);
     }
 
     /**
@@ -632,7 +632,7 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertCount(0, $result->cms[2]->cmevidences);
 
         // Test get_competency_detail when grading competency in course module is disabled.
-        api::$iscmcompetencygradingenabled = false;
+        api::set_is_cm_comptency_grading_enabled(false);
 
         // Test for user2 for comp1.
         $result = api::get_competency_detail($this->user2->id, $this->comp1->get('id'), $planuser2->get('id'));
@@ -641,7 +641,7 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $result = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $planuser1->get('id'));
         $this->assertCount(0, $result->cms);
         // Enable grading competency in course module.
-        api::$iscmcompetencygradingenabled = true;
+        api::set_is_cm_comptency_grading_enabled(true);
 
     }
 
@@ -750,5 +750,23 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
                 }
             }
         }
+    }
+}
+
+
+/**
+ * Test subclass that makes some variables or methods we want to test public.
+ *
+ * @package    report_lpmonitoring
+ * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
+ * @copyright  2019 Université de Montréal
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class api extends nontestable_api {
+    /**
+     * Change value for the iscmcompetencygradingenabled variable.
+     */
+    public static function set_is_cm_comptency_grading_enabled($value) {
+        self::$iscmcompetencygradingenabled = $value;
     }
 }

@@ -176,24 +176,35 @@
         <h5 class="count_top"><i class="fa fa-gavel"></i> {{#str}}finalrating, report_lpmonitoring{{/str}}</h5>
         <div class="tile-stats">
             {{#isnotrated}}
-            <div class="count pull-right level-proficiency">{{#str}}notrated, report_lpmonitoring{{/str}}</div>	
-            <div class="icon icon-proficiency"><i class="fa fa-question-circle"></i> </div>
+                <div class="count pull-right level-proficiency">{{#str}}notrated, report_lpmonitoring{{/str}}</div>
+                <div class="icon icon-proficiency"><i class="fa fa-question-circle"></i> </div>
             {{/isnotrated}}
             {{#isnotproficient}}
-            <div class="count pull-right level-proficiency">{{#str}}notproficient, report_lpmonitoring{{/str}}</div>	
-            <div class="icon icon-proficiency"><i class="fa fa-times fail"></i> </div>
+                <div class="count pull-right level-proficiency">{{#str}}notproficient, report_lpmonitoring{{/str}}</div>
+                <div class="icon icon-proficiency"><i class="fa fa-times fail"></i> </div>
             {{/isnotproficient}}
             {{#isproficient}}
-            <div class="count pull-right level-proficiency">{{#str}}proficient, report_lpmonitoring{{/str}}</div>	
-            <div class="icon icon-proficiency"><i class="fa fa-check green"></i> </div>
+                <div class="count pull-right level-proficiency">{{#str}}proficient, report_lpmonitoring{{/str}}</div>
+                <div class="icon icon-proficiency"><i class="fa fa-check green"></i> </div>
             {{/isproficient}}
-
             <div class="count">
                 {{^isnotrated}}
                 <span class="label cr-scalename truncate" style="background-color: {{finalgradecolor}}">{{finalgradename}}</span>
                 {{/isnotrated}}
             </div>
             {{#cangrade}}
+                {{^isnotrated}}
+                    <div class="reset-grade">
+                        <a href="#" title="{{#str}}resetonecompetency, report_lpmonitoring{{/str}}" data-resetgrade-plan="{{plan.id}}" data-competencyid="{{competencyid}}" data-userid="{{plan.userid}}">{{#str}}reset, core{{/str}}</a>
+                        <button class="fa fa-question-circle text-info fa-fw button-resethelp"
+                                data-container="body"
+                                data-trigger="focus"
+                                data-toggle="popover"
+                                data-placement="left"
+                                data-content="{{#str}}resetonecompetency, report_lpmonitoring{{/str}}">
+                        </button>
+                    </div>
+                {{/isnotrated}}
                 <button {{#plan.iscompleted}} disabled {{/plan.iscompleted}} class="btn btn-primary rate-competency" id="rate_{{competencyid}}">{{#str}}rate, tool_lp{{/str}}</button>
             {{/cangrade}}
 
