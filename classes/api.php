@@ -1285,4 +1285,31 @@ class api {
         // Queue the task for the next run.
         \core\task\manager::queue_adhoc_task($task);
     }
+
+    /**
+     * Rate users in competencies template with default scales values.
+     *
+     * @param array $compdata Competencies with scales values associated.
+     */
+    public static function rate_users_in_template_with_defaultvalues($compdata) {
+        if (isset($compdata->cms) && $compdata->cms->templateid) {
+            try {
+                $templateid = $compdata->cms->templateid;
+                \core_competency\api::read_template($templateid);
+                $plans = \core_competency\api::list_plans_for_template($templateid);
+                $forcerating = $compdata->cms->forcerating;
+                foreach ($plans as $plan) {
+                    foreach ($compdata->cms->scalevalues as $data) {
+                        $competency = \core_competency\template_competency::get_competency($templateid, $data->compid);
+                        $ucc = \core_competency\api::get_user_competency($plan->get('userid'), $competency->get('id'));
+                        if ($ucc->get('grade') === null || $forcerating) {
+                            \core_competency\api::grade_competency_in_plan($plan, $competency->get('id'), $data->value);
+                        }
+                    }
+                }
+            } catch (\Exception $ex) {
+                mtrace($ex->getMessage());
+            }
+        }
+    }
 }

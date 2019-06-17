@@ -32,6 +32,10 @@ define(['jquery',
          */
         var BulkRating = function(templateid) {
             this.templateid = templateid;
+            // Clear form inputs.
+            $(document).ready(function() {
+                $('#savescalesvalues').trigger('reset');
+            });
             $(document).on('submit', '#savescalesvalues', this.saveHandler.bind(this));
             $(document).on('change', '.donotapplybulk input[type=checkbox]', function() {
                 var compid = $(this).data('compid');

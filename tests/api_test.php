@@ -2571,7 +2571,6 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
     /*
      * Test add_rating_task.
-     * @group addtask
      */
     public function test_add_rating_task() {
         global $DB;

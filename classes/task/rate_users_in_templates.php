@@ -49,6 +49,6 @@ class rate_users_in_templates extends \core\task\adhoc_task {
         cron_setup_user($user);
 
         // Rate users in template.
-        // TODO EVOSTDM-1765.
+        api::rate_users_in_template_with_defaultvalues($this->get_custom_data());
     }
 }
