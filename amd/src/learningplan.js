@@ -59,6 +59,7 @@ define(['jquery',
             popup._refresh = function() {
                 var self = this;
                 learningplan.reloadCompetencyDetail(self._competencyId, self._userId, self._planId);
+                self.close();
             };
 
             $(this.templateSelector).on('change', this.templateChangeHandler.bind(this)).change();
@@ -774,6 +775,7 @@ define(['jquery',
                         popup._refresh = function() {
                             var self = this;
                             learningplan.reloadCompetencyDetail(self._competencyId, self._userId, self._planId);
+                            self.close();
                         };
                     });
                 } else {

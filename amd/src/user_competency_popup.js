@@ -93,9 +93,27 @@ define(['jquery',
             // We have to display user info in popup.
             templates.render('tool_lp/user_competency_summary_in_plan', context).done(function(html, js) {
                 str.get_string('usercompetencysummary', 'report_competency').done(function(title) {
-                    (new Dialogue(title, html, templates.runTemplateJS.bind(templates, js), self._refresh.bind(self), true));
+                    self.popup = new Dialogue(title, html, templates.runTemplateJS.bind(templates, js),
+                        self._refresh.bind(self), true);
                 }).fail(notification.exception);
             }).fail(notification.exception);
+        };
+
+        /**
+         * @var {Dialogue} popup  The popup window (Dialogue).
+         * @private
+         */
+        UserCompetencyPopup.prototype.popup = null;
+
+        /**
+         * Destroy DOM after close.
+         *
+         * @param Dialogue
+         * @function
+         */
+        UserCompetencyPopup.prototype.close = function() {
+            this.popup.close();
+            this.popup = null;
         };
 
         /**
