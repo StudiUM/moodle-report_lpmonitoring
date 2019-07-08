@@ -1241,6 +1241,7 @@ define(['jquery',
             }]);
             promise[0].then(function(results) {
                 results.templateid = parseInt(templateid);
+                M.cfg.contextid = results.plan.usercontext;
                 if (results.hasnavigation === false) {
                     $('.plan-info-container').addClass('nonavigation');
                 } else {

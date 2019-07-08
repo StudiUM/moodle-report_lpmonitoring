@@ -106,14 +106,14 @@ Feature: Display learning plan ratings details
     And I click on "rate-competency" of the competency "Competency A"
     And "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "not good"
-    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "0/1" in the ".proficient-stats" "css_element"
     And I should see "1" in the ".notproficient-stats" "css_element"
     And I should see "0" in the ".notrated-stats" "css_element"
     And I click on "rate-competency" of the competency "Competency A"
     And "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "good"
-    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "1/1" in the ".proficient-stats" "css_element"
     And I should see "0" in the ".notproficient-stats" "css_element"
     And I should see "0" in the ".notrated-stats" "css_element"
@@ -301,7 +301,7 @@ Feature: Display learning plan ratings details
     When I click on "rate-competency" of the competency "Competency B"
     Then "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "not qualified"
-    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "Not proficient" in "level-proficiency" of the competency "Competency B"
     And I should see "not qualified" in "finalrate" of the competency "Competency B"
     And I toggle the "Competency B" detail
@@ -319,7 +319,7 @@ Feature: Display learning plan ratings details
     And I click on "//dd/button[contains(., 'Rate')]" "xpath_element"
     And "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "good"
-    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     And I click on "Close" "button" in the "User competency summary" "dialogue"
     And I should see "Proficient" in "level" of the competency "Competency A"
     And I toggle the "Competency A" detail

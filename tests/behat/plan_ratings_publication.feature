@@ -29,7 +29,7 @@ Feature: Manage publication of ratings in learning plans
     And I toggle the "Competency B" detail
     And I click on "rate-competency" of the competency "Competency B"
     And I set the field with xpath "//select[@name='rating']" to "not qualified"
-    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "Not proficient" in "level-proficiency" of the competency "Competency B"
     And I should see "not qualified" in "finalrate" of the competency "Competency B"
     # Login as student
@@ -104,7 +104,7 @@ Feature: Manage publication of ratings in learning plans
     And I toggle the "Competency B" detail
     And I click on "rate-competency" of the competency "Competency B"
     And I set the field with xpath "//select[@name='rating']" to "not qualified"
-    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "Not proficient" in "level-proficiency" of the competency "Competency B"
     And I should see "not qualified" in "finalrate" of the competency "Competency B"
     And I should see "No" in the ".displayratings" "css_element"
@@ -150,7 +150,7 @@ Feature: Manage publication of ratings in learning plans
     And I toggle the "Competency B" detail
     And I click on "rate-competency" of the competency "Competency B"
     And I set the field with xpath "//select[@name='rating']" to "not qualified"
-    And I click on "//button[contains(@data-action, 'rate')]" "xpath_element"
+    And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "Not proficient" in "level-proficiency" of the competency "Competency B"
     And I should see "not qualified" in "finalrate" of the competency "Competency B"
     And I click on ".switcher-container .slider" "css_element"
