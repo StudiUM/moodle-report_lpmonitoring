@@ -30,7 +30,7 @@ Feature: Display learning plan template statistics
     And "Robert Smith" row "Rated" column of "totallistusers" table should contain "Yes"
     And "William Presley" row "Rated" column of "totallistusers" table should contain "Yes"
     And "Frederic Simson" row "Rated" column of "totallistusers" table should contain "Yes"
-    And I set the field "Search" to "William"
+    And I set the field with xpath "//div[@class='lpmonitoringdialogue']//input[@type='search']" to "William"
     And I should see "William Presley" in the "User list" "dialogue"
     And I should not see "Robert Smith" in the "User list" "dialogue"
     And I should not see "Frederic Simson" in the "User list" "dialogue"
