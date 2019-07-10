@@ -631,6 +631,23 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertCount(0, $result->cms[1]->cmevidences);
         $this->assertCount(0, $result->cms[2]->cmevidences);
 
+        // Test when unenrol user1 from course1.
+        $plugin = enrol_get_plugin('manual');
+        $enrolinstances = enrol_get_instances($course1->id, true);
+        $enrolinstance = array_shift($enrolinstances);
+        $plugin->unenrol_user($enrolinstance, $this->user1->id);
+        $result = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $planuser1->get('id'));
+        $this->assertCount(2, $result->cms);
+        $this->assertEquals($cm11->id, $result->cms[0]->cmid);
+        $this->assertEquals($cm22->id, $result->cms[1]->cmid);
+
+        // Test when unenrol user1 from course2.
+        $enrolinstances = enrol_get_instances($course2->id, true);
+        $enrolinstance = array_shift($enrolinstances);
+        $plugin->unenrol_user($enrolinstance, $this->user1->id);
+        $result = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $planuser1->get('id'));
+        $this->assertCount(0, $result->cms);
+
         // Test get_competency_detail when grading competency in course module is disabled.
         api::set_is_cm_comptency_grading_enabled(false);
 

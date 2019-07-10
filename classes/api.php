@@ -740,6 +740,7 @@ class api {
         $courses = course_competency::get_courses_with_competency_and_user($competencyid, $userid);
 
         $competencydetails->courses = array();
+        $coursesids = [];
         foreach ($courses as $course) {
             $courseinfo = new \stdClass();
             $courseinfo->course = $course;
@@ -769,7 +770,9 @@ class api {
                 }
             }
             $competencydetails->courses[] = $courseinfo;
+            $coursesids[] = $course->id;
         }
+
         $competencydetails->cms = array();
         if (self::is_cm_comptency_grading_enabled()) {
             $cms = \tool_cmcompetency\api::list_coursesmodules_using_competency($competencyid);
@@ -778,6 +781,10 @@ class api {
                 $cminfo = new \stdClass();
                 $cmid = $cm;
                 $cminfo->cmid = $cmid;
+                $cm = get_coursemodule_from_id('', $cmid, 0, true);
+                if (!in_array($cm->course, $coursesids)) {
+                    continue;
+                }
 
                 // Find rating in course module.
                 $cminfo->usecompetencyincm = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cmid, $userid,
@@ -790,7 +797,6 @@ class api {
                         $sort, $order);
 
                 // Calculate grade if exist.
-                $cm = get_coursemodule_from_id('', $cmid, 0, true);
                 $cminfo->cm = $cm;
                 $gradeitems = \grade_item::fetch_all(array('itemtype' => 'mod', 'itemmodule' => $cm->modname,
                         'iteminstance' => $cm->instance, 'courseid' => $cm->course));
