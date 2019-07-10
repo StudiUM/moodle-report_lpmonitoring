@@ -61,3 +61,24 @@ Feature: Display learning plan ratings details
     And I should see "good" in the "//tr[contains(@class, 'odd')]/td[contains(@class, 'evaluation')][3]//a" "xpath_element"
     And I should see "not qualified" in the "//tr[contains(@class, 'even')]/td[contains(@class, 'evaluation')][3]//a" "xpath_element"
     And I should not see "Genetic" in the "//tr[contains(@role, 'row')]/th[contains(@class, 'course-cell')][2]/a[contains(., 'Genetic')]" "xpath_element"
+
+  Scenario: Check with a course hidden for students
+    Given I set the field "templateSelectorReport" to "Medicine Year 1"
+    When I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    Then I should see "Pablo Menendez" item in the autocomplete list
+    And I click on "Pablo Menendez" item in the autocomplete list
+    And I press "Apply"
+    And I click on "//ul/li/a[contains(@href, '#report-content')]" "xpath_element"
+    And I click on "//label[text()='In the course activity']" "xpath_element"
+    And I set the field with xpath "(//input[contains(@id, 'table-search-columns')])" to "Psycho"
+    And I click on "//tr[contains(., 'Competency A')]//td[contains(@class, 'cm-cell') and not(contains(@class, 'filtersearchhidden'))]//a" "xpath_element"
+    And "User competency summary" "dialogue" should be visible
+    And I should see "Competency A" in the ".competency-heading" "css_element"
+    And I should see "Activity Ps1" in the "User competency summary" "dialogue"
+    And I should see "good" dd in "Rating" dt
+    And I click on "Close" "button" in the "User competency summary" "dialogue"
+    # Check the course is correctly hidden
+    And I follow "List of courses"
+    And I follow "Medicine"
+    And I should see "Genetic"
+    And I should not see "Psychology"

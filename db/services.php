@@ -213,5 +213,25 @@ $functions = array(
         'capabilities' => 'moodle/competency:competencygrade',
         'ajax'         => true
     ),
+    'report_lpmonitoring_user_competency_viewed_in_course' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'user_competency_viewed_in_course',
+        'classpath'    => '',
+        'description'  => 'Log the user competency viewed in course event',
+        'type'         => 'write',
+        'capabilities' => 'moodle/competency:usercompetencyview',
+        'ajax'         => true,
+        'services'     => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
+    'report_lpmonitoring_data_for_user_competency_summary_in_course' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'data_for_user_competency_summary_in_course',
+        'classpath'    => '',
+        'description'  => 'Load a summary of a user competency.',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:coursecompetencyview',
+        'ajax'         => true,
+        'services'     => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
+    ),
 );
 

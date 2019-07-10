@@ -79,6 +79,9 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $course6 = $datagenerator->create_course(array('shortname' => 'Neuroscience', 'fullname' => 'Neuroscience',
             'category' => $cat1->id));
 
+        // Make course 3 (Psychology) hidden for students.
+        course_change_visibility($course3->id, false);
+
         // Create templates.
         $template1 = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
         $template2 = $cpg->create_template(array('shortname' => 'Medicine Year 2', 'contextid' => $cat1ctx->id));

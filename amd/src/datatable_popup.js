@@ -61,10 +61,10 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates'
                     }]);
                 } else {
                     var requests = ajax.call([{
-                        methodname: 'tool_lp_data_for_user_competency_summary_in_course',
+                        methodname: 'report_lpmonitoring_data_for_user_competency_summary_in_course',
                         args: {userid: userId, competencyid: competencyId, courseid: elementId},
                     }, {
-                        methodname: 'core_competency_user_competency_viewed_in_course',
+                        methodname: 'report_lpmonitoring_user_competency_viewed_in_course',
                         args: {userid: userId, competencyid: competencyId, courseid: elementId},
                     }]);
                 }

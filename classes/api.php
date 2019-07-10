@@ -1318,4 +1318,31 @@ class api {
             }
         }
     }
+
+    /**
+     * Log user competency viewed in course event.
+     * This function is similar to core_competency/api::user_competency_viewed_in_course but it does not validate the course.
+     * The log event is saved even if the course is hidden.
+     * Other checks can be done before calling the user_competency_viewed_in_course, but if this is called,
+     * then the user viewed the data, so we log the info.
+     *
+     * @param user_competency_course|int $usercoursecompetencyorid The user competency course object or its ID.
+     * @param int $courseid The course ID
+     * @return bool
+     */
+    public static function user_competency_viewed_in_course($usercoursecompetencyorid) {
+        core_competency_api::require_enabled();
+        $ucc = $usercoursecompetencyorid;
+        if (!is_object($ucc)) {
+            $ucc = new user_competency_course($ucc);
+        }
+
+        if (!$ucc || !user_competency::can_read_user_in_course($ucc->get('userid'), $ucc->get('courseid'))) {
+            throw new required_capability_exception($ucc->get_context(), 'moodle/competency:usercompetencyview',
+                'nopermissions', '');
+        }
+
+        \core\event\competency_user_competency_viewed_in_course::create_from_user_competency_viewed_in_course($ucc)->trigger();
+        return true;
+    }
 }

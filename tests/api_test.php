@@ -2637,4 +2637,42 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertEquals($this->comp1->get('id'), $datascales[0]->compid);
         $this->assertEquals(2, $datascales[0]->value);
     }
+
+    /**
+     * Test the user competency viewed event in course, even when the course is hidden.
+     */
+    public function test_user_competency_viewed_in_course() {
+        $this->resetAfterTest(true);
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $lpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
+
+        $course = $dg->create_course();
+        $pc = $lpg->create_course_competency(array('courseid' => $course->id, 'competencyid' => $this->comp1->get('id')));
+        $params = array('userid' => $this->user1->id, 'competencyid' => $this->comp1->get('id'), 'courseid' => $course->id);
+        $ucc = $lpg->create_user_competency_course($params);
+
+        // Hide the course and test as student.
+        course_change_visibility($course->id, false);
+        $this->setUser($this->user1);
+
+        // Trigger and capture the event.
+        $sink = $this->redirectEvents();
+        api::user_competency_viewed_in_course($ucc);
+
+        // Get our event event.
+        $events = $sink->get_events();
+        $event = reset($events);
+
+        // Check that the event data is valid.
+        $this->assertInstanceOf('\core\event\competency_user_competency_viewed_in_course', $event);
+        $this->assertEquals($ucc->get('id'), $event->objectid);
+        $this->assertEquals(context_course::instance($course->id)->id, $event->contextid);
+        $this->assertEquals($ucc->get('userid'), $event->relateduserid);
+        $this->assertEquals($course->id, $event->courseid);
+        $this->assertEquals($this->comp1->get('id'), $event->other['competencyid']);
+
+        $this->assertEventContextNotUsed($event);
+        $this->assertDebuggingNotCalled();
+    }
 }

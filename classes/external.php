@@ -34,6 +34,7 @@ use external_multiple_structure;
 use external_single_structure;
 use external_value;
 use context;
+use context_user;
 use core_user;
 use core_competency\plan;
 use core_competency\url;
@@ -55,7 +56,9 @@ use report_lpmonitoring\external\lpmonitoring_competency_detail_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_incourse_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_incoursemodule_exporter;
+use report_lpmonitoring\external\lpmonitoring_user_competency_summary_in_course_exporter;
 use report_lpmonitoring\external\stats_plan_exporter;
+use report_lpmonitoring\output\lpmonitoring_user_competency_summary_in_course;
 use context_system;
 use moodle_exception;
 
@@ -1497,4 +1500,124 @@ class external extends external_api {
         return new external_value(PARAM_BOOL, 'True if grade(s) was resetted');
     }
 
+    /**
+     * Returns description of user_competency_viewed_in_course() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function user_competency_viewed_in_course_parameters() {
+        $competencyid = new external_value(
+            PARAM_INT,
+            'The competency id',
+            VALUE_REQUIRED
+        );
+        $userid = new external_value(
+            PARAM_INT,
+            'The user id',
+            VALUE_REQUIRED
+        );
+        $courseid = new external_value(
+            PARAM_INT,
+            'The course id',
+            VALUE_REQUIRED
+        );
+        $params = array(
+            'competencyid' => $competencyid,
+            'userid' => $userid,
+            'courseid' => $courseid
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Log user competency viewed in course event.
+     *
+     * @param int $competencyid The competency ID.
+     * @param int $userid The user ID.
+     * @param int $courseid The course ID.
+     * @return boolean
+     */
+    public static function user_competency_viewed_in_course($competencyid, $userid, $courseid) {
+        $params = self::validate_parameters(self::user_competency_viewed_in_course_parameters(), array(
+            'competencyid' => $competencyid,
+            'userid' => $userid,
+            'courseid' => $courseid
+        ));
+        $ucc = core_competency_api::get_user_competency_in_course($params['courseid'], $params['userid'], $params['competencyid']);
+        $result = api::user_competency_viewed_in_course($ucc);
+
+        return $result;
+    }
+
+    /**
+     * Returns description of user_competency_viewed_in_course() result value.
+     *
+     * @return \external_description
+     */
+    public static function user_competency_viewed_in_course_returns() {
+        return new external_value(PARAM_BOOL, 'True if the event user competency viewed in course was logged');
+    }
+
+    /**
+     * Returns description of data_for_user_competency_summary_in_course() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function data_for_user_competency_summary_in_course_parameters() {
+        $userid = new external_value(
+            PARAM_INT,
+            'Data base record id for the user',
+            VALUE_REQUIRED
+        );
+        $competencyid = new external_value(
+            PARAM_INT,
+            'Data base record id for the competency',
+            VALUE_REQUIRED
+        );
+        $courseid = new external_value(
+            PARAM_INT,
+            'Data base record id for the course',
+            VALUE_REQUIRED
+        );
+
+        $params = array(
+            'userid' => $userid,
+            'competencyid' => $competencyid,
+            'courseid' => $courseid,
+        );
+        return new external_function_parameters($params);
+    }
+
+    /**
+     * Read a user competency summary in course.
+     *
+     * @param int $userid The user id
+     * @param int $competencyid The competency id
+     * @param int $courseid The course id
+     * @return \stdClass
+     */
+    public static function data_for_user_competency_summary_in_course($userid, $competencyid, $courseid) {
+        global $PAGE;
+        $params = self::validate_parameters(self::data_for_user_competency_summary_in_course_parameters(), array(
+            'userid' => $userid,
+            'competencyid' => $competencyid,
+            'courseid' => $courseid
+        ));
+        $context = context_user::instance($params['userid']);
+        self::validate_context($context);
+        $output = $PAGE->get_renderer('tool_lp');
+
+        $renderable = new lpmonitoring_user_competency_summary_in_course($params['userid'], $params['competencyid'],
+            $params['courseid']);
+        return $renderable->export_for_template($output);
+    }
+
+    /**
+     * Returns description of data_for_user_competency_summary_in_course() result value.
+     *
+     * @return \external_description
+     */
+    public static function data_for_user_competency_summary_in_course_returns() {
+        return lpmonitoring_user_competency_summary_in_course_exporter::get_read_structure();
+    }
 }

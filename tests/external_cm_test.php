@@ -508,4 +508,46 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         $this->assertEquals(0, $result['scalecompetencyitems'][0]['nbratings']);
         $this->assertEquals(0, $result['scalecompetencyitems'][1]['nbratings']);
     }
+
+    /**
+     * Test get data for the user competency summary in course.
+     */
+    public function test_data_for_user_competency_summary_in_course() {
+        $this->setUser($this->creator);
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+
+        $course = $dg->create_course(['fullname' => 'New course']);
+
+        $pagegenerator = $this->getDataGenerator()->get_plugin_generator('mod_page');
+        $page = $pagegenerator->create_instance(array('course' => $course->id, 'name' => 'Page 1'));
+        $cm = get_coursemodule_from_instance('page', $page->id);
+
+        $dg->enrol_user($this->creator->id, $course->id, 'editingteacher');
+        $dg->enrol_user($this->user1->id, $course->id, 'student');
+
+        $f1 = $lpg->create_framework();
+        $c1 = $lpg->create_competency(['competencyframeworkid' => $f1->get('id')]);
+        $lpg->create_course_competency(['courseid' => $course->id, 'competencyid' => $c1->get('id')]);
+        // Link competency to course module.
+        $lpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cm->id));
+
+        \tool_cmcompetency\external::grade_competency_in_coursemodule($cm->id, $this->user1->id, $c1->get('id'), 1,
+            'New note', false);
+
+        // Do the tests as the student in the course.
+        $this->setUser($this->user1);
+
+        // Test when course is visible.
+        $summary = external::data_for_user_competency_summary_in_course($this->user1->id, $c1->get('id'), $course->id);
+        $this->assertEquals($course->id, $summary->course->id);
+        $this->assertCount(1, $summary->coursemodules);
+        $this->assertEquals($cm->id, $summary->coursemodules[0]->id);
+
+        // Hide the course and check that the modules are not listed anymore, but there are no errors.
+        course_change_visibility($course->id, false);
+        $summary = external::data_for_user_competency_summary_in_course($this->user1->id, $c1->get('id'), $course->id);
+        $this->assertEquals($course->id, $summary->course->id);
+        $this->assertCount(0, $summary->coursemodules);
+    }
 }
