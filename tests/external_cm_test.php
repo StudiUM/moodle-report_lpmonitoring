@@ -548,6 +548,6 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
         course_change_visibility($course->id, false);
         $summary = external::data_for_user_competency_summary_in_course($this->user1->id, $c1->get('id'), $course->id);
         $this->assertEquals($course->id, $summary->course->id);
-        $this->assertCount(0, $summary->coursemodules);
+        $this->assertCount(1, $summary->coursemodules);
     }
 }
