@@ -7,9 +7,9 @@ Feature: Manage configuration for monitoring of learning plans report
   Background:
     Given the lpmonitoring fixtures exist
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     Then I should see "Competencies scale colors"
     And I follow "Competencies scale colors"
 

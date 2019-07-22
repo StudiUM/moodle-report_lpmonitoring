@@ -133,6 +133,7 @@
         </div>
     </div>
     {{#plan.isactive}}
+    {{#plan.isdisplayratingenabled}}
     <div class="report-stats-competencies displayratings">
         <div class="space-block-stats"><span></div>
         <div>
@@ -162,6 +163,7 @@
             </div>
         </div>
     </div>
+    {{/plan.isdisplayratingenabled}}
     {{/plan.isactive}}
 {{/plan.cangrade}}
 

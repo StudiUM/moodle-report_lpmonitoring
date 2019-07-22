@@ -81,7 +81,7 @@ class stats_plan_exporter extends exporter {
         $nbcompetenciesproficient = 0;
         $nbcompetenciesnotrated = 0;
         $nbcompetenciesrated = 0;
-        $shoulddisplay = \tool_lp\api::has_to_display_rating($this->related['plan']);
+        $shoulddisplay = \report_lpmonitoring\api::has_to_display_rating($this->related['plan']);
         if ($shoulddisplay) {
             foreach ($usercompetencies as $r) {
                 $usercompetency = (isset($r->usercompetency)) ? $r->usercompetency : $r->usercompetencyplan;

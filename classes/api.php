@@ -63,6 +63,9 @@ class api {
     /** @var boolean iscmcompetencygradingenabled  **/
     static protected $iscmcompetencygradingenabled = true;
 
+    /** @var boolean isdisplayratingenabled  **/
+    static protected $isdisplayratingenabled = true;
+
     /**
      * Get scales from frameworkid.
      *
@@ -1169,6 +1172,13 @@ class api {
     }
 
     /**
+     * Check if display rating is enabled.
+     */
+    public static function is_display_rating_enabled() {
+        return self::$isdisplayratingenabled;
+    }
+
+    /**
      * Reset a user competency grading.
      *
      * @param int $planid Plan id.
@@ -1273,7 +1283,7 @@ class api {
         \core_competency\api::read_template($templateid);
         // Check if there is current task for this learning plan template.
         if (self::rating_task_exist($templateid)) {
-            throw new \moodle_exception('taskratingrunning', 'report_cmcompetency');
+            throw new \moodle_exception('taskratingrunning', 'report_lpmonitoring');
         }
 
         // Build custom data for adhoc task.
@@ -1343,6 +1353,45 @@ class api {
         }
 
         \core\event\competency_user_competency_viewed_in_course::create_from_user_competency_viewed_in_course($ucc)->trigger();
+        return true;
+    }
+
+    /**
+     * Get display rating setting for plan.
+     *
+     * @param int|plan $planorid The plan, or its ID.
+     * @return Boolean If we have to display or not the rating for plan
+     */
+    static public function has_to_display_rating_for_plan($planorid) {
+        if (self::$isdisplayratingenabled) {
+            return \tool_lp\api::has_to_display_rating_for_plan($planorid);
+        }
+        return true;
+    }
+
+    /**
+     * Check if display rating for plan can be reset to value of template.
+     *
+     * @param int|plan $planorid The plan, or its ID.
+     * @return Boolean If we have a display rating set for plan
+     */
+    static public function can_reset_display_rating_for_plan($planorid) {
+        if (self::$isdisplayratingenabled) {
+            return \tool_lp\api::can_reset_display_rating_for_plan($planorid);
+        }
+        return false;
+    }
+
+    /**
+     * Has to display rating setting for plan.
+     *
+     * @param int|plan $planorid The plan, or its ID.
+     * @return Boolean If we have to display or not the rating for plan
+     */
+    static public function has_to_display_rating($planorid) {
+        if (self::$isdisplayratingenabled) {
+            return \tool_lp\api::has_to_display_rating($planorid);
+        }
         return true;
     }
 }

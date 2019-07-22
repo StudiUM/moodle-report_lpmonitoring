@@ -277,4 +277,15 @@ class behat_report_lpmonitoring extends behat_base {
         }
     }
 
+    /**
+     * If hide competency rating is not enabled, skip the test.
+     *
+     * @Given /^hide competency rating is enabled$/
+     */
+    public function hide_competency_rating_is_enabled() {
+        if (!api::is_display_rating_enabled()) {
+            throw new \Moodle\BehatExtension\Exception\SkippedException;
+        }
+    }
+
 }
