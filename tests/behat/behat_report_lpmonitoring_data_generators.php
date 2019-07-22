@@ -123,7 +123,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $lpg->create_report_competency_config(array(
             'competencyframeworkid' => $framework->get('id'),
             'scaleid' => $scale2->id,
-            'scaleconfiguration' => '[{"id": 1, "color": "#f30c0c"}, {"id": 1, "color": "#14e610"}]')
+            'scaleconfiguration' => '[{"id": 1, "color": "#f30c0c"}, {"id": 2, "color": "#14e610"}]')
         );
 
         // Create course competency.

@@ -20,7 +20,6 @@ Feature: Display learning plan ratings details
     Then I should see "Pablo Menendez" item in the autocomplete list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
-
     And I click on "//ul/li/a[contains(@href, '#report-content')]" "xpath_element"
     And I click on "//td[contains(@class, 'searchable')]/a[contains(., 'Competency A')]" "xpath_element"
     And "User competency summary" "dialogue" should be visible
@@ -71,6 +70,7 @@ Feature: Display learning plan ratings details
     And I click on "//ul/li/a[contains(@href, '#report-content')]" "xpath_element"
     And I click on "//label[text()='In the course activity']" "xpath_element"
     And I set the field with xpath "(//input[contains(@id, 'table-search-columns')])" to "Psycho"
+    And I should see "good" in "Competency A" row "Psychology" column of "main-table" table
     And I click on "//tr[contains(., 'Competency A')]//td[contains(@class, 'cm-cell') and not(contains(@class, 'filtersearchhidden'))]//a" "xpath_element"
     And "User competency summary" "dialogue" should be visible
     And I should see "Competency A" in the ".competency-heading" "css_element"
@@ -82,3 +82,67 @@ Feature: Display learning plan ratings details
     And I follow "Medicine"
     And I should see "Genetic"
     And I should not see "Psychology"
+
+  Scenario: Filter the data table on competencies and courses.
+    Given I set the field "templateSelectorReport" to "Medicine Year 1"
+    When I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    Then I should see "Pablo Menendez" item in the autocomplete list
+    And I click on "Pablo Menendez" item in the autocomplete list
+    And I press "Apply"
+    And I click on "//ul/li/a[contains(@href, '#report-content')]" "xpath_element"
+    # No search : we see both competencies, for some courses and activities.
+    And "//tr/td[contains(., 'Competency A')]" "xpath_element" should be visible
+    And "//tr/td[contains(., 'Competency B')]" "xpath_element" should be visible
+    And "//th[contains(@class, 'course-cell') and contains(., 'Pathology')]" "xpath_element" should be visible
+    And "//th[contains(@class, 'cm-cell') and contains(., 'Activity Pa1')]" "xpath_element" should be visible
+    And "//th[contains(@class, 'course-cell') and contains(., 'Neuroscience')]" "xpath_element" should be visible
+    And "//th[contains(@class, 'cm-cell') and contains(., 'Activity N1')]" "xpath_element" should be visible
+    And I should see "not qualified" in "Competency B" row "Pathology" column of "main-table" table
+    And I should see "qualified" in "Competency B" row "Pathology Activity Pa1" column of "main-table" table
+    # We search for "Competency B" only : Competency A is hidden.
+    And I set the field with xpath "(//input[contains(@id, 'table-search-competency')])" to "Competency B"
+    And "//tr/td[contains(., 'Competency A')]" "xpath_element" should not be visible
+    And "//tr/td[contains(., 'Competency B')]" "xpath_element" should be visible
+    # We search for "Patho" in courses/activities : the columns for other courses and activities are hidden.
+    And I set the field with xpath "(//input[contains(@id, 'table-search-columns')])" to "Patho"
+    And "//th[contains(@class, 'course-cell') and contains(., 'Pathology')]" "xpath_element" should be visible
+    And "//th[contains(@class, 'cm-cell') and contains(., 'Activity Pa1')]" "xpath_element" should be visible
+    And "//th[contains(@class, 'course-cell') and contains(., 'Neuroscience')]" "xpath_element" should not be visible
+    And "//th[contains(@class, 'cm-cell') and contains(., 'Activity N1')]" "xpath_element" should not be visible
+    And I should see "not qualified" in "Competency B" row "Pathology" column of "main-table" table
+    And I should see "qualified" in "Competency B" row "Pathology Activity Pa1" column of "main-table" table
+
+  Scenario: Filter the data table by scale values
+    Given I set the field "templateSelectorReport" to "Medicine Year 1"
+    When I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Rebecca"
+    Then I should see "Rebecca Armenta" item in the autocomplete list
+    And I click on "Rebecca Armenta" item in the autocomplete list
+    And I press "Apply"
+    And I click on "//ul/li/a[contains(@href, '#report-content')]" "xpath_element"
+    # No filter selected : both competencies should be visible.
+    And "//tr/td[contains(., 'Competency A')]" "xpath_element" should be visible
+    And "//tr/td[contains(., 'Competency B')]" "xpath_element" should be visible
+    # We check that the correct values are in the "Filter by scale value" dropdown (no "good" or "qualified" for Rebecca).
+    And the "scale-filter-report" select box should contain "not good"
+    And the "scale-filter-report" select box should contain "not qualified"
+    And the "scale-filter-report" select box should contain "Not rated"
+    And the "scale-filter-report" select box should not contain "good"
+    And the "scale-filter-report" select box should not contain "qualified"
+    # We filter with different values and check which competencies should be visible.
+    And I set the field "scale-filter-report" to "not good"
+    And "//tr/td[contains(., 'Competency A')]" "xpath_element" should be visible
+    And "//tr/td[contains(., 'Competency B')]" "xpath_element" should not be visible
+    And I set the field "scale-filter-report" to "not qualified"
+    And "//tr/td[contains(., 'Competency A')]" "xpath_element" should not be visible
+    And "//tr/td[contains(., 'Competency B')]" "xpath_element" should be visible
+    # We combine with a Competency search.
+    And I set the field with xpath "(//input[contains(@id, 'table-search-competency')])" to "Competency A"
+    And I should see "No matching records found"
+    And I set the field with xpath "(//input[contains(@id, 'table-search-competency')])" to ""
+    # We check for activities only, still with filter "not qualified" : Only Competency B match.
+    And I click on "//label[text()='In the course activity']" "xpath_element"
+    And "//tr/td[contains(., 'Competency A')]" "xpath_element" should not be visible
+    And "//tr/td[contains(., 'Competency B')]" "xpath_element" should be visible
+    # We check for courses only, still with filter "not qualified" : No comptency match.
+    And I click on "//label[text()='In the course']" "xpath_element"
+    And I should see "No matching records found"
