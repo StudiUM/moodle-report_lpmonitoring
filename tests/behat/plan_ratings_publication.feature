@@ -5,11 +5,12 @@ Feature: Manage publication of ratings in learning plans
   I need to manage ratings publication in learning plans and templates
 
   Background:
-    Given the lpmonitoring fixtures exist
+    Given hide competency rating is enabled
+    And the lpmonitoring fixtures exist
     And I log in as "lpmanager"
-    And I follow "List of courses"
+    And I am on course index
     When I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     Then I should see "Learning plan templates"
     And I follow "Learning plan templates"
 
@@ -18,9 +19,9 @@ Feature: Manage publication of ratings in learning plans
     Given I click on "Hide ratings for this template" of edit menu in the "Medicine Year 1" row
     And I log out
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I press "Apply"
@@ -58,9 +59,9 @@ Feature: Manage publication of ratings in learning plans
     And I log out
     # Login as learning plan admin
     And I log in as "lpmanager"
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I should see "Learning plan templates"
     And I follow "Learning plan templates"
     And I click on "Display ratings for this template" of edit menu in the "Medicine Year 1" row
@@ -93,9 +94,9 @@ Feature: Manage publication of ratings in learning plans
     Given I click on "Hide ratings for this template" of edit menu in the "Medicine Year 1" row
     And I log out
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I press "Apply"
@@ -139,9 +140,9 @@ Feature: Manage publication of ratings in learning plans
   Scenario: Manage learning plan ratings publication [reset display rating in learning plan]
     Given I log out
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I press "Apply"
@@ -182,9 +183,9 @@ Feature: Manage publication of ratings in learning plans
     And I log out
     # Login as learning plan admin
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I press "Apply"

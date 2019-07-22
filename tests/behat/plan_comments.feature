@@ -5,9 +5,9 @@ Feature: Manage learning plans comments
   Background:
     Given the lpmonitoring fixtures exist
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     When I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     Then I should see "Monitoring of learning plans"
     And I follow "Monitoring of learning plans"
 
@@ -77,9 +77,9 @@ Feature: Manage learning plans comments
     And I log out
     # The appreciator can view the comment that the student entered
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"

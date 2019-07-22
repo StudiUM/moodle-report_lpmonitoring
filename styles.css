@@ -1635,3 +1635,23 @@ ul.detail-comp-tab li a::first-letter {
 .filter-report-custom > .col-md-3 {
     float: right;
 }
+.filter-datatable-right {
+    justify-content: flex-end;
+    flex-flow: column;
+    align-items: flex-end;
+}
+.path-report-lpmonitoring .well {
+    padding: 0.7rem;
+    margin-bottom: 0.5rem;
+}
+.lpmonitoringdialogue .row {
+    width: 100%;
+}
+.lpmonitoringdialogue ul.pagination {
+    flex-flow: row;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+.lpmonitoringdialogue .dataTables_wrapper.dt-bootstrap .row div {
+    width: 100%;
+}

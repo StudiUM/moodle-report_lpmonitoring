@@ -568,51 +568,54 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals($plan2->get('id'), $result['navnext']['planid']);
         // Test display rating settings.
         // Template on , plan off.
-        $this->setAdminUser();
-        \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 1);
-        \tool_lp\external::set_display_rating_for_plan($plan2->get('id'), 0);
-        $this->setUser($user2);
-        $result = external::read_plan($plan2->get('id'), 0);
-        $result = external::clean_returnvalue(external::read_plan_returns(), $result);
-        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
-        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotproficient']);
-        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesproficient']);
-        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesnotrated']);
-        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesrated']);
-        // Reset display rating of plan to be identical to template.
-        $this->setAdminUser();
-        \tool_lp\external::reset_display_rating_for_plan($plan2->get('id'));
-        $this->setUser($user2);
-        $result = external::read_plan($plan2->get('id'), 0);
-        $result = external::clean_returnvalue(external::read_plan_returns(), $result);
-        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
-        $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
-        $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
-        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotrated']);
-        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesrated']);
-        // Template off , plan on.
-        $this->setAdminUser();
-        \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 0);
-        \tool_lp\external::set_display_rating_for_plan($plan2->get('id'), 1);
-        $this->setUser($user2);
-        $result = external::read_plan($plan2->get('id'), 0);
-        $result = external::clean_returnvalue(external::read_plan_returns(), $result);
-        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
-        $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
-        $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
-        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotrated']);
-        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesrated']);
-        // Reset display rating of plan to be identical to template.
-        $this->setAdminUser();
-        \tool_lp\external::reset_display_rating_for_plan($plan2->get('id'));
-        $this->setUser($user2);
-        $result = external::read_plan($plan2->get('id'), 0);
-        $result = external::clean_returnvalue(external::read_plan_returns(), $result);
-        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
-        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotproficient']);
-        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesproficient']);
-        $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesnotrated']);
-        $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesrated']);
+        if (\report_lpmonitoring\api::is_display_rating_enabled()) {
+            $this->setAdminUser();
+            \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 1);
+            \tool_lp\external::set_display_rating_for_plan($plan2->get('id'), 0);
+            $this->setUser($user2);
+            $result = external::read_plan($plan2->get('id'), 0);
+            $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+            $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
+            $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotproficient']);
+            $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesproficient']);
+            $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesnotrated']);
+            $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesrated']);
+            // Reset display rating of plan to be identical to template.
+            $this->setAdminUser();
+            \tool_lp\external::reset_display_rating_for_plan($plan2->get('id'));
+            $this->setUser($user2);
+            $result = external::read_plan($plan2->get('id'), 0);
+            $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+            $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
+            $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
+            $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
+            $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotrated']);
+            $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesrated']);
+            // Template off , plan on.
+            $this->setAdminUser();
+            \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 0);
+            \tool_lp\external::set_display_rating_for_plan($plan2->get('id'), 1);
+            $this->setUser($user2);
+            $result = external::read_plan($plan2->get('id'), 0);
+            $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+            $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
+            $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesnotproficient']);
+            $this->assertEquals(1, $result['plan']['stats']['nbcompetenciesproficient']);
+            $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotrated']);
+            $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesrated']);
+            // Reset display rating of plan to be identical to template.
+            $this->setAdminUser();
+            \tool_lp\external::reset_display_rating_for_plan($plan2->get('id'));
+            $this->setUser($user2);
+            $result = external::read_plan($plan2->get('id'), 0);
+            $result = external::clean_returnvalue(external::read_plan_returns(), $result);
+            $this->assertEquals(2, $result['plan']['stats']['nbcompetenciestotal']);
+            $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesnotproficient']);
+            $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesproficient']);
+            $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesnotrated']);
+            $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesrated']);
+        }
+
     }
 
     /**
@@ -935,95 +938,97 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->assertEquals(1, $result[2]['usercompetencyplan']['proficiency']);
         // Test display rating.
         // Display rating template off.
-        $this->setAdminUser();
-        \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 0);
-        // User should not see ratings.
-        $this->setUser($user);
-        $result = external::list_plan_competencies($plan->get('id'));
-        $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
-        // Take competency 2 as example.
-        $this->assertEquals(false, $result[2]['isproficient']);
-        $this->assertEquals(false, $result[2]['isnotproficient']);
-        $this->assertEquals(true, $result[2]['isnotrated']);
-        $this->assertEquals('-', $result[2]['usercompetency']['gradename']);
-        $this->assertEquals('-', $result[2]['usercompetency']['proficiencyname']);
-        $this->assertNull($result[2]['usercompetency']['grade']);
-        $this->assertNull($result[2]['usercompetency']['proficiency']);
-        // Display rating template on.
-        $this->setAdminUser();
-        \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 1);
-        // User should see ratings.
-        $this->setUser($user);
-        $result = external::list_plan_competencies($plan->get('id'));
-        $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
-        // Take competency 2 as example.
-        $this->assertEquals(true, $result[2]['isproficient']);
-        $this->assertEquals(false, $result[2]['isnotproficient']);
-        $this->assertEquals(false, $result[2]['isnotrated']);
-        $this->assertNotEquals('-', $result[2]['usercompetency']['gradename']);
-        $this->assertNotEquals('-', $result[2]['usercompetency']['proficiencyname']);
-        $this->assertEquals(2, $result[2]['usercompetency']['grade']);
-        $this->assertEquals(1, $result[2]['usercompetency']['proficiency']);
-        // Display rating template off, plan on.
-        $this->setAdminUser();
-        \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 0);
-        \tool_lp\external::set_display_rating_for_plan($plan->get('id'), 1);
-        // User should see ratings.
-        $this->setUser($user);
-        $result = external::list_plan_competencies($plan->get('id'));
-        $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
-        // Take competency 2 as example.
-        $this->assertEquals(true, $result[2]['isproficient']);
-        $this->assertEquals(false, $result[2]['isnotproficient']);
-        $this->assertEquals(false, $result[2]['isnotrated']);
-        $this->assertNotEquals('-', $result[2]['usercompetency']['gradename']);
-        $this->assertNotEquals('-', $result[2]['usercompetency']['proficiencyname']);
-        $this->assertEquals(2, $result[2]['usercompetency']['grade']);
-        $this->assertEquals(1, $result[2]['usercompetency']['proficiency']);
-        // Reset display rating to be identical to template.
-        $this->setAdminUser();
-        \tool_lp\external::reset_display_rating_for_plan($plan->get('id'));
-        $this->setUser($user);
-        $result = external::list_plan_competencies($plan->get('id'));
-        $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
-        // Take competency 2 as example.
-        $this->assertEquals(false, $result[2]['isproficient']);
-        $this->assertEquals(false, $result[2]['isnotproficient']);
-        $this->assertEquals(true, $result[2]['isnotrated']);
-        $this->assertEquals('-', $result[2]['usercompetency']['gradename']);
-        $this->assertEquals('-', $result[2]['usercompetency']['proficiencyname']);
-        $this->assertNull($result[2]['usercompetency']['grade']);
-        $this->assertNull($result[2]['usercompetency']['proficiency']);
-        // Display rating template on, plan off.
-        $this->setAdminUser();
-        \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 1);
-        \tool_lp\external::set_display_rating_for_plan($plan->get('id'), 0);
-        // User should not see ratings.
-        $this->setUser($user);
-        $result = external::list_plan_competencies($plan->get('id'));
-        $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
-        // Take competency 2 as example.
-        $this->assertEquals(false, $result[2]['isproficient']);
-        $this->assertEquals(false, $result[2]['isnotproficient']);
-        $this->assertEquals(true, $result[2]['isnotrated']);
-        $this->assertEquals('-', $result[2]['usercompetency']['gradename']);
-        $this->assertEquals('-', $result[2]['usercompetency']['proficiencyname']);
-        $this->assertNull($result[2]['usercompetency']['grade']);
-        $this->assertNull($result[2]['usercompetency']['proficiency']);
-        // Reset display rating to be identical to template.
-        $this->setAdminUser();
-        \tool_lp\external::reset_display_rating_for_plan($plan->get('id'));
-        $this->setUser($user);
-        $result = external::list_plan_competencies($plan->get('id'));
-        $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
-        // Take competency 2 as example.
-        $this->assertEquals(true, $result[2]['isproficient']);
-        $this->assertEquals(false, $result[2]['isnotproficient']);
-        $this->assertEquals(false, $result[2]['isnotrated']);
-        $this->assertNotEquals('-', $result[2]['usercompetency']['gradename']);
-        $this->assertNotEquals('-', $result[2]['usercompetency']['proficiencyname']);
-        $this->assertEquals(2, $result[2]['usercompetency']['grade']);
-        $this->assertEquals(1, $result[2]['usercompetency']['proficiency']);
+        if (\report_lpmonitoring\api::is_display_rating_enabled()) {
+            $this->setAdminUser();
+            \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 0);
+            // User should not see ratings.
+            $this->setUser($user);
+            $result = external::list_plan_competencies($plan->get('id'));
+            $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
+            // Take competency 2 as example.
+            $this->assertEquals(false, $result[2]['isproficient']);
+            $this->assertEquals(false, $result[2]['isnotproficient']);
+            $this->assertEquals(true, $result[2]['isnotrated']);
+            $this->assertEquals('-', $result[2]['usercompetency']['gradename']);
+            $this->assertEquals('-', $result[2]['usercompetency']['proficiencyname']);
+            $this->assertNull($result[2]['usercompetency']['grade']);
+            $this->assertNull($result[2]['usercompetency']['proficiency']);
+            // Display rating template on.
+            $this->setAdminUser();
+            \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 1);
+            // User should see ratings.
+            $this->setUser($user);
+            $result = external::list_plan_competencies($plan->get('id'));
+            $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
+            // Take competency 2 as example.
+            $this->assertEquals(true, $result[2]['isproficient']);
+            $this->assertEquals(false, $result[2]['isnotproficient']);
+            $this->assertEquals(false, $result[2]['isnotrated']);
+            $this->assertNotEquals('-', $result[2]['usercompetency']['gradename']);
+            $this->assertNotEquals('-', $result[2]['usercompetency']['proficiencyname']);
+            $this->assertEquals(2, $result[2]['usercompetency']['grade']);
+            $this->assertEquals(1, $result[2]['usercompetency']['proficiency']);
+            // Display rating template off, plan on.
+            $this->setAdminUser();
+            \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 0);
+            \tool_lp\external::set_display_rating_for_plan($plan->get('id'), 1);
+            // User should see ratings.
+            $this->setUser($user);
+            $result = external::list_plan_competencies($plan->get('id'));
+            $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
+            // Take competency 2 as example.
+            $this->assertEquals(true, $result[2]['isproficient']);
+            $this->assertEquals(false, $result[2]['isnotproficient']);
+            $this->assertEquals(false, $result[2]['isnotrated']);
+            $this->assertNotEquals('-', $result[2]['usercompetency']['gradename']);
+            $this->assertNotEquals('-', $result[2]['usercompetency']['proficiencyname']);
+            $this->assertEquals(2, $result[2]['usercompetency']['grade']);
+            $this->assertEquals(1, $result[2]['usercompetency']['proficiency']);
+            // Reset display rating to be identical to template.
+            $this->setAdminUser();
+            \tool_lp\external::reset_display_rating_for_plan($plan->get('id'));
+            $this->setUser($user);
+            $result = external::list_plan_competencies($plan->get('id'));
+            $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
+            // Take competency 2 as example.
+            $this->assertEquals(false, $result[2]['isproficient']);
+            $this->assertEquals(false, $result[2]['isnotproficient']);
+            $this->assertEquals(true, $result[2]['isnotrated']);
+            $this->assertEquals('-', $result[2]['usercompetency']['gradename']);
+            $this->assertEquals('-', $result[2]['usercompetency']['proficiencyname']);
+            $this->assertNull($result[2]['usercompetency']['grade']);
+            $this->assertNull($result[2]['usercompetency']['proficiency']);
+            // Display rating template on, plan off.
+            $this->setAdminUser();
+            \tool_lp\external::set_display_rating_for_template($tpl->get('id'), 1);
+            \tool_lp\external::set_display_rating_for_plan($plan->get('id'), 0);
+            // User should not see ratings.
+            $this->setUser($user);
+            $result = external::list_plan_competencies($plan->get('id'));
+            $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
+            // Take competency 2 as example.
+            $this->assertEquals(false, $result[2]['isproficient']);
+            $this->assertEquals(false, $result[2]['isnotproficient']);
+            $this->assertEquals(true, $result[2]['isnotrated']);
+            $this->assertEquals('-', $result[2]['usercompetency']['gradename']);
+            $this->assertEquals('-', $result[2]['usercompetency']['proficiencyname']);
+            $this->assertNull($result[2]['usercompetency']['grade']);
+            $this->assertNull($result[2]['usercompetency']['proficiency']);
+            // Reset display rating to be identical to template.
+            $this->setAdminUser();
+            \tool_lp\external::reset_display_rating_for_plan($plan->get('id'));
+            $this->setUser($user);
+            $result = external::list_plan_competencies($plan->get('id'));
+            $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
+            // Take competency 2 as example.
+            $this->assertEquals(true, $result[2]['isproficient']);
+            $this->assertEquals(false, $result[2]['isnotproficient']);
+            $this->assertEquals(false, $result[2]['isnotrated']);
+            $this->assertNotEquals('-', $result[2]['usercompetency']['gradename']);
+            $this->assertNotEquals('-', $result[2]['usercompetency']['proficiencyname']);
+            $this->assertEquals(2, $result[2]['usercompetency']['grade']);
+            $this->assertEquals(1, $result[2]['usercompetency']['proficiency']);
+        }
     }
 
     /**

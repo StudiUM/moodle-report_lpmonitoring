@@ -8,9 +8,9 @@ Feature: Display learning plan ratings details
     Given course module competency grading is enabled
     And the lpmonitoring fixtures exist
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     When I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     Then I should see "Monitoring of learning plans"
     And I follow "Monitoring of learning plans"
 

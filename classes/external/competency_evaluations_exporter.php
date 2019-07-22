@@ -99,7 +99,7 @@ class competency_evaluations_exporter extends \core\external\exporter {
             }
         }
 
-        $competencydetailinfos->competencydetail->displayrating = \tool_lp\api::has_to_display_rating($plan->get('id'));
+        $competencydetailinfos->competencydetail->displayrating = api::has_to_display_rating($plan->get('id'));
         $exporter = new lpmonitoring_competency_detail_exporter($competencydetailinfos->competencydetail);
         $result->competencydetail = $exporter->export($output);
 

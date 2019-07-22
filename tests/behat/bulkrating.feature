@@ -7,9 +7,9 @@ Feature: Bulk rating
   Background:
     Given the lpmonitoring fixtures exist
     And I log in as "appreciator"
-    And I follow "List of courses"
+    And I am on course index
     When I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     Then I should see "Bulk rating for all students for all competencies"
     # Rate Pablo.
@@ -23,9 +23,9 @@ Feature: Bulk rating
     And I set the field with xpath "//select[@name='rating']" to "not good"
     And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     # Go to bulk rating page.
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I should see "Bulk rating for all students for all competencies"
     And I follow "Bulk rating for all students for all competencies"
 
@@ -56,9 +56,9 @@ Feature: Bulk rating
     And I should not see "Evaluation is in progress, please wait for it to finish before starting a new one"
     And the "Save" "button" should be enabled
     # Check that students have been rated, except Pablo (who was already rated).
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"
@@ -84,9 +84,9 @@ Feature: Bulk rating
     Then I should see "Evaluations will be executed soon"
     And I run all adhoc tasks
     # Check that students have been rated, including Pablo (who was already rated).
-    And I follow "List of courses"
+    And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@class, 'custom-courseadmin-menu')]" "xpath_element"
+    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"

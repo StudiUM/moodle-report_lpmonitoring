@@ -126,7 +126,7 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
         $result = new \stdClass();
 
         $result->competencyid = $data->competency->get('id');
-        $shoulddisplay = $data->displayrating;
+        $shoulddisplay = isset($data->displayrating) ? $data->displayrating : true;
         $uc = (isset($data->usercompetency)) ? $data->usercompetency : $data->usercompetencyplan;
         // Set the scaleid.
         $result->scaleid = $data->competency->get_scale()->id;
