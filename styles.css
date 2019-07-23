@@ -1635,7 +1635,37 @@ ul.detail-comp-tab li a::first-letter {
 .filter-report-custom > .col-md-3 {
     float: right;
 }
-.filter-datatable-right {
+
+/*summary table*/
+.summary-ra {
+    background-color: hsl(150,100%,40%);
+    border-color: hsl(150,100%,40%);
+    border: 1px solid hsl(150,100%,40%);
+}
+
+.summary-rpa {
+    background-color: hsl(60,100%,40%);
+    border-color: hsl(60,100%,40%);
+    border: 1px solid hsl(60,100%,40%);
+}
+
+.summary-nrpa {
+    background-color: hsl(30,100%,40%);
+    border-color: hsl(30,100%,40%);
+    border: 1px solid hsl(30,100%,40%);
+}
+
+.summary-no {
+    background-color: #c7cbcf;
+    border-color: #c7cbcf;
+    border: 1px solid #c7cbcf;
+}
+
+.summary-evaluation {
+    background-color: #c0ae81;
+    border-color: #c0ae81;
+    border: 1px solid #c0ae81;
+}.filter-datatable-right {
     justify-content: flex-end;
     flex-flow: column;
     align-items: flex-end;

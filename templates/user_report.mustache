@@ -38,6 +38,7 @@
             <ul id="nav-tabs" class="nav nav-tabs hidden" role="tablist">
                 <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#detail-content" role="tab">{{#str}}tabdetail, report_lpmonitoring{{/str}}</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#report-content" role="tab">{{#str}}tabreport, report_lpmonitoring{{/str}}</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#summary-content" role="tab">{{#str}}tabsummary, report_lpmonitoring{{/str}}</a></li>
             </ul>
 
             <div class="tab-content">
@@ -46,6 +47,9 @@
                 </div>
                 <div id="report-content" class="tab-pane fade" role="tabpanel">
                   {{> report_lpmonitoring/datatable }}
+                </div>
+                <div id="summary-content" class="tab-pane fade" role="tabpanel">
+                    {{> report_lpmonitoring/summary }}
                 </div>
             </div>
         </div>

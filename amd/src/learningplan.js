@@ -647,9 +647,11 @@ define(['jquery',
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         $("#report-content").empty();
+                        $("#summary-content").empty();
                         $("#nav-tabs").addClass("hidden");
                     });
                 }
+                self.loadSummaryTab(plan);
                 self.loadReportTab(plan);
             }).fail(
                 function(exp) {
@@ -793,6 +795,22 @@ define(['jquery',
                 }
             );
         };
+
+        /**
+         * Load the summary tab.
+         *
+         * @function
+         */
+          LearningplanReport.prototype.loadSummaryTab = function() {
+
+            // Competencies are optional for the moment.
+            var competencies = [];
+
+            templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
+                        $("#summary-content").html(html);
+                        templates.runTemplateJS(js);
+            });
+          };
 
         /**
          * Apply inline grader for the rate button.
@@ -1276,6 +1294,7 @@ define(['jquery',
                                 $("#listPlanCompetencies").empty();
                                 $("#plan-stats-report").empty();
                                 $("#report-content").empty();
+                                $("#summary-content").empty();
                                 $("#nav-tabs").hide();
                                 $("#users-list-full-navigation").empty();
                             });

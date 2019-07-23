@@ -103,6 +103,7 @@ $string['statslearningplan'] = 'Statistics for learning plans';
 $string['successtaskmsg'] = 'Evaluations will be executed soon';
 $string['tabdetail'] = 'In the details';
 $string['tabreport'] = 'Report';
+$string['tabsummary'] = 'Summary';
 $string['tagarea_competency_plan'] = 'Learning plans';
 $string['tag'] = 'Tag';
 $string['tags'] = 'Tag(s)';
