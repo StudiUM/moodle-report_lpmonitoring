@@ -159,6 +159,38 @@ To display the report, the user must select a learning plan and click on "Apply"
 
 ![Student lpmonitoring](https://wiki.umontreal.ca/download/attachments/124980567/report_lpmonitoringstudentdetail.PNG)
 
+# New features for 3.5 and 3.6
+## Allow tagging of learning plans
+•	Manages tags for learning plans
+•	Filter by tag
+![tagging](https://wiki.umontreal.ca/download/attachments/124980567/new-feature-tag.PNG?api=v2)
+![tagging](https://wiki.umontreal.ca/download/attachments/124980567/tags-manager.PNG?api=v2)
+![tagging](https://wiki.umontreal.ca/download/attachments/124980567/filter-tag.PNG?api=v2)
+
+## Manage comments directly in the report page
+The block comment in the learning plan page (core) is now available in the report page, and we can filter by users having at least one comment.
+![comment](https://wiki.umontreal.ca/download/attachments/124980567/new-fetature-comment.PNG?api=v2)
+![comment](https://wiki.umontreal.ca/download/attachments/124980567/comments.PNG?api=v2)
+![comment](https://wiki.umontreal.ca/download/attachments/124980567/filter-comment.PNG?api=v2)
+
+## User list navigation
+A collapsible block was added, containing the resulting user list from search and filters, so we can easily navigate between users. That way, we are not limited to the next/previous buttons of the main learning plan bar.
+![User list](https://wiki.umontreal.ca/download/attachments/124980567/new-feature.PNG?api=v2)
+
+## Resetting competencies of a learning plan
+We can reset all competencies of a learning plan: this will reset the value of rating but the evidences will be kept.
+We can also make a reset on single competency.
+![reset](https://wiki.umontreal.ca/download/attachments/124980567/reset.PNG?api=v2)
+![reset](https://wiki.umontreal.ca/download/attachments/124980567/reset-popup.PNG?api=v2)
+
+## Bulk rating in competencies for all users learning plans of learning plan template
+This feature allows to rate competencies for all users learning plan of learning plan template.A scale value can be chosen for each competency. Note that rated students won't be impacted : to force ratings, tick "Force rating of users already rated" option. The ratings will take effect in the next passage of the CRON.
+![reset](https://wiki.umontreal.ca/download/attachments/124980567/bulk.PNG?api=v2)
+
+## Report tab
+It shows ratings in courses in a table display, that can be filtered by competency, course name or/and scale value.
+![bulk](https://wiki.umontreal.ca/download/attachments/124980567/report.PNG?api=v2)
+
 
 ***
 _Developed by_ ![Université de Montréal](http://www.umontreal.ca/images/iu/logo-udem.gif)
