@@ -33,23 +33,32 @@ use report_lpmonitoring\api;
  * Class for exporting data for a competency and its evaluations.
  *
  * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
- * @copyright  2019 Université de Montréal
+ * @copyright  2019 Université de Montréalal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class competency_evaluations_exporter extends \core\external\exporter {
+class competency_summary_evaluations_exporter extends \core\external\exporter {
 
     protected static function define_other_properties() {
         return array(
             'competency' => array(
                 'type' => competency_exporter::read_properties_definition()
             ),
-            'competencydetail' => array(
-                'type' => lpmonitoring_competency_detail_exporter::read_properties_definition()
-            ),
-            'evaluationslist' => array(
-                'type' => evaluations_exporter::read_properties_definition(),
+            'evaluationslist_total' => array(
+                'type' => summary_evaluations_exporter::read_properties_definition(),
                 'multiple' => true
-            )
+            ),
+            'evaluationslist_course' => array(
+                'type' => summary_evaluations_exporter::read_properties_definition(),
+                'multiple' => true
+            ),
+            'evaluationslist_cm' => array(
+                'type' => summary_evaluations_exporter::read_properties_definition(),
+                'multiple' => true
+            ),
+            'showasparent' => array(
+                'type' => PARAM_BOOL,
+                'optional' => true
+            ),
         );
     }
 
@@ -67,42 +76,27 @@ class competency_evaluations_exporter extends \core\external\exporter {
         $result->competency = $this->data->competencydetailinfos->competency;
         $result->evaluationslist = array();
 
-        foreach ($this->data->allcourses as $courseid => $course) {
-            // Evaluation for the course.
-            $data = new \stdClass();
-            $data->iscourse = true;
-            $data->elementid = $courseid;
-            if (isset($competencydetailinfos->tmpevalincourse[$courseid])) {
-                $data->grade = $competencydetailinfos->tmpevalincourse[$courseid];
-            } else {
-                $data->grade = null;
-            }
-            $data->competencydetail = $competencydetailinfos->competencydetail;
-            $exporter = new evaluations_exporter($data);
-            $result->evaluationslist[] = $exporter->export($output);
+        // TODO EVOSTDM-1880 : retourner les bonnes évaluations pour total, course et cm
+        $data = new \stdClass();
 
-            // Evaluation for the modules in this course.
-            if (api::is_cm_comptency_grading_enabled()) {
-                foreach ($course['modulesinfo'] as $cmid => $module) {
-                    $data = new \stdClass();
-                    $data->iscourse = false;
-                    $data->elementid = $cmid;
-                    if (isset($competencydetailinfos->tmpevalinmodule[$cmid])) {
-                        $data->grade = $competencydetailinfos->tmpevalinmodule[$cmid];
-                    } else {
-                        $data->grade = null;
-                    }
-                    $data->competencydetail = $competencydetailinfos->competencydetail;
-                    $exporter = new evaluations_exporter($data);
-                    $result->evaluationslist[] = $exporter->export($output);
-                }
-            }
+        $exporter = new summary_evaluations_exporter($data);
+        $result->evaluationslist_total[] = $exporter->export($output);
+        $exporter = new summary_evaluations_exporter($data);
+        $result->evaluationslist_total[] = $exporter->export($output);
+
+        $result->evaluationslist_course = array();
+        $result->evaluationslist_cm = array();
+        if (api::is_cm_comptency_grading_enabled()) {
+            $exporter = new summary_evaluations_exporter($data);
+            $result->evaluationslist_course[] = $exporter->export($output);
+            $exporter = new summary_evaluations_exporter($data);
+            $result->evaluationslist_course[] = $exporter->export($output);
+
+            $exporter = new summary_evaluations_exporter($data);
+            $result->evaluationslist_cm[] = $exporter->export($output);
+            $exporter = new summary_evaluations_exporter($data);
+            $result->evaluationslist_cm[] = $exporter->export($output);
         }
-
-        $competencydetailinfos->competencydetail->displayrating = api::has_to_display_rating($plan->get('id'));
-        $exporter = new lpmonitoring_competency_detail_exporter($competencydetailinfos->competencydetail);
-        $result->competencydetail = $exporter->export($output);
-
         return (array) $result;
     }
 }

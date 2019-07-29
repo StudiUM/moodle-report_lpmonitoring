@@ -799,18 +799,61 @@ define(['jquery',
         /**
          * Load the summary tab.
          *
+         * @param {Object} Plan
          * @function
          */
-          LearningplanReport.prototype.loadSummaryTab = function() {
+        LearningplanReport.prototype.loadSummaryTab = function(plan) {
+            var learningplan = this;
+            var tablesearchvalue = $('#summary-search-competency').val();
 
-            // Competencies are optional for the moment.
-            var competencies = [];
+            // Get the "Summary" tab content.
+            var promiseCompetenciesSummary = ajax.call([{
+                methodname: 'report_lpmonitoring_list_plan_competencies_summary',
+                args: {
+                    id: plan.id
+                }
+            }]);
+            promiseCompetenciesSummary[0].then(function(results) {
+                if (results['competencies_list'].length > 0) {
+                    var competencies = {reportinfos:results, plan:plan, hascompetencies: true};
+                    /*
+                    // Keep the filter and search values.
+                    var checkedvalue = $('input[type=radio][name=reportfilter]:checked').val();
+                    if (checkedvalue == 'course') {
+                        competencies.filterchecked_course = true;
+                    } else if (checkedvalue == 'module') {
+                        competencies.filterchecked_module = true;
+                    } else {
+                        competencies.filterchecked_both = true;
+                    }
+                    */
+                    competencies.tablesearchvalue = tablesearchvalue;
 
-            templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
+                    // Render the "Summary" data table template.
+                    templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
                         $("#summary-content").html(html);
                         templates.runTemplateJS(js);
-            });
-          };
+                        var popup = new Popup('[data-region=summary-competencies-section]', '[data-user-competency=true]');
+                        // Override the after show refresh method of the user competency popup.
+                        popup._refresh = function() {
+                            var self = this;
+                            learningplan.reloadCompetencyDetail(self._competencyId, self._userId, self._planId);
+                            self.close();
+                        };
+                    });
+                } else {
+                    var competencies = {hascompetencies: false};
+                    templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
+                        $("#summary-content").html(html);
+                        templates.runTemplateJS(js);
+                    });
+                }
+            }).fail(
+                function(exp) {
+                    notification.exception(exp);
+                }
+            );
+        };
 
         /**
          * Apply inline grader for the rate button.

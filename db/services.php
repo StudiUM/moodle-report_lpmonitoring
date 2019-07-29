@@ -233,5 +233,14 @@ $functions = array(
         'ajax'         => true,
         'services'     => array(MOODLE_OFFICIAL_MOBILE_SERVICE),
     ),
+    'report_lpmonitoring_list_plan_competencies_summary' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'list_plan_competencies_summary',
+        'classpath'    => '',
+        'description'  => 'Get the list plan competencies summary',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:planview',
+        'ajax'         => true
+    ),
 );
 

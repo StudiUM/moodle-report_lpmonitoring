@@ -1,117 +1,130 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
 
-		<table class="table table-bordered">
-			<thead class="">
-				<tr>
-					<th colspan="2">Marie-Eve Lévesque</th>
-                                        
-					<th class="summary-ra">RA</th>
-					<th class="summary-rpa">RPA</th>
-                                        <th class="summary-nrpa">NRPA</th>
-                                        <th class="summary-no">NO</th>
-				</tr>
-			</thead>
-			<tbody>
-                                <!-- Ligne de Total des évaluations par compétence -->
-                                <tr class="accordion-toggle summary-evaluation" data-toggle="collapse" data-target=".collapseOne">
-					<td>T1</td>
-                                        <td>Communiquer</td>
-					<td>7</td>
-					<td>6</td>
-                                        <td>0</td>
-                                        <td>1</td>
-				</tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseOne collapse in">
-                                        <td>T1.1</td>
-                                        <td>Qualité de la langue écrite</td>
-                                        <td> </td>
-                                        <td class="summary-rpa">2</td>
-                                        <td> </td>
-                                        <td> </td>
-                                </tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseOne collapse in">
-                                        <td>T1.2</td>
-                                        <td>Qualité de la langue parlée</td>
-                                        <td class="summary-ra">3</td>
-                                        <td class="summary-rpa">2</td>
-                                        <td> </td>
-                                        <td> </td>
-                                </tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseOne collapse in">
-                                        <td>T1.3</td>
-                                        <td>Décodage du langage non-verbal</td>
-                                        <td> </td>
-                                        <td class="summary-rpa">1</td>
-                                        <td> </td>
-                                        <td> </td>
-                                </tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseOne collapse in">
-                                        <td>T1.3</td>
-                                        <td>Application de l'écoute active</td>
-                                        <td class="summary-ra">2</td>
-                                        <td class="summary-rpa">2</td>
-                                        <td> </td>
-                                        <td> </td>
-                                </tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseOne collapse in">
-                                        <td>T1.4</td>
-                                        <td>Utilisation des technologies d'information et de communication</td>
-                                        <td class="summary-ra">2</td>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td class="summary-no">1</td>
-                                </tr>
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-                                <!-- Ligne de Total des évaluations par compétence -->
-                                <tr class="accordion-toggle summary-evaluation" data-toggle="collapse" data-target=".collapseTwo">
-					<td>T2</td>
-                                        <td>Gérer les ressources</td>
-					<td>1</td>
-					<td>1</td>
-                                        <td>1</td>
-                                        <td>0</td>
-				</tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseTwo collapse in">
-                                        <td>T2.1</td>
-                                        <td>Utilisation des ressources matérielles</td>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
-                                </tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseTwo collapse in">
-                                        <td>T2.2</td>
-                                        <td>Qualité de la langue parlée</td>
-                                        <td class="summary-ra">1</td>
-                                        <td class="summary-rpa">1</td>
-                                        <td class="summary-nrpa">1</td>
-                                        <td> </td>
-                                </tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseTwo collapse in">
-                                        <td>T2.6</td>
-                                        <td>Coordination des aspects organisationnels de son milieu de travail</td>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
-                                </tr>
-                                <!-- Ligne de Total des évaluations par élément de compétence -->
-                                <tr class="collapseTwo collapse in">
-                                        <td>T2.7</td>
-                                        <td>Prévention et gestion des conflits interpersonnels</td>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
-                                        <td> </td>
-                                </tr>
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    Competency report data table.
 
-			</tbody>
-		</table>
+    Classes required for JS:
+
+    Context variables required for this template:
+    * hascompetencies
+    * reportinfos
+        * iscmcompetencygradingenabled
+        * competencies_list - array of following elements
+            * competency
+                * idnumber
+                * id
+                * shortname
+            * showasparent
+            * evaluationslist_total - array of following elements
+                * color
+                * number
+            * evaluationslist_course - array of following elements
+                * color
+                * number
+            * evaluationslist_cm - array of following elements
+                * color
+                * number
+        * scale - array of following elements
+            * value
+            * name
+            * color
+    * plan
+        * id
+        * user
+            * id
+    * tablesearchvalue
+    * filterchecked_course - boolean
+    * filterchecked_module - boolean
+    * filterchecked_both - boolean
+}}
+
+{{^hascompetencies}}
+    <p class="alert alert-info">
+        {{#str}}nocompetenciesinlearningplan, tool_lp{{/str}}
+    </p>
+{{/hascompetencies}}
+
+{{#hascompetencies}}
+    {{#reportinfos}}
+            <table id="summary-table" class="summary-table table table-bordered hidden" data-region="summary-competencies-section">
+                <thead>
+                    <tr>
+                        <th>
+                            {{#str}}competencies, core_competency{{/str}}
+                            <input id="summary-search-competency"
+                                {{#tablesearchvalue}}value="{{tablesearchvalue}}"{{/tablesearchvalue}}
+                                class="filtercolumn form-control"
+                                type="text" placeholder="{{#str}}searchincompetencies, report_lpmonitoring{{/str}}"/>
+                        </th>
+                        {{#scale}}
+                            <th class="total-cell" style="background-color: {{color}}">{{name}}</th>
+                        {{/scale}}
+                        {{#iscmcompetencygradingenabled}}
+                            {{#scale}}
+                                <th class="course-cell" style="background-color: {{color}}">{{name}}</th>
+                            {{/scale}}
+                            {{#scale}}
+                                <th class="cm-cell" style="background-color: {{color}}">{{name}}</th>
+                            {{/scale}}
+                        {{/iscmcompetencygradingenabled}}
+                    </tr>
+                </thead>
+
+                <tbody>
+                {{#competencies_list}}
+                    {{#showasparent}}
+                        <tr class="accordion-toggle summary-parent" data-toggle="collapse" data-target=".collapse-{{competency.id}}">
+                            <td>
+                                {{competency.idnumber}} - {{competency.shortname}}
+                            </td>
+                    {{/showasparent}}
+
+                    {{^showasparent}}
+                        <tr class="collapse-{{competency.parentid}} collapse show">
+                            <td>
+                                {{competency.idnumber}} - 
+                                <a href="#" data-user-competency="true" data-userid="{{plan.user.id}}" data-competencyid="{{competency.id}}" 
+                                    data-planid="{{plan.id}}" title="{{competency.shortname}}" role="button">
+                                    {{competency.shortname}}
+                                </a>
+                            </td>
+                    {{/showasparent}}
+
+                    {{#evaluationslist_total}}
+                        <td class="total-cell" {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}>{{number}}</td>
+                    {{/evaluationslist_total}}
+                    {{#iscmcompetencygradingenabled}}
+                        {{#evaluationslist_course}}
+                            <td class="course-cell" {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}>{{number}}</td>
+                        {{/evaluationslist_course}}
+                        {{#evaluationslist_cm}}
+                            <td class="cm-cell" {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}>{{number}}</td>
+                        {{/evaluationslist_cm}}
+                    {{/iscmcompetencygradingenabled}}
+                    </tr>
+                {{/competencies_list}}
+                </tbody>
+            </table>
+    {{/reportinfos}}
+
+    {{#js}}
+        require(['jquery', 'report_lpmonitoring/summary_datatable'], function($, Sdt) {
+            Sdt.init('#summary-table', 'reportfilter', '#summary-search-competency', '#summary-content .total-cell',
+                '#summary-content .course-cell', '#summary-content .cm-cell');
+        });
+    {{/js}}
+{{/hascompetencies}}

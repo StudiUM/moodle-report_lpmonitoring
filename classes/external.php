@@ -52,6 +52,7 @@ use core_competency\external\user_competency_plan_exporter;
 use core_comment\external\comment_area_exporter;
 use core_tag_tag;
 use report_lpmonitoring\external\list_plan_competency_report_exporter;
+use report_lpmonitoring\external\list_plan_competency_summary_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_detail_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_incourse_exporter;
@@ -1381,6 +1382,44 @@ class external extends external_api {
      */
     public static function list_plan_competencies_report_returns() {
         return list_plan_competency_report_exporter::get_read_structure();
+    }
+
+    /**
+     * Returns description of list_plan_competencies_summary() parameters.
+     *
+     * @return \external_description
+     */
+    public static function list_plan_competencies_summary_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(PARAM_INT, 'The plan ID.')
+        ));
+    }
+
+    /**
+     * List plan competencies for the summary.
+     * @param  int $id The plan ID.
+     * @return array
+     */
+    public static function list_plan_competencies_summary($id) {
+        global $PAGE;
+        $context = context_system::instance();
+        self::validate_context($context);
+        $output = $PAGE->get_renderer('report_lpmonitoring');
+
+        $plan = \core_competency\api::read_plan($id);
+        $resultcompetencies = self::list_plan_competencies($id);
+        $exporter = new list_plan_competency_summary_exporter($resultcompetencies, ['plan' => $plan]);
+        $result = $exporter->export($output);
+        return $result;
+    }
+
+    /**
+     * Returns description of list_plan_competencies_summary() result value.
+     *
+     * @return \external_description
+     */
+    public static function list_plan_competencies_summary_returns() {
+        return list_plan_competency_summary_exporter::get_read_structure();
     }
 
     /**
