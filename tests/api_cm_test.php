@@ -244,6 +244,34 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
     }
 
     /**
+     * Assign letter boundary. This is necessary so all tests use the same scale.
+     *
+     * @param int $contextid Context id
+     */
+    private function assign_good_letter_boundary($contextid) {
+        global $DB;
+        $newlettersscale = array(
+                array('contextid' => $contextid, 'lowerboundary' => 90.00000, 'letter' => 'A'),
+                array('contextid' => $contextid, 'lowerboundary' => 85.00000, 'letter' => 'A-'),
+                array('contextid' => $contextid, 'lowerboundary' => 80.00000, 'letter' => 'B+'),
+                array('contextid' => $contextid, 'lowerboundary' => 75.00000, 'letter' => 'B'),
+                array('contextid' => $contextid, 'lowerboundary' => 70.00000, 'letter' => 'B-'),
+                array('contextid' => $contextid, 'lowerboundary' => 65.00000, 'letter' => 'C+'),
+                array('contextid' => $contextid, 'lowerboundary' => 54.00000, 'letter' => 'C'),
+                array('contextid' => $contextid, 'lowerboundary' => 50.00000, 'letter' => 'C-'),
+                array('contextid' => $contextid, 'lowerboundary' => 40.00000, 'letter' => 'D+'),
+                array('contextid' => $contextid, 'lowerboundary' => 25.00000, 'letter' => 'D'),
+                array('contextid' => $contextid, 'lowerboundary' => 0.00000, 'letter' => 'F'),
+            );
+
+        $DB->delete_records('grade_letters', array('contextid' => $contextid));
+        foreach ($newlettersscale as $record) {
+            // There is no API to do this, so we have to manually insert into the database.
+            $DB->insert_record('grade_letters', $record);
+        }
+    }
+
+    /**
      * Test get learning plans from templateid with scale filter in course module.
      */
     public function test_search_users_by_templateid_and_scalefilter() {
@@ -495,6 +523,13 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $dg->enrol_user($this->user2->id, $course1->id);
         $dg->enrol_user($this->user2->id, $course2->id);
         $dg->enrol_user($this->user3->id, $course1->id);
+
+        // Assign the letter boundaries we want for these courses.
+        $context = context_course::instance($course1->id);
+        $this->assign_good_letter_boundary($context->id);
+        $context = context_course::instance($course2->id);
+        $this->assign_good_letter_boundary($context->id);
+
         // Insert student grades for the activities.
         $grade = new \stdClass();
         $grade->userid   = $this->user1->id;
@@ -540,8 +575,8 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertEquals(2, $result->cms[1]->usecompetencyincm->get('grade'));
         $this->assertEquals(1, $result->cms[2]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[3]->usecompetencyincm->get('grade'));
-        $this->assertEquals('B-', $result->cms[0]->grade);
-        $this->assertEquals('F', $result->cms[1]->grade);
+        $this->assertEquals('B+', $result->cms[0]->grade);
+        $this->assertEquals('D', $result->cms[1]->grade);
         $this->assertEquals('F', $result->cms[2]->grade);
         $this->assertEquals('-', $result->cms[3]->grade);
         $this->assertCount(1, $result->cms[0]->cmevidences);
@@ -607,7 +642,7 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
         $this->assertEquals(2, $result->cms[0]->usecompetencyincm->get('grade'));
         $this->assertEquals(1, $result->cms[1]->usecompetencyincm->get('grade'));
         $this->assertEquals(null, $result->cms[2]->usecompetencyincm->get('grade'));
-        $this->assertEquals('F', $result->cms[0]->grade);
+        $this->assertEquals('D', $result->cms[0]->grade);
         $this->assertEquals('F', $result->cms[1]->grade);
         $this->assertEquals('-', $result->cms[2]->grade);
         $this->assertCount(1, $result->cms[0]->cmevidences);

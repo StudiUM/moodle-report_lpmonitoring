@@ -230,7 +230,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     }
 
     /**
-     * Assign letter bondary.
+     * Assign letter boundary. This is necessary so all tests use the same scale.
      *
      * @param int $contextid Context id
      */
@@ -1492,7 +1492,13 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $context = context_course::instance($c2->id);
         $this->assign_good_letter_boundary($context->id);
 
+        $gradeitem = \grade_item::fetch_course_item($c1->id);
+        $gradegrade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $u1->id));
+        
         $result = api::get_competency_detail($u1->id, $comp1->get('id'), $plan->get('id'));
+        
+        $gradeitem = \grade_item::fetch_course_item($c1->id);
+        $gradegrade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $u1->id));
 
         // User competency is found and has the right information.
         $this->assertNotNull($result->usercompetency);
