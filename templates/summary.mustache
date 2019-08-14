@@ -23,25 +23,30 @@
     * hascompetencies
     * reportinfos
         * iscmcompetencygradingenabled
-        * competencies_list - array of following elements
-            * competency
-                * idnumber
-                * id
-                * shortname
-            * showasparent
-            * evaluationslist_total - array of following elements
+        * scale_competency
+            * competencies_list - array of following elements
+                * competency
+                    * idnumber
+                    * id
+                    * shortname
+                * showasparent
+                * evaluationslist_total - array of following elements
+                    * color
+                    * number
+                    * empty
+                * evaluationslist_course - array of following elements
+                    * color
+                    * number
+                    * empty
+                * evaluationslist_cm - array of following elements
+                    * color
+                    * number
+                    * empty
+            * scale - array of following elements
+                * value
+                * name
                 * color
-                * number
-            * evaluationslist_course - array of following elements
-                * color
-                * number
-            * evaluationslist_cm - array of following elements
-                * color
-                * number
-        * scale - array of following elements
-            * value
-            * name
-            * color
+            * scaleid
     * plan
         * id
         * user
@@ -60,12 +65,13 @@
 
 {{#hascompetencies}}
     {{#reportinfos}}
-            <table id="summary-table" class="summary-table table table-bordered hidden" data-region="summary-competencies-section">
+        {{#scale_competency}}
+            <table id="summary-table-{{scaleid}}" class="summary-table table table-bordered" data-region="summary-competencies-section">
                 <thead>
                     <tr>
                         <th>
                             {{#str}}competencies, core_competency{{/str}}
-                            <input id="summary-search-competency"
+                            <input id="summary-search-competency-{{scaleid}}"
                                 {{#tablesearchvalue}}value="{{tablesearchvalue}}"{{/tablesearchvalue}}
                                 class="filtercolumn form-control"
                                 type="text" placeholder="{{#str}}searchincompetencies, report_lpmonitoring{{/str}}"/>
@@ -87,7 +93,7 @@
                 <tbody>
                 {{#competencies_list}}
                     {{#showasparent}}
-                        <tr class="accordion-toggle summary-parent" data-toggle="collapse" data-target=".collapse-{{competency.id}}">
+                        <tr class="accordion-toggle summary-parent" data-toggle="collapse">
                             <td>
                                 {{competency.idnumber}} - {{competency.shortname}}
                             </td>
@@ -105,26 +111,60 @@
                     {{/showasparent}}
 
                     {{#evaluationslist_total}}
-                        <td class="total-cell" {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}>{{number}}</td>
+                        <td class="total-cell" 
+                            {{^empty}}
+                                {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}
+                            {{/empty}}>
+                            {{^showasparent}}
+                                {{#number}}{{number}}{{/number}}
+                            {{/showasparent}}
+                            {{#showasparent}}
+                                {{number}}
+                            {{/showasparent}}
+                        </td>
                     {{/evaluationslist_total}}
+
                     {{#iscmcompetencygradingenabled}}
                         {{#evaluationslist_course}}
-                            <td class="course-cell" {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}>{{number}}</td>
+                            <td class="course-cell" 
+                                {{^empty}}
+                                    {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}
+                                {{/empty}}>
+                                {{^showasparent}}
+                                    {{#number}}{{number}}{{/number}}
+                                {{/showasparent}}
+                                {{#showasparent}}
+                                    {{number}}
+                                {{/showasparent}}
+                            </td>
                         {{/evaluationslist_course}}
                         {{#evaluationslist_cm}}
-                            <td class="cm-cell" {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}>{{number}}</td>
+                            <td class="cm-cell" 
+                                {{^empty}}
+                                    {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}
+                                {{/empty}}>
+                                {{^showasparent}}
+                                {{#number}}{{number}}{{/number}}
+                            {{/showasparent}}
+                            {{#showasparent}}
+                                {{number}}
+                            {{/showasparent}}
+                        </td>
                         {{/evaluationslist_cm}}
                     {{/iscmcompetencygradingenabled}}
+
                     </tr>
                 {{/competencies_list}}
                 </tbody>
             </table>
-    {{/reportinfos}}
 
-    {{#js}}
-        require(['jquery', 'report_lpmonitoring/summary_datatable'], function($, Sdt) {
-            Sdt.init('#summary-table', 'reportfilter', '#summary-search-competency', '#summary-content .total-cell',
-                '#summary-content .course-cell', '#summary-content .cm-cell');
-        });
-    {{/js}}
+            {{#js}}
+                require(['jquery', 'report_lpmonitoring/summary_datatable'], function($, Sdt) {
+                    Sdt.init('#summary-table-{{scaleid}}', 'reportfilter', '#summary-search-competency-{{scaleid}}', '#summary-content .total-cell',
+                        '#summary-content .course-cell', '#summary-content .cm-cell');
+                });
+            {{/js}}
+
+        {{/scale_competency}}
+    {{/reportinfos}}
 {{/hascompetencies}}

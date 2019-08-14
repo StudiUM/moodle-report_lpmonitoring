@@ -52,7 +52,7 @@ use core_competency\external\user_competency_plan_exporter;
 use core_comment\external\comment_area_exporter;
 use core_tag_tag;
 use report_lpmonitoring\external\list_plan_competency_report_exporter;
-use report_lpmonitoring\external\list_plan_competency_summary_exporter;
+use report_lpmonitoring\external\scale_competency_summary_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_detail_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_exporter;
 use report_lpmonitoring\external\lpmonitoring_competency_statistics_incourse_exporter;
@@ -913,23 +913,59 @@ class external extends external_api {
 
     /**
      * List plan competencies.
-     * @param  int $id The plan ID.
+     * @param int $id The plan ID.
+     * @param boolean True if include parents in result.
      * @return array
      */
-    public static function list_plan_competencies($id) {
-
+    public static function list_plan_competencies($id, $withparent = false) {
+        global $PAGE;
         $plan = \core_competency\api::read_plan($id);
         $result = core_competency_external::list_plan_competencies($id);
         $displayrating = true;
         if ($plan->get('status') == \core_competency\plan::STATUS_ACTIVE) {
             $displayrating = api::has_to_display_rating($plan);
         }
+        if ($withparent) {
+            $output = $PAGE->get_renderer('report_lpmonitoring');
+            $helper = new \core_competency\external\performance_helper();
+            $competencieswithparents = [];
+            $competencies = [];
+        }
+
         foreach ($result as $key => $r) {
             $usercompetency = (isset($r->usercompetency)) ? $r->usercompetency : $r->usercompetencyplan;
             $proficiency = $usercompetency->proficiency;
             $r->isnotrated = false;
             $r->isproficient = false;
             $r->isnotproficient = false;
+            $r->isparent = false;
+            if ($withparent) {
+                // If there is no parent (first level of competency), we consider the competency itself as the parent.
+                if (empty($r->competency->parentid)) {
+                    $r->competency->parentid = $r->competency->id;
+                }
+                $parentcomp = new \core_competency\competency($r->competency->parentid);
+
+                $context = $helper->get_context_from_competency($parentcomp);
+
+                $exporter = new \core_competency\external\competency_exporter($parentcomp, array('context' => $context));
+                $parent = $exporter->export($output);
+
+                if (!in_array($parent->id, array_keys($competencieswithparents))) {
+                    $newcompdetail = new \stdClass();
+                    $newcompdetail->competency = $parent;
+                    $newcompdetail->usercompetency = \core_competency\user_competency::get_multiple($plan->get('userid'),
+                            [$parent->id]);
+                    $newcompdetail->isparent = true;
+                    $newcompdetail->isnotrated = false;
+                    $newcompdetail->isproficient = false;
+                    $newcompdetail->isnotproficient = false;
+                    $competencieswithparents[$parent->id]['parent'] = $newcompdetail;
+                    $competencieswithparents[$parent->id]['competencies'][] = $r;
+                } else {
+                    $competencieswithparents[$parent->id]['competencies'][] = $r;
+                }
+            }
             if (!$displayrating) {
                 $r->isnotrated = true;
                 continue;
@@ -943,6 +979,16 @@ class external extends external_api {
                     $r->isnotproficient = true;
                 }
             }
+        }
+
+        if ($withparent) {
+            foreach ($competencieswithparents as $cpm) {
+                $competencies[] = $cpm['parent'];
+                foreach ($cpm['competencies'] as $child) {
+                    $competencies[] = $child;
+                }
+            }
+            return $competencies;
         }
         return $result;
     }
@@ -1407,8 +1453,8 @@ class external extends external_api {
         $output = $PAGE->get_renderer('report_lpmonitoring');
 
         $plan = \core_competency\api::read_plan($id);
-        $resultcompetencies = self::list_plan_competencies($id);
-        $exporter = new list_plan_competency_summary_exporter($resultcompetencies, ['plan' => $plan]);
+        $resultcompetencies = self::list_plan_competencies($id, true);
+        $exporter = new scale_competency_summary_exporter($resultcompetencies, ['plan' => $plan]);
         $result = $exporter->export($output);
         return $result;
     }
@@ -1419,7 +1465,7 @@ class external extends external_api {
      * @return \external_description
      */
     public static function list_plan_competencies_summary_returns() {
-        return list_plan_competency_summary_exporter::get_read_structure();
+        return scale_competency_summary_exporter::get_read_structure();
     }
 
     /**

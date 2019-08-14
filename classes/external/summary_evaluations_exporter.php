@@ -40,20 +40,16 @@ class summary_evaluations_exporter extends \core\external\exporter {
     protected static function define_other_properties() {
         return array(
             'number' => array(
-                'type' => PARAM_INT
+                'type' => PARAM_INT,
+            ),
+            'empty' => array(
+                'type' => PARAM_BOOL,
+                'optional' => true
             ),
             'color' => array(
                 'type' => PARAM_TEXT
             )
         );
-    }
-
-    protected function get_other_values(renderer_base $output) {
-        // TODO EVOSTDM-1880 : retourner les bons nombres et couleurs
-        $result = new \stdClass();
-        $result->number = 3;
-        $result->color = '#86c66a';
-        return (array) $result;
     }
 
     /**

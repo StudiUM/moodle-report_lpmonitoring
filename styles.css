@@ -1270,7 +1270,7 @@
   z-index: 5;
   min-width: 300px;
 }
-.competencyreport .table-scroll #main-table_filter, .competencyreport #summary-table_filter {
+.competencyreport .dataTables_filter {
     display: none;
 }
 #report-content .filter-report-custom {
@@ -1665,4 +1665,11 @@ ul.detail-comp-tab li a::first-letter {
 }
 .lpmonitoringdialogue .dataTables_wrapper.dt-bootstrap .row div {
     width: 100%;
+}
+.summary-table td.course-cell,
+.summary-table td.total-cell,
+.summary-table td.cm-cell {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1.2rem;
 }

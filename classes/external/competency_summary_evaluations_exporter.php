@@ -64,39 +64,86 @@ class competency_summary_evaluations_exporter extends \core\external\exporter {
 
     protected static function define_related() {
         // We cache the plan so it does not need to be retrieved every time.
-        return array('plan' => 'core_competency\\plan');
+        return array('plan' => 'core_competency\\plan',
+                    'scalevalues' => '\\stdClass[]');
     }
 
     protected function get_other_values(renderer_base $output) {
-        $plan = $this->related['plan'];
-
+        $scalevalues = $this->related['scalevalues'];
         $competencydetailinfos = $this->data->competencydetailinfos;
-
         $result = new \stdClass();
         $result->competency = $this->data->competencydetailinfos->competency;
         $result->evaluationslist = array();
 
-        // TODO EVOSTDM-1880 : retourner les bonnes évaluations pour total, course et cm
-        $data = new \stdClass();
-
-        $exporter = new summary_evaluations_exporter($data);
-        $result->evaluationslist_total[] = $exporter->export($output);
-        $exporter = new summary_evaluations_exporter($data);
-        $result->evaluationslist_total[] = $exporter->export($output);
-
         $result->evaluationslist_course = array();
+        $result->evaluationslist_total = array();
         $result->evaluationslist_cm = array();
-        if (api::is_cm_comptency_grading_enabled()) {
-            $exporter = new summary_evaluations_exporter($data);
-            $result->evaluationslist_course[] = $exporter->export($output);
-            $exporter = new summary_evaluations_exporter($data);
+
+        foreach ($scalevalues as $config) {
+            if ($competencydetailinfos->isparent) {
+                $data = new \stdClass();
+                $data->empty = false;
+                $data->number = 0;
+                $data->color = $config->color;
+
+                $exporter = new summary_evaluations_exporter($data);
+                $result->evaluationslist_course[] = $exporter->export($output);
+
+                if (api::is_cm_comptency_grading_enabled()) {
+                    $exporter = new summary_evaluations_exporter($data);
+                    $result->evaluationslist_cm[] = $exporter->export($output);
+                }
+
+                $exporter = new summary_evaluations_exporter($data);
+                $result->evaluationslist_total[] = $exporter->export($output);
+                continue;
+            }
+            $datacourse = new \stdClass();
+            $datacourse->empty = false;
+            $datacourse->number = 0;
+            $datacourse->color = $config->color;
+            if (!empty($competencydetailinfos->competencydetail->courses)) {
+                foreach ($competencydetailinfos->competencydetail->courses as $course) {
+                    $usercmpcourse = $course->usecompetencyincourse;
+                    if ($usercmpcourse && $usercmpcourse->get('grade') == $config->value) {
+                        $datacourse->number++;
+                    }
+                }
+                $datacourse->empty = ($datacourse->number == 0) ? true : false;
+            } else {
+                $datacourse->empty = true;
+            }
+
+            $exporter = new summary_evaluations_exporter($datacourse);
             $result->evaluationslist_course[] = $exporter->export($output);
 
-            $exporter = new summary_evaluations_exporter($data);
-            $result->evaluationslist_cm[] = $exporter->export($output);
-            $exporter = new summary_evaluations_exporter($data);
-            $result->evaluationslist_cm[] = $exporter->export($output);
+            $datacm = new \stdClass();
+            $datacm->empty = false;
+            $datacm->number = 0;
+            $datacm->color = $config->color;
+            if (api::is_cm_comptency_grading_enabled()) {
+                if (!empty($competencydetailinfos->competencydetail->cms)) {
+                    foreach ($competencydetailinfos->competencydetail->cms as $cm) {
+                        $usercmpcm = $cm->usecompetencyincm;
+                        if ($usercmpcm && $usercmpcm->get('grade') == $config->value) {
+                            $datacm->number++;
+                        }
+                    }
+                    $datacm->empty = ($datacm->number == 0) ? true : false;
+                } else {
+                    $datacm->empty = true;
+                }
+                $exporter = new summary_evaluations_exporter($datacm);
+                $result->evaluationslist_cm[] = $exporter->export($output);
+            }
+            $datatotal = new \stdClass();
+            $datatotal->number = $datacm->number + $datacourse->number;
+            $datatotal->color = $config->color;
+            $datatotal->empty = ($datatotal->number == 0) ? true : false;
+            $exporter = new summary_evaluations_exporter($datatotal);
+            $result->evaluationslist_total[] = $exporter->export($output);
         }
+
         return (array) $result;
     }
 }

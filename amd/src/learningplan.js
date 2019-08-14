@@ -814,7 +814,7 @@ define(['jquery',
                 }
             }]);
             promiseCompetenciesSummary[0].then(function(results) {
-                if (results['competencies_list'].length > 0) {
+                if (results['scale_competency'].length > 0) {
                     var competencies = {reportinfos:results, plan:plan, hascompetencies: true};
                     /*
                     // Keep the filter and search values.
