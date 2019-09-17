@@ -804,7 +804,6 @@ define(['jquery',
          */
         LearningplanReport.prototype.loadSummaryTab = function(plan) {
             var learningplan = this;
-            var tablesearchvalue = $('#summary-search-competency').val();
 
             // Get the "Summary" tab content.
             var promiseCompetenciesSummary = ajax.call([{
@@ -816,9 +815,9 @@ define(['jquery',
             promiseCompetenciesSummary[0].then(function(results) {
                 if (results['scale_competency'].length > 0) {
                     var competencies = {reportinfos:results, plan:plan, hascompetencies: true};
-                    /*
+
                     // Keep the filter and search values.
-                    var checkedvalue = $('input[type=radio][name=reportfilter]:checked').val();
+                    var checkedvalue = $('input[type=radio][name=summaryfilter]:checked').val();
                     if (checkedvalue == 'course') {
                         competencies.filterchecked_course = true;
                     } else if (checkedvalue == 'module') {
@@ -826,8 +825,17 @@ define(['jquery',
                     } else {
                         competencies.filterchecked_both = true;
                     }
-                    */
-                    competencies.tablesearchvalue = tablesearchvalue;
+
+                    var scaleselected = $('#scale-filter-summary').val();
+                    for (var i = 0; i < competencies.reportinfos.scale_competency.length; i++) {
+                        var scaleid = competencies.reportinfos.scale_competency[i].scaleid;
+                        competencies.reportinfos.scale_competency[i].scaleselected = false;
+                        if (scaleid == scaleselected) {
+                            competencies.reportinfos.scale_competency[i].scaleselected = true;
+                        }
+                        var searchvalue = $( '#summary-search-competency-' + scaleid ).val();
+                        competencies.reportinfos.scale_competency[i].tablesearchvalue = searchvalue;
+                    }
 
                     // Render the "Summary" data table template.
                     templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {

@@ -28,22 +28,19 @@ define(['jquery', 'report_lpmonitoring/paginated_datatable'],
              * Constructor.
              *
              * @param {string} tableSelector The CSS selector used for the table.
-             * @param {string} reportfilterName The name of the filter radio buttons.
+             * @param {string} summaryfilterName The name of the filter radio buttons.
              * @param {string} searchSelector The CSS selector used for the table search input.
              * @param {string} coursesSelector The CSS selector used for courses columns and cells.
              * @param {string} activitiesSelector The CSS selector used for activities columns and cells.
              */
-            var SummaryDataTable = function(tableSelector, reportfilterName, searchSelector, totalSelector, coursesSelector,
+            var SummaryDataTable = function(tableSelector, summaryfilterName, searchSelector, totalSelector, coursesSelector,
             activitiesSelector) {
                 this.tableSelector = tableSelector;
-                this.reportfilterName = reportfilterName;
+                this.summaryfilterName = summaryfilterName;
                 this.searchSelector = searchSelector;
                 this.totalSelector = totalSelector;
                 this.coursesSelector = coursesSelector;
                 this.activitiesSelector = activitiesSelector;
-                /* TODO EVOSTDM-1879 : Voir si nécessaire de garder columns
-                this.columns = [];
-                */
 
                 var self = this;
                 // Perform the search and filters according to the actual values.
@@ -53,16 +50,19 @@ define(['jquery', 'report_lpmonitoring/paginated_datatable'],
                     $(self.searchSelector).on('input', function() {
                         self.performSearch();
                     });
-                    // TODO EVOSTDM-1879 : Filtre par cours/activité/total
-                    $('input[type=radio][name=' + self.reportfilterName + ']').change(function() {
+
+                    $('input[type=radio][name=' + self.summaryfilterName + ']').change(function() {
                         self.courseActivityFilter();
                         self.performSearch();
                     });
 
+                    $('#scale-filter-summary').on('change', function() {
+                        self.summarySelectScale();
+                    });
+
                     $(tableSelector).show();
-                    /* TODO EVOSTDM-1879
                     self.courseActivityFilter();
-                    */
+                    self.summarySelectScale();
                     self.performSearch();
                 });
             };
@@ -70,7 +70,7 @@ define(['jquery', 'report_lpmonitoring/paginated_datatable'],
             /** @var {String} The table CSS selector. */
             SummaryDataTable.prototype.tableSelector = null;
             /** @var {String} The report filter name (for radio buttons). */
-            SummaryDataTable.prototype.reportfilterName = null;
+            SummaryDataTable.prototype.summaryfilterName = null;
             /** @var {String} The search input CSS selector. */
             SummaryDataTable.prototype.searchSelector = null;
             /** @var {String} The total CSS selector. */
@@ -79,8 +79,6 @@ define(['jquery', 'report_lpmonitoring/paginated_datatable'],
             SummaryDataTable.prototype.coursesSelector = null;
             /** @var {String} The activities (course modules) cells CSS selector. */
             SummaryDataTable.prototype.activitiesSelector = null;
-            /** @var {Array} The columns indexes. */
-            SummaryDataTable.prototype.columns = [];
 
             /**
              * Perform the search in competency names (hide rows accordingly).
@@ -101,47 +99,50 @@ define(['jquery', 'report_lpmonitoring/paginated_datatable'],
              * @function
              */
             SummaryDataTable.prototype.courseActivityFilter = function() {
-                // TODO EVOSTDM-1879 : Filtre par cours/activité/total
-                /*
                 var self = this;
-                var checkedvalue = $('input[type=radio][name=' + self.reportfilterName + ']:checked').val();
+                var checkedvalue = $('input[type=radio][name=' + self.summaryfilterName + ']:checked').val();
                 var classcolumn = '';
-                var courseormodule = false;
                 if (checkedvalue === 'course') {
                     classcolumn = 'course-cell';
-                    courseormodule = true;
-                }
-                else if (checkedvalue === 'module') {
+                } else if (checkedvalue === 'module') {
                     classcolumn = 'cm-cell';
-                    courseormodule = true;
-                }
-                if (courseormodule) {
-                    $(self.tableSelector + " thead tr th").each(function( index ) {
-                        if (index > 1) {
-                            var column = $(self.tableSelector).DataTable().column(index);
-                            var columnheader = column.header();
-                            var condition = $(this).hasClass(classcolumn);
-                            $(columnheader).toggleClass('switchsearchhidden', !condition);
-                            $(this).toggleClass('switchsearchhidden', !condition);
-                            column.nodes().to$().toggleClass('switchsearchhidden', !condition);
-                        }
-                    });
                 } else {
-                    $.each(self.columns, function(index, value) {
-                        var column = $(self.tableSelector).DataTable().column(value);
-                        var columnheader = column.header();
-                        $(columnheader).removeClass('switchsearchhidden');
-                        column.nodes().to$().removeClass('switchsearchhidden');
-                    });
+                    classcolumn = 'total-cell';
                 }
-                */
+                $(self.tableSelector + " thead tr th").each(function( index ) {
+                    if (index > 0) {
+                        var column = $(self.tableSelector).DataTable().column(index);
+                        var columnheader = column.header();
+                        var condition = $(this).hasClass(classcolumn);
+                        $(columnheader).toggleClass('switchsearchhidden', !condition);
+                        $(this).toggleClass('switchsearchhidden', !condition);
+                        column.nodes().to$().toggleClass('switchsearchhidden', !condition);
+                    }
+                });
+            };
+
+            /**
+             * Switch display between scales.
+             *
+             * @name   summarySelectScale
+             * @return {Void}
+             * @function
+             */
+            SummaryDataTable.prototype.summarySelectScale = function() {
+                var optionSelected = $('#scale-filter-summary').val();
+                if ($(this.tableSelector).data('scaleid') == optionSelected) {
+                    $(this.tableSelector).parents(".table-scroll").show();
+                    this.performSearch();
+                } else {
+                    $(this.tableSelector).parents(".table-scroll").hide();
+                }
             };
 
             return {
-                init: function (tableSelector, reportfilterName, searchSelector, totalSelector, coursesSelector,
+                init: function (tableSelector, summaryfilterName, searchSelector, totalSelector, coursesSelector,
                     activitiesSelector) {
-                        return new SummaryDataTable(tableSelector, reportfilterName, searchSelector, totalSelector, coursesSelector,
-                            activitiesSelector);
+                        return new SummaryDataTable(tableSelector, summaryfilterName, searchSelector, totalSelector,
+                            coursesSelector, activitiesSelector);
                 }
             };
         });

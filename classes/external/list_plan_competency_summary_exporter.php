@@ -25,6 +25,7 @@
 namespace report_lpmonitoring\external;
 defined('MOODLE_INTERNAL') || die();
 
+use context_system;
 use core\external\exporter;
 use renderer_base;
 use report_lpmonitoring\api;
@@ -50,6 +51,9 @@ class list_plan_competency_summary_exporter extends exporter {
             ),
             'scaleid' => array(
                 'type' => PARAM_INT
+            ),
+            'scalename' => array(
+                'type' => PARAM_TEXT
             )
         );
     }
@@ -69,6 +73,7 @@ class list_plan_competency_summary_exporter extends exporter {
 
         $result = array();
         $result['scaleid'] = $scale->id;
+        $result['scalename'] = $scale->name;
 
         $relatedinfo = new \stdClass();
         foreach ($scalevalues as $scalevalue) {
@@ -186,5 +191,16 @@ class list_plan_competency_summary_exporter extends exporter {
             }
         }
         return $result;
+    }
+
+    /**
+     * Get the format parameters for scalename.
+     *
+     * @return array
+     */
+    protected function get_format_parameters_for_scalename() {
+        return [
+            'context' => context_system::instance(), // The system context is cached, so we can get it right away.
+        ];
     }
 }

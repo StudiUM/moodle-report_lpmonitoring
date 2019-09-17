@@ -1278,7 +1278,7 @@
     margin-bottom: 15px;
     height: 30px;
 }
-#report-content .filter-report-custom .radio-primary {
+#report-content .filter-report-custom .radio-primary, #summary-content .filter-report-custom .radio-primary {
     float: left;
     margin-right: 30px;
 }
@@ -1296,8 +1296,8 @@
     margin-bottom: 5px;
     clear: both;
 }
-#main-table .filtersearchhidden,
-#main-table .switchsearchhidden {
+#report-table .filtersearchhidden,
+#report-content .switchsearchhidden, #summary-content .switchsearchhidden {
     display: none !important;
 }
 #report-content .table-scroll td {
@@ -1592,7 +1592,7 @@ ul.detail-comp-tab li a::first-letter {
 }
 
 /* button radio */
-#reportFilter #id_displayinfo .fcontainer .fitem_fradio .form-inline {
+#reportFilter #id_displayinfo .fcontainer .fitem_fradio .form-inline{
     display: block !important;
 }
 
@@ -1645,10 +1645,8 @@ ul.detail-comp-tab li a::first-letter {
 .summary-table thead th.total-cell, .summary-table thead th.course-cell, .summary-table thead th.cm-cell {
     vertical-align: middle;
 }
-.summary-parent {
-    background-color: #c0ae81;
-    border-color: #c0ae81;
-    border: 1px solid #c0ae81;
+.competencyreport .table-scroll .summary-parent th, .competencyreport .table-scroll .summary-parent td {
+    background-color: rgba(0,0,0,.15);
 }
 
 .path-report-lpmonitoring .well {
