@@ -1296,7 +1296,7 @@
     margin-bottom: 5px;
     clear: both;
 }
-#report-table .filtersearchhidden,
+#report-content .filtersearchhidden,
 #report-content .switchsearchhidden, #summary-content .switchsearchhidden {
     display: none !important;
 }

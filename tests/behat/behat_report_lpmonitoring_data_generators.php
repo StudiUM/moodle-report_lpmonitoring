@@ -107,16 +107,30 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
             'contextid' => $cat1ctx->id
         );
         $framework = $cpg->create_framework($framework);
+
+        $cparent = $cpg->create_competency(array(
+            'competencyframeworkid' => $framework->get('id'),
+            'shortname' => 'Parent Competency')
+        );
+
         $c1 = $cpg->create_competency(array(
             'competencyframeworkid' => $framework->get('id'),
-            'shortname' => 'Competency A')
+            'shortname' => 'Competency A',
+            'parentid' => $cparent->get('id'))
         );
 
         $c2 = $cpg->create_competency(array(
             'competencyframeworkid' => $framework->get('id'),
             'shortname' => 'Competency B',
+            'parentid' => $cparent->get('id'),
             'scaleid' => $scale2->id,
             'scaleconfiguration' => $scaleconfiguration2)
+        );
+
+        $c3 = $cpg->create_competency(array(
+            'competencyframeworkid' => $framework->get('id'),
+            'shortname' => 'Competency C',
+            'parentid' => $cparent->get('id'))
         );
 
         // Create color configuration for the specific scale.
@@ -129,6 +143,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         // Create course competency.
         $cpg->create_course_competency(array('courseid' => $course1->id, 'competencyid' => $c1->get('id')));
         $cpg->create_course_competency(array('courseid' => $course1->id, 'competencyid' => $c2->get('id')));
+        $cpg->create_course_competency(array('courseid' => $course1->id, 'competencyid' => $c3->get('id')));
 
         $cpg->create_course_competency(array('courseid' => $course2->id, 'competencyid' => $c1->get('id')));
         $cpg->create_course_competency(array('courseid' => $course2->id, 'competencyid' => $c2->get('id')));
@@ -148,6 +163,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         // Create template competency.
         $cpg->create_template_competency(array('templateid' => $template1->get('id'), 'competencyid' => $c1->get('id')));
         $cpg->create_template_competency(array('templateid' => $template1->get('id'), 'competencyid' => $c2->get('id')));
+        $cpg->create_template_competency(array('templateid' => $template1->get('id'), 'competencyid' => $c3->get('id')));
 
         $cpg->create_template_competency(array('templateid' => $template2->get('id'), 'competencyid' => $c1->get('id')));
         $cpg->create_template_competency(array('templateid' => $template2->get('id'), 'competencyid' => $c2->get('id')));
@@ -335,9 +351,10 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         assign_capability('moodle/competency:templateview', CAP_ALLOW, $role2id, $cat1ctx->id);
         role_assign($role2id, $manager->id, $cat1ctx->id);
 
-        // Rate some comptencies in course for Pablo.
+        // Rate some competencies in courses for Pablo.
         core_competency_api::grade_competency_in_course($course1->id, $user4->id, $c1->get('id'), 1, "My note");
         core_competency_api::grade_competency_in_course($course1->id, $user4->id, $c2->get('id'), 2);
+        core_competency_api::grade_competency_in_course($course1->id, $user4->id, $c3->get('id'), 1);
 
         core_competency_api::grade_competency_in_course($course2->id, $user4->id, $c1->get('id'), 1);
         core_competency_api::grade_competency_in_course($course2->id, $user4->id, $c2->get('id'), 1);
@@ -468,6 +485,9 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $cpg->create_course_module_competency(array('competencyid' => $c2->get('id'), 'cmid' => $cmn1->id));
         $cpg->create_course_module_competency(array('competencyid' => $c2->get('id'), 'cmid' => $cmn2->id));
 
+        $cpg->create_course_module_competency(array('competencyid' => $c3->get('id'), 'cmid' => $cmps1->id));
+        $cpg->create_course_module_competency(array('competencyid' => $c3->get('id'), 'cmid' => $cmg1->id));
+
         // Grade some activities.
         $gi = \grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign', 'iteminstance' => $module3->id,
             'courseid' => $course2->id));
@@ -523,6 +543,10 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
             // For Cynthia.
             \tool_cmcompetency\api::grade_competency_in_coursemodule($cmg1, $user5->id, $c2->get('id'), 2);
             \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn2, $user5->id, $c2->get('id'), 2);
+            // Rate competency B in course modules.
+            // For Pablo.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmps1, $user4->id, $c3->get('id'), 2);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmg1, $user4->id, $c3->get('id'), 2, 'My note Data 5');
         }
     }
 }

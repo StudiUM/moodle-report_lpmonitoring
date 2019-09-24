@@ -27,6 +27,7 @@
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
 use Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
+use Behat\Mink\Exception\ExpectationException as ExpectationException;
 use report_lpmonitoring\api;
 
 /**
@@ -202,8 +203,17 @@ class behat_report_lpmonitoring extends behat_base {
      * @param string $table
      */
     public function i_should_see_in_row_column_of_table($value, $row, $column, $table) {
-        $tablenode = $this->get_selected_node('table', $table);
-        $tablexpath = $tablenode->getXpath();
+        // Find the visible table (in case more than one table $table is found).
+        list($selector, $locator) = $this->transform_selector('table', $table);
+        $tablenodes = $this->find_all($selector, $locator);
+        $visiblenode = null;
+        foreach ($tablenodes as $node) {
+            if ($node->isVisible()) {
+                $visiblenode = $node;
+                break;
+            }
+        }
+        $tablexpath = $visiblenode->getXpath();
 
         $rowliteral = \behat_context_helper::escape($row);
         $valueliteral = \behat_context_helper::escape($value);
@@ -243,11 +253,22 @@ class behat_report_lpmonitoring extends behat_base {
         $columnvaluexpath = $rowxpath . $columnpositionxpath . "[contains(normalize-space(.)," . $valueliteral . ")]";
 
         // Looks for the requested node inside the container node.
-        $coumnnode = $this->getSession()->getDriver()->find($columnvaluexpath);
-        if (empty($coumnnode)) {
+        $columnnode = $this->getSession()->getDriver()->find($columnvaluexpath);
+        if (empty($columnnode)) {
             $locatorexceptionmsg = $value . '" in "' . $row . '" row with column "' . $column;
             throw new ElementNotFoundException($this->getSession(), "\n$columnvaluexpath\n\n".'Column value', null,
                     $locatorexceptionmsg);
+        } else {
+            // Checks if the corresponding node is visible (loop until a visible node is found).
+            foreach ($columnnode as $node) {
+                if ($node->isVisible()) {
+                    return;
+                }
+            }
+            throw new ExpectationException(
+                '"' . $value . '" in "' . $row . '" row with column "' . $column . '" of table "' .$table. ' "is not visible',
+                $this->getSession()
+            );
         }
     }
 
@@ -273,6 +294,17 @@ class behat_report_lpmonitoring extends behat_base {
      */
     public function course_module_competency_grading_is_enabled() {
         if (!api::is_cm_comptency_grading_enabled()) {
+            throw new \Moodle\BehatExtension\Exception\SkippedException;
+        }
+    }
+
+    /**
+     * If course module competency grading is enabled, skip the test.
+     *
+     * @Given /^course module competency grading is not enabled$/
+     */
+    public function course_module_competency_grading_is_not_enabled() {
+        if (api::is_cm_comptency_grading_enabled()) {
             throw new \Moodle\BehatExtension\Exception\SkippedException;
         }
     }
