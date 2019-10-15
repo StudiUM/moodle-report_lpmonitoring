@@ -148,6 +148,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $cpg->create_course_competency(array('courseid' => $course2->id, 'competencyid' => $c1->get('id')));
         $cpg->create_course_competency(array('courseid' => $course2->id, 'competencyid' => $c2->get('id')));
 
+        $cpg->create_course_competency(array('courseid' => $course3->id, 'competencyid' => $cparent->get('id')));
         $cpg->create_course_competency(array('courseid' => $course3->id, 'competencyid' => $c1->get('id')));
         $cpg->create_course_competency(array('courseid' => $course3->id, 'competencyid' => $c2->get('id')));
 
@@ -247,10 +248,28 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
             'status' => \core_competency\plan::STATUS_ACTIVE)
         );
 
+        // Create special plans for Pablo.
+        // Plan where only the first level competency is assessed.
+        $plevel1only = $cpg->create_plan(array(
+            'userid' => $user4->id,
+            'name' => 'Pablo plan level 1 only')
+        );
+        // Plan where both the first level and the second level competencies are assessed.
+        $plevel1and2 = $cpg->create_plan(array(
+            'userid' => $user4->id,
+            'name' => 'Pablo plan level 1 and 2')
+        );
+
         $cpg->create_plan_competency(array('planid' => $p->get('id'), 'competencyid' => $c1->get('id')));
         $cpg->create_plan_competency(array('planid' => $pactive->get('id'), 'competencyid' => $c1->get('id')));
         $cpg->create_plan_competency(array('planid' => $pdraft->get('id'), 'competencyid' => $c1->get('id')));
         $cpg->create_plan_competency(array('planid' => $pcomplete->get('id'), 'competencyid' => $c1->get('id')));
+
+        $cpg->create_plan_competency(array('planid' => $plevel1only->get('id'), 'competencyid' => $cparent->get('id')));
+
+        $cpg->create_plan_competency(array('planid' => $plevel1and2->get('id'), 'competencyid' => $cparent->get('id')));
+        $cpg->create_plan_competency(array('planid' => $plevel1and2->get('id'), 'competencyid' => $c1->get('id')));
+        $cpg->create_plan_competency(array('planid' => $plevel1and2->get('id'), 'competencyid' => $c2->get('id')));
 
         // Make draft.
         core_competency_api::unapprove_plan($pdraft->get('id'));
@@ -359,6 +378,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         core_competency_api::grade_competency_in_course($course2->id, $user4->id, $c1->get('id'), 1);
         core_competency_api::grade_competency_in_course($course2->id, $user4->id, $c2->get('id'), 1);
 
+        core_competency_api::grade_competency_in_course($course3->id, $user4->id, $cparent->get('id'), 1);
         core_competency_api::grade_competency_in_course($course3->id, $user4->id, $c1->get('id'), 2);
         core_competency_api::grade_competency_in_course($course3->id, $user4->id, $c2->get('id'), 2);
 
@@ -471,6 +491,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $cmn3 = get_coursemodule_from_id('assign', $module8->cmid);
 
         // Link competencies to course modules.
+        $cpg->create_course_module_competency(array('competencyid' => $cparent->get('id'), 'cmid' => $cmps1->id));
         $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmps1->id));
         $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmg1->id));
         $cpg->create_course_module_competency(array('competencyid' => $c1->get('id'), 'cmid' => $cmph1->id));
@@ -525,6 +546,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
             \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn1, $user1->id, $c1->get('id'), 1);
             \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn3, $user1->id, $c1->get('id'), 1);
             // For Pablo.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($cmps1, $user4->id, $cparent->get('id'), 2);
             \tool_cmcompetency\api::grade_competency_in_coursemodule($cmps1, $user4->id, $c1->get('id'), 2);
             \tool_cmcompetency\api::grade_competency_in_coursemodule($cmg1, $user4->id, $c1->get('id'), 2, 'My note Data 1');
             \tool_cmcompetency\api::grade_competency_in_coursemodule($cmn1, $user4->id, $c1->get('id'), 1, 'My note Data 2');

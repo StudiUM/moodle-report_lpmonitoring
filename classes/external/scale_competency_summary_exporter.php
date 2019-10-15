@@ -66,31 +66,27 @@ class scale_competency_summary_exporter extends exporter {
 
         $scales = [];
         foreach ($resultcompetencies as $key => $r) {
-            // Export the scale only if it is not a parent.
-            if (! (isset($r->isparent) && $r->isparent)) {
-                $competency = new \core_competency\competency($r->competency->id);
-                $scale = $helper->get_scale_from_competency($competency);
-                if (!in_array($scale->id, $scales)) {
-                    $reportscaleconfig = api::read_report_competency_config($r->competency->competencyframeworkid, $scale->id);
-                    $reportscaleconfig = json_decode($reportscaleconfig->get('scaleconfiguration'));
-                    $scalevalues = [];
-                    foreach ($reportscaleconfig as $config) {
-                        $scaleinfo = new \stdClass();
-                        $scaleinfo->value = $config->id;
-                        $scaleinfo->name = $scale->scale_items[$config->id - 1];
-                        $scaleinfo->color = $config->color;
-                        $scalevalues[] = $scaleinfo;
-                    }
-
-                    $exporter = new list_plan_competency_summary_exporter($this->data, ['plan' => $plan, 'scale' => $scale,
-                        'scalevalues' => $scalevalues]);
-                    $exportedcompetency = $exporter->export($output);
-                    $result['scale_competency'][] = $exportedcompetency;
-                    $scales[] = $scale->id;
+            $competency = new \core_competency\competency($r->competency->id);
+            $scale = $helper->get_scale_from_competency($competency);
+            if (!in_array($scale->id, $scales)) {
+                $reportscaleconfig = api::read_report_competency_config($r->competency->competencyframeworkid, $scale->id);
+                $reportscaleconfig = json_decode($reportscaleconfig->get('scaleconfiguration'));
+                $scalevalues = [];
+                foreach ($reportscaleconfig as $config) {
+                    $scaleinfo = new \stdClass();
+                    $scaleinfo->value = $config->id;
+                    $scaleinfo->name = $scale->scale_items[$config->id - 1];
+                    $scaleinfo->color = $config->color;
+                    $scalevalues[] = $scaleinfo;
                 }
+
+                $exporter = new list_plan_competency_summary_exporter($this->data, ['plan' => $plan, 'scale' => $scale,
+                    'scalevalues' => $scalevalues]);
+                $exportedcompetency = $exporter->export($output);
+                $result['scale_competency'][] = $exportedcompetency;
+                $scales[] = $scale->id;
             }
         }
-
         return $result;
     }
 }

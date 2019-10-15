@@ -2275,4 +2275,152 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $compdetail = api::get_competency_detail($user->id, $comp2->get('id'), $plan->get('id'));
         $this->assertNull($compdetail->usercompetency->get('grade'));
     }
+
+    /**
+     * Test list plan competencies and evaluations for lpmonitoring summary.
+     */
+    public function test_list_plan_competencies_summary() {
+        global $DB;
+        $this->setUser($this->creator);
+
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $mpg = $dg->get_plugin_generator('report_lpmonitoring');
+
+        // Create framework 1 with its scale.
+        $scale1 = $dg->create_scale(array('scale' => 'Good, Not good'));
+        $scaleconfig = array(array('scaleid' => $scale1->id));
+        $scaleconfig[] = array('name' => 'Good', 'id' => 1, 'scaledefault' => 1, 'proficient' => 1);
+        $scaleconfig[] = array('name' => 'Not good', 'id' => 2, 'scaledefault' => 0, 'proficient' => 0);
+        $f1 = $lpg->create_framework(array('scaleid' => $scale1->id, 'scaleconfiguration' => $scaleconfig));
+
+        $scaleconfig = array();
+        $scaleconfig[] = array('id' => 1, 'color' => '#AAAAAA');
+        $scaleconfig[] = array('id' => 2, 'color' => '#BBBBBB');
+
+        $record = new stdclass();
+        $record->competencyframeworkid = $f1->get('id');
+        $record->scaleid = $f1->get('scaleid');
+        $record->scaleconfiguration = json_encode($scaleconfig);
+        $mpg->create_report_competency_config($record);
+
+        $user = $dg->create_user();
+        $cparent = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id'), 'shortname' => 'Parent Competency'));
+        $c1a = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id'), 'parentid' => $cparent->get('id')));
+        $c1b = $lpg->create_competency(array('competencyframeworkid' => $f1->get('id'), 'parentid' => $cparent->get('id')));
+
+        $tpl = $lpg->create_template();
+        $lpg->create_template_competency(array('templateid' => $tpl->get('id'), 'competencyid' => $c1a->get('id')));
+        $lpg->create_template_competency(array('templateid' => $tpl->get('id'), 'competencyid' => $c1b->get('id')));
+
+        $plan = $lpg->create_plan(array('userid' => $user->id, 'templateid' => $tpl->get('id'),
+                'status' => plan::STATUS_ACTIVE));
+
+        $this->setAdminUser();
+
+        // Create courses.
+        $c1 = $dg->create_course();
+        $c2 = $dg->create_course();
+
+        // Associate competencies to courses.
+        $lpg->create_course_competency(array('competencyid' => $c1a->get('id'), 'courseid' => $c1->id));
+        $lpg->create_course_competency(array('competencyid' => $c1b->get('id'), 'courseid' => $c1->id));
+
+        // Enrol the user 1 in C1 and C2.
+        $dg->enrol_user($user->id, $c1->id);
+        $dg->enrol_user($user->id, $c2->id);
+
+        // Assign rates to comptencies in courses C1 and C2.
+        $lpg->create_user_competency_course(array('userid' => $user->id, 'competencyid' => $c1a->get('id'),
+            'grade' => 1, 'courseid' => $c1->id, 'proficiency' => 1));
+        $lpg->create_user_competency_course(array('userid' => $user->id, 'competencyid' => $c1b->get('id'),
+            'grade' => 2, 'courseid' => $c1->id, 'proficiency' => 0));
+
+        if (api::is_cm_comptency_grading_enabled()) {
+            // Create modules.
+            $module1 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c1->id));
+            $datacm1 = get_coursemodule_from_id('data', $module1->cmid);
+            $module2 = $dg->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $c1->id));
+            $datacm2 = get_coursemodule_from_id('data', $module2->cmid);
+
+            // Assign competencies to modules.
+            $lpg->create_course_module_competency(array('competencyid' => $c1a->get('id'), 'cmid' => $module1->cmid));
+            $lpg->create_course_module_competency(array('competencyid' => $c1a->get('id'), 'cmid' => $module2->cmid));
+
+            // Assign rates to competencies in modules.
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($datacm1, $user->id, $c1a->get('id'), 1);
+            \tool_cmcompetency\api::grade_competency_in_coursemodule($datacm2, $user->id, $c1a->get('id'), 2);
+        }
+
+        $this->setUser($this->appreciator);
+
+        // Get the data for the report.
+        $result = external::list_plan_competencies_summary($plan->get('id'));
+        $result = external::clean_returnvalue(external::list_plan_competencies_summary_returns(), $result);
+
+        $resultcompparent = $result['scale_competency'][0]['competencies_list'][0];
+        $resultevalparenttotal = $resultcompparent['evaluationslist_total'];
+        $resultevalparentcourse = $resultcompparent['evaluationslist_course'];
+        $resultevalparentcm = $resultcompparent['evaluationslist_cm'];
+
+        $resultcomp1 = $result['scale_competency'][0]['competencies_list'][1];
+        $resulteval1total = $resultcomp1['evaluationslist_total'];
+        $resulteval1course = $resultcomp1['evaluationslist_course'];
+
+        $resultcomp2 = $result['scale_competency'][0]['competencies_list'][2];
+        $resulteval2total = $resultcomp2['evaluationslist_total'];
+        $resulteval2course = $resultcomp2['evaluationslist_course'];
+
+        // Basic checks.
+        $this->assertTrue($resultcompparent['showasparent']);
+        $this->assertFalse($resultcompparent['isassessable']);
+
+        $this->assertFalse($resultcomp1['showasparent']);
+        $this->assertTrue($resultcomp1['isassessable']);
+
+        $this->assertFalse($resultcomp2['showasparent']);
+        $this->assertTrue($resultcomp2['isassessable']);
+
+        // Check the result for each scale level.
+        if (api::is_cm_comptency_grading_enabled()) {
+            $resulteval1cm = $resultcomp1['evaluationslist_cm'];
+            $resulteval2cm = $resultcomp2['evaluationslist_cm'];
+
+            $this->assertEquals(2, $resultevalparenttotal[0]['number']);
+            $this->assertEquals(2, $resultevalparenttotal[1]['number']);
+            $this->assertEquals(1, $resultevalparentcourse[0]['number']);
+            $this->assertEquals(1, $resultevalparentcourse[1]['number']);
+            $this->assertEquals(1, $resultevalparentcm[0]['number']);
+            $this->assertEquals(1, $resultevalparentcm[1]['number']);
+
+            $this->assertEquals(2, $resulteval1total[0]['number']);
+            $this->assertEquals(1, $resulteval1total[1]['number']);
+            $this->assertEquals(1, $resulteval1course[0]['number']);
+            $this->assertEquals(0, $resulteval1course[1]['number']);
+            $this->assertEquals(1, $resulteval1cm[0]['number']);
+            $this->assertEquals(1, $resulteval1cm[1]['number']);
+
+            $this->assertEquals(0, $resulteval2total[0]['number']);
+            $this->assertEquals(1, $resulteval2total[1]['number']);
+            $this->assertEquals(0, $resulteval2course[0]['number']);
+            $this->assertEquals(1, $resulteval2course[1]['number']);
+            $this->assertEquals(0, $resulteval2cm[0]['number']);
+            $this->assertEquals(0, $resulteval2cm[1]['number']);
+        } else {
+            $this->assertEquals(1, $resultevalparenttotal[0]['number']);
+            $this->assertEquals(1, $resultevalparenttotal[1]['number']);
+            $this->assertEquals(1, $resultevalparentcourse[0]['number']);
+            $this->assertEquals(1, $resultevalparentcourse[1]['number']);
+
+            $this->assertEquals(1, $resulteval1total[0]['number']);
+            $this->assertEquals(0, $resulteval1total[1]['number']);
+            $this->assertEquals(1, $resulteval1course[0]['number']);
+            $this->assertEquals(0, $resulteval1course[1]['number']);
+
+            $this->assertEquals(0, $resulteval2total[0]['number']);
+            $this->assertEquals(1, $resulteval2total[1]['number']);
+            $this->assertEquals(0, $resulteval2course[0]['number']);
+            $this->assertEquals(1, $resulteval2course[1]['number']);
+        }
+    }
 }

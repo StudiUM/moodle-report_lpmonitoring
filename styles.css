@@ -1637,7 +1637,7 @@ ul.detail-comp-tab li a::first-letter {
     vertical-align: middle;
 }
 .competencyreport .table-scroll .summary-parent th, .competencyreport .table-scroll .summary-parent td {
-    background-color: rgba(0,0,0,.15);
+    background-color: #D9D9D9;
 }
 
 .path-report-lpmonitoring .well {

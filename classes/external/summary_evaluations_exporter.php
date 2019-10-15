@@ -42,6 +42,10 @@ class summary_evaluations_exporter extends \core\external\exporter {
             'number' => array(
                 'type' => PARAM_INT,
             ),
+            'number_self' => array(
+                'type' => PARAM_INT,
+                'optional' => true
+            ),
             'empty' => array(
                 'type' => PARAM_BOOL,
                 'optional' => true

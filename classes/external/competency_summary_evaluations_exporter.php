@@ -59,6 +59,10 @@ class competency_summary_evaluations_exporter extends \core\external\exporter {
                 'type' => PARAM_BOOL,
                 'optional' => true
             ),
+            'isassessable' => array(
+                'type' => PARAM_BOOL,
+                'optional' => true
+            ),
         );
     }
 
@@ -80,24 +84,6 @@ class competency_summary_evaluations_exporter extends \core\external\exporter {
         $result->evaluationslist_cm = array();
 
         foreach ($scalevalues as $config) {
-            if ($competencydetailinfos->isparent) {
-                $data = new \stdClass();
-                $data->empty = false;
-                $data->number = 0;
-                $data->color = $config->color;
-
-                $exporter = new summary_evaluations_exporter($data);
-                $result->evaluationslist_course[] = $exporter->export($output);
-
-                if (api::is_cm_comptency_grading_enabled()) {
-                    $exporter = new summary_evaluations_exporter($data);
-                    $result->evaluationslist_cm[] = $exporter->export($output);
-                }
-
-                $exporter = new summary_evaluations_exporter($data);
-                $result->evaluationslist_total[] = $exporter->export($output);
-                continue;
-            }
             $datacourse = new \stdClass();
             $datacourse->empty = false;
             $datacourse->number = 0;

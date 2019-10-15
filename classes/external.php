@@ -914,7 +914,7 @@ class external extends external_api {
     /**
      * List plan competencies.
      * @param int $id The plan ID.
-     * @param boolean True if include parents in result.
+     * @param boolean $withparent True if include parents in result.
      * @return array
      */
     public static function list_plan_competencies($id, $withparent = false) {
@@ -939,31 +939,39 @@ class external extends external_api {
             $r->isproficient = false;
             $r->isnotproficient = false;
             $r->isparent = false;
+            $r->isassessable = true;
             if ($withparent) {
-                // If there is no parent (first level of competency), we consider the competency itself as the parent.
-                if (empty($r->competency->parentid)) {
-                    $r->competency->parentid = $r->competency->id;
-                }
-                $parentcomp = new \core_competency\competency($r->competency->parentid);
+                $assessedcompetency = new \core_competency\competency($r->competency->id);
+                $ancestors = $assessedcompetency->get_ancestors();
+                $firstlevelparent = reset($ancestors);
 
-                $context = $helper->get_context_from_competency($parentcomp);
+                // If there is a parent.
+                if ($firstlevelparent) {
+                    $context = $helper->get_context_from_competency($firstlevelparent);
+                    $exporter = new \core_competency\external\competency_exporter($firstlevelparent, array('context' => $context));
+                    $parent = $exporter->export($output);
+                    $r->competency->firstlevelparentid = $parent->id;
 
-                $exporter = new \core_competency\external\competency_exporter($parentcomp, array('context' => $context));
-                $parent = $exporter->export($output);
-
-                if (!in_array($parent->id, array_keys($competencieswithparents))) {
-                    $newcompdetail = new \stdClass();
-                    $newcompdetail->competency = $parent;
-                    $newcompdetail->usercompetency = \core_competency\user_competency::get_multiple($plan->get('userid'),
-                            [$parent->id]);
-                    $newcompdetail->isparent = true;
-                    $newcompdetail->isnotrated = false;
-                    $newcompdetail->isproficient = false;
-                    $newcompdetail->isnotproficient = false;
-                    $competencieswithparents[$parent->id]['parent'] = $newcompdetail;
-                    $competencieswithparents[$parent->id]['competencies'][] = $r;
+                    if (!in_array($parent->id, array_keys($competencieswithparents))) {
+                        $newcompdetail = new \stdClass();
+                        $newcompdetail->competency = $parent;
+                        $newcompdetail->usercompetency = \core_competency\user_competency::get_multiple($plan->get('userid'),
+                                [$parent->id]);
+                        $newcompdetail->isparent = true;
+                        $newcompdetail->isnotrated = false;
+                        $newcompdetail->isproficient = false;
+                        $newcompdetail->isnotproficient = false;
+                        $newcompdetail->isassessable = false;
+                        $competencieswithparents[$parent->id]['parent'] = $newcompdetail;
+                        $competencieswithparents[$parent->id]['competencies'][] = $r;
+                    } else {
+                        $competencieswithparents[$parent->id]['competencies'][] = $r;
+                    }
                 } else {
-                    $competencieswithparents[$parent->id]['competencies'][] = $r;
+                    // This is already a first level competency.
+                    $r->isparent = true;
+                    $r->isassessable = true;
+                    $competencieswithparents[$r->competency->id]['parent'] = $r;
                 }
             }
             if (!$displayrating) {
@@ -982,10 +990,20 @@ class external extends external_api {
         }
 
         if ($withparent) {
+            $onlylevel1 = true;
             foreach ($competencieswithparents as $cpm) {
                 $competencies[] = $cpm['parent'];
-                foreach ($cpm['competencies'] as $child) {
-                    $competencies[] = $child;
+                if (!empty($cpm['competencies'])) {
+                    foreach ($cpm['competencies'] as $child) {
+                        $competencies[] = $child;
+                        $onlylevel1 = false;
+                    }
+                }
+            }
+            // If all competencies are level 1, we do not consider them as parents.
+            if ($onlylevel1) {
+                foreach ($competencies as $cmp) {
+                    $cmp->isparent = false;
                 }
             }
             return $competencies;

@@ -91,7 +91,7 @@ class list_plan_competency_summary_exporter extends exporter {
             if (empty($r->isparent) && $scalecmp->id !== $scale->id) {
                 continue;
             }
-            if (isset($r->isparent) && $r->isparent) {
+            if (isset($r->isparent) && $r->isparent && !$r->isassessable) {
                 $compdetail = new \stdClass();
                 $compdetail->competency = $comp;
                 $compdetail->usercompetency = null;
@@ -104,42 +104,63 @@ class list_plan_competency_summary_exporter extends exporter {
             $data->allcourses = array();
             $data->competencydetailinfos = $r;
 
+            $data->isassessable = (isset($r->isassessable) && $r->isassessable) ? $r->isassessable : false;
             $data->showasparent = (isset($r->isparent) && $r->isparent) ? $r->isparent : false;
             $exporter = new competency_summary_evaluations_exporter($data, ['plan' => $plan, 'scalevalues' => $scalevalues]);
             $exportedcompetency = $exporter->export($output);
             $result['competencies_list'][] = $exportedcompetency;
             // Get total in parent competency.
             if (empty($r->isparent)) {
-                if (empty($parents[$r->competency->parentid])) {
-                    $parents[$r->competency->parentid] = ['total' => [], 'cm' => [], 'course' => []];
-                }
+                if (!empty($r->competency->firstlevelparentid)) {
+                    if (empty($parents[$r->competency->firstlevelparentid])) {
+                        $parents[$r->competency->firstlevelparentid] = ['total' => [], 'cm' => [], 'course' => [],
+                            'total_self' => [], 'cm_self' => [], 'course_self' => []];
+                    }
 
+                    foreach ($exportedcompetency->evaluationslist_total as $key => $value) {
+                        $number = (isset($parents[$r->competency->firstlevelparentid]['total'][$key])) ?
+                                $parents[$r->competency->firstlevelparentid]['total'][$key] : 0;
+                        $number += $value->number;
+                        $parents[$r->competency->firstlevelparentid]['total'][$key] = $number;
+                    }
+
+                    foreach ($exportedcompetency->evaluationslist_course as $key => $value) {
+                        $number = (isset($parents[$r->competency->firstlevelparentid]['course'][$key])) ?
+                                $parents[$r->competency->firstlevelparentid]['course'][$key] : 0;
+                        $number += $value->number;
+                        $parents[$r->competency->firstlevelparentid]['course'][$key] = $number;
+                    }
+                    if (api::is_cm_comptency_grading_enabled()) {
+                        foreach ($exportedcompetency->evaluationslist_cm as $key => $value) {
+                            $number = (isset($parents[$r->competency->firstlevelparentid]['cm'][$key])) ?
+                                    $parents[$r->competency->firstlevelparentid]['cm'][$key] : 0;
+                            $number += $value->number;
+                            $parents[$r->competency->firstlevelparentid]['cm'][$key] = $number;
+                        }
+                    }
+                }
+            } else {
+                // If this is a parent.
+                if (empty($parents[$r->competency->id])) {
+                    $parents[$r->competency->id] = ['total' => [], 'cm' => [], 'course' => [],
+                        'total_self' => [], 'cm_self' => [], 'course_self' => []];
+                }
+                $isgoodscale = ($scalecmp->id == $scale->id);
                 foreach ($exportedcompetency->evaluationslist_total as $key => $value) {
-                    $number = (isset($parents[$r->competency->parentid]['total'][$key])) ?
-                            $parents[$r->competency->parentid]['total'][$key] : 0;
-                    $number += $value->number;
-                    $parents[$r->competency->parentid]['total'][$key] = $number;
+                    $parents[$r->competency->id]['total_self'][$key] = ($isgoodscale) ? $value->number : 0;
                 }
-
                 foreach ($exportedcompetency->evaluationslist_course as $key => $value) {
-                    $number = (isset($parents[$r->competency->parentid]['course'][$key])) ?
-                            $parents[$r->competency->parentid]['course'][$key] : 0;
-                    $number += $value->number;
-                    $parents[$r->competency->parentid]['course'][$key] = $number;
+                    $parents[$r->competency->id]['course_self'][$key] = ($isgoodscale) ? $value->number : 0;
                 }
                 if (api::is_cm_comptency_grading_enabled()) {
                     foreach ($exportedcompetency->evaluationslist_cm as $key => $value) {
-                        $number = (isset($parents[$r->competency->parentid]['cm'][$key])) ?
-                                $parents[$r->competency->parentid]['cm'][$key] : 0;
-                        $number += $value->number;
-                        $parents[$r->competency->parentid]['cm'][$key] = $number;
+                        $parents[$r->competency->id]['cm_self'][$key] = ($isgoodscale) ? $value->number : 0;
                     }
                 }
             }
         }
         $result = $this->cleanemptyparent($result, $parents);
         $result = $this->fillparent($result, $parents);
-
         return $result;
     }
 
@@ -155,6 +176,11 @@ class list_plan_competency_summary_exporter extends exporter {
             if ($comp->showasparent === true) {
                 if (!in_array($comp->competency->id, array_keys($parents))) {
                     unset($result['competencies_list'][$key]);
+                } else {
+                    if (count($parents[$comp->competency->id]['total']) == 0) {
+                        // This is a parent competency, but not for this scale.
+                        unset($result['competencies_list'][$key]);
+                    }
                 }
             }
         }
@@ -174,17 +200,23 @@ class list_plan_competency_summary_exporter extends exporter {
                 $compid = $comp->competency->id;
                 if (array_key_exists($compid, $parents)) {
                     foreach ($comp->evaluationslist_total as $keyeval => $value) {
-                        $number = $parents[$compid]['total'][$keyeval];
-                        $comp->evaluationslist_total[$keyeval]->number = $number;
+                        if (isset($parents[$compid]['total'][$keyeval])) {
+                            $comp->evaluationslist_total[$keyeval]->number = $parents[$compid]['total'][$keyeval];
+                            $comp->evaluationslist_total[$keyeval]->number_self = $parents[$compid]['total_self'][$keyeval];
+                        }
                     }
                     foreach ($comp->evaluationslist_course as $keyeval => $value) {
-                        $number = $parents[$compid]['course'][$keyeval];
-                        $comp->evaluationslist_course[$keyeval]->number = $number;
+                        if (isset($parents[$compid]['course'][$keyeval])) {
+                            $comp->evaluationslist_course[$keyeval]->number = $parents[$compid]['course'][$keyeval];
+                            $comp->evaluationslist_course[$keyeval]->number_self = $parents[$compid]['course_self'][$keyeval];
+                        }
                     }
                     if (api::is_cm_comptency_grading_enabled()) {
                         foreach ($comp->evaluationslist_cm as $keyeval => $value) {
-                            $number = $parents[$compid]['cm'][$keyeval];
-                            $comp->evaluationslist_cm[$keyeval]->number = $number;
+                            if (isset($parents[$compid]['cm'][$keyeval])) {
+                                $comp->evaluationslist_cm[$keyeval]->number = $parents[$compid]['cm'][$keyeval];
+                                $comp->evaluationslist_cm[$keyeval]->number_self = $parents[$compid]['cm_self'][$keyeval];
+                            }
                         }
                     }
                 }

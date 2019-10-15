@@ -30,17 +30,21 @@
                     * id
                     * shortname
                 * showasparent
+                * isassessable
                 * evaluationslist_total - array of following elements
                     * color
                     * number
+                    * number_self - only if it is a parent and is assessable
                     * empty
                 * evaluationslist_course - array of following elements
                     * color
                     * number
+                    * number_self - only if it is a parent and is assessable
                     * empty
                 * evaluationslist_cm - array of following elements
                     * color
                     * number
+                    * number_self - only if it is a parent and is assessable
                     * empty
             * scale - array of following elements
                 * value
@@ -132,34 +136,33 @@
 
                     <tbody>
                     {{#competencies_list}}
-                        {{#showasparent}}
-                            <tr class="accordion-toggle summary-parent" data-toggle="collapse">
-                                <td>
-                                    {{competency.idnumber}} - {{competency.shortname}}
-                                </td>
-                        {{/showasparent}}
-
-                        {{^showasparent}}
-                            <tr class="collapse-{{competency.parentid}} collapse show">
-                                <td>
-                                    {{competency.idnumber}} - 
-                                    <a href="#" data-user-competency="true" data-userid="{{plan.user.id}}" data-competencyid="{{competency.id}}" 
-                                        data-planid="{{plan.id}}" title="{{competency.shortname}}" role="button">
-                                        {{competency.shortname}}
-                                    </a>
-                                </td>
-                        {{/showasparent}}
+                        <tr {{#showasparent}}class="summary-parent"{{/showasparent}}>
+                            <td>
+                                {{competency.idnumber}} - 
+                                {{#isassessable}}
+                                    <a href="#" data-user-competency="true" data-userid="{{plan.user.id}}" 
+                                        data-competencyid="{{competency.id}}" data-planid="{{plan.id}}" 
+                                        title="{{competency.shortname}}" role="button">{{competency.shortname}}</a>
+                                {{/isassessable}}
+                                {{^isassessable}}
+                                    {{competency.shortname}}
+                                {{/isassessable}}
+                            </td>
 
                         {{#evaluationslist_total}}
                             <td class="total-cell" 
                                 {{^empty}}
                                     {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}
-                                {{/empty}}>
+                                {{/empty}}
+                            >
                                 {{^showasparent}}
                                     {{#number}}{{number}}{{/number}}
                                 {{/showasparent}}
                                 {{#showasparent}}
                                     {{number}}
+                                    {{#isassessable}}
+                                        {{#number_self}}(+{{number_self}}){{/number_self}}
+                                    {{/isassessable}}
                                 {{/showasparent}}
                             </td>
                         {{/evaluationslist_total}}
@@ -175,6 +178,9 @@
                                     {{/showasparent}}
                                     {{#showasparent}}
                                         {{number}}
+                                        {{#isassessable}}
+                                            {{#number_self}}(+{{number_self}}){{/number_self}}
+                                        {{/isassessable}}
                                     {{/showasparent}}
                                 </td>
                             {{/evaluationslist_course}}
@@ -184,11 +190,14 @@
                                         {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}
                                     {{/empty}}>
                                     {{^showasparent}}
-                                    {{#number}}{{number}}{{/number}}
-                                {{/showasparent}}
-                                {{#showasparent}}
-                                    {{number}}
-                                {{/showasparent}}
+                                        {{#number}}{{number}}{{/number}}
+                                    {{/showasparent}}
+                                    {{#showasparent}}
+                                        {{number}}
+                                        {{#isassessable}}
+                                            {{#number_self}}(+{{number_self}}){{/number_self}}
+                                        {{/isassessable}}
+                                    {{/showasparent}}
                             </td>
                             {{/evaluationslist_cm}}
                         {{/iscmcompetencygradingenabled}}
