@@ -1338,21 +1338,12 @@
     vertical-align: bottom;
     white-space: nowrap;
 }
-#report-content .table-scroll td.evaluation {
-    color: #fff;
-    text-shadow: 0 0 3px #000;
-}
-#report-content .table-scroll td.evaluation a {
-    color: #fff;
-}
-#report-content .table-scroll td.evaluation.notrated {
-    color: #000;
-    text-shadow: none;
-}
+
+#report-content .table-scroll td.evaluation a,
+#report-content .table-scroll td.evaluation.notrated,
 #report-content .table-scroll td.evaluation.notrated a {
     color: #000;
 }
-
 
 /** full navigation **/
 .toggle-lp-list-users {
@@ -1670,4 +1661,8 @@ ul.detail-comp-tab li a::first-letter {
     text-align: center;
     vertical-align: middle;
     font-size: 1.2rem;
+}
+.summary-table tr:not(.summary-parent) .light-color,
+#report-content .table-scroll td.evaluation a.light-color {
+    color: #FFF;
 }

@@ -21,8 +21,8 @@
  * @copyright  2019 Université de Montréal
  */
 
-define(['jquery', 'report_lpmonitoring/paginated_datatable'],
-        function ($, DataTable) {
+define(['jquery', 'report_lpmonitoring/paginated_datatable', 'report_lpmonitoring/colorcontrast'],
+        function ($, DataTable, colorcontrast) {
 
             /**
              * Constructor.
@@ -45,6 +45,10 @@ define(['jquery', 'report_lpmonitoring/paginated_datatable'],
                 var self = this;
                 // Perform the search and filters according to the actual values.
                 $(document).ready(function() {
+                    // Init the color contrast object.
+                    var colorContrast = colorcontrast.init();
+                    colorContrast.apply('.summary-table .total-cell, .summary-table  .course-cell, .summary-table  .cm-cell');
+
                     DataTable.apply(self.tableSelector, false, false);
 
                     $(self.searchSelector).on('input', function() {
