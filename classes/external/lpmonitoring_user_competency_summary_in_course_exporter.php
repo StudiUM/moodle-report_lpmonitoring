@@ -28,11 +28,13 @@ defined('MOODLE_INTERNAL') || die();
 use core_competency\api;
 use core_competency\course_module_competency;
 use core_competency\user_competency;
+use core_competency\external\plan_exporter;
 use core_course\external\course_module_summary_exporter;
 use core_course\external\course_summary_exporter;
 use context_course;
 use renderer_base;
 use stdClass;
+use moodle_url;
 use tool_lp\external\user_competency_summary_exporter;
 use tool_lp\external\user_competency_summary_in_course_exporter;
 
@@ -87,6 +89,16 @@ class lpmonitoring_user_competency_summary_in_course_exporter extends user_compe
             $exportedmodules[] = $cmexporter->export($output);
         }
         $result->coursemodules = $exportedmodules;
+
+        // User learning plans.
+        $plans = api::list_plans_with_competency($this->related['user']->id, $this->related['competency']);
+        $exportedplans = array();
+        foreach ($plans as $plan) {
+            $planexporter = new plan_exporter($plan, array('template' => $plan->get_template()));
+            $exportedplans[] = $planexporter->export($output);
+        }
+        $result->plans = $exportedplans;
+        $result->pluginbaseurl = (new moodle_url('/admin/tool/lp'))->out(true);
 
         return (array) $result;
     }
