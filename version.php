@@ -25,10 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2021111000;
+$plugin->version  = 2023093000;
 $plugin->requires = 2021051704;
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.1.2 (Build 2021111000)';
+$plugin->release   = '1.7.0 (Build 2023093000)';
 $plugin->component = 'report_lpmonitoring';
 
 $plugin->dependencies = array(
