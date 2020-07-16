@@ -598,8 +598,10 @@ define(['jquery',
             if (self.userView === false) {
                 conditionByTemplate = $('#template').is(':checked') && $(self.templateSelector).val() !== '';
                 conditionStudent = $('#student').is(':checked') && $(self.studentSelector).val() !== null &&
-                        $(self.studentPlansSelector).val() !== null &&
-                        $(self.studentPlansSelector).val() !== '';
+                        $('option:selected', $(self.studentSelector)).attr('value') !== undefined &&
+                        $("option:selected", $(self.studentPlansSelector)).attr('value') !== null &&
+                        $("option:selected", $(self.studentPlansSelector)).attr('value') !== undefined &&
+                        $("option:selected", $(self.studentPlansSelector)).attr('value') !== '';
                 conditionByTag = $('#tag').is(':checked') && $(self.tagSelector).val() !== '';
             } else {
                 conditionStudent = $(self.studentPlansSelector).val() !== null &&
