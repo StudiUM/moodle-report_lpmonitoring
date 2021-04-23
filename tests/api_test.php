@@ -88,7 +88,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     /** @var stdClass $comp2 Competency to be added to the framework. */
     protected $comp2 = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
 
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
@@ -823,14 +823,12 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             api::read_plan($planstephanie->get('id'), $this->templateincategory->get('id'));
             $this->fail("We don't have read plan permission for Stephanie Grant");
         } catch (Exception $ex) {
-            $this->assertContains('Stepanie Grant', $ex->getMessage());
+            $this->assertStringContainsString('Stepanie Grant', $ex->getMessage());
         }
     }
 
     /**
      * Test read current plan and get previous and next user plans.
-     *
-     * @expectedException moodle_exception
      */
     public function test_get_plans() {
         $this->resetAfterTest(true);
@@ -914,6 +912,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertEquals($plan2->get('id'), $result->next->planid);
 
         // Test template with no plan.
+        $this->expectException('moodle_exception');
         $result = api::read_plan(0, $tpl2->get('id'));
     }
 
@@ -1928,7 +1927,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             api::get_competency_statistics($this->comp1->get('id'), $this->templateincategory->get('id'));
             $this->fail("We don't have read plan permission for Stephanie Grant");
         } catch (Exception $ex) {
-            $this->assertContains('Stepanie Grant', $ex->getMessage());
+            $this->assertStringContainsString('Stepanie Grant', $ex->getMessage());
         }
     }
 
@@ -2534,7 +2533,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertInstanceOf('\report_lpmonitoring\event\user_competency_resetted', $eventrating1);
         $this->assertEquals($this->user1->id, $eventrating1->relateduserid);
         $this->assertEquals($context->id, $eventrating1->contextid);
-        $this->assertContains("the user competency with id '".$uc->get('id')."'", $eventrating1->get_description());
+        $this->assertStringContainsString("the user competency with id '".$uc->get('id')."'", $eventrating1->get_description());
         $this->assertEventContextNotUsed($eventrating1);
         $this->assertDebuggingNotCalled();
 
@@ -2558,7 +2557,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->assertInstanceOf('\report_lpmonitoring\event\user_competency_resetted', $eventrating2);
         $this->assertEquals($this->user1->id, $eventrating2->relateduserid);
         $this->assertEquals($context->id, $eventrating2->contextid);
-        $this->assertContains("the user competency with id '".$uc->get('id')."'", $eventrating2->get_description());
+        $this->assertStringContainsString("the user competency with id '".$uc->get('id')."'", $eventrating2->get_description());
         $this->assertEventContextNotUsed($eventrating2);
         $this->assertDebuggingNotCalled();
 
@@ -2592,7 +2591,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             api::add_rating_task($template->get('id'), true, "");
             $this->fail('Must fail user does not have permissions to view learning plan templates.');
         } catch (\Exception $ex) {
-            $this->assertContains('Sorry, but you do not currently have permissions to do that (View learning plan templates)',
+            $this->assertStringContainsString('Sorry, but you do not currently have permissions to do that (View learning plan templates)',
                     $ex->getMessage());
         }
 
@@ -2617,7 +2616,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             \report_lpmonitoring\api::add_rating_task($this->templateincategory->get('id'), $forcerating, $data);
             $this->fail('Must fail scales values ratings for template already exist.');
         } catch (\Exception $ex) {
-            $this->assertContains(get_string('taskratingrunning', 'report_lpmonitoring'), $ex->getMessage());
+            $this->assertStringContainsString(get_string('taskratingrunning', 'report_lpmonitoring'), $ex->getMessage());
         }
         // Remove scheduled task.
         $this->setAdminUser();

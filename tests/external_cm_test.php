@@ -93,7 +93,7 @@ class report_lpmonitoring_external_cm_testcase extends externallib_advanced_test
     /** @var stdClass $scale Scale linked to the framework. */
     protected $scale = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         if (!api::is_cm_comptency_grading_enabled()) {
             $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
         }

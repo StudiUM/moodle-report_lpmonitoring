@@ -65,7 +65,7 @@ class report_lpmonitoring_task_testcase extends externallib_advanced_testcase {
     /** @var stdClass $comp2 Competency to be added to the framework. */
     protected $comp2 = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
 
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();

@@ -66,7 +66,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
     /** @var stdClass creator context. */
     protected $contextcreator = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
 
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();

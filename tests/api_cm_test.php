@@ -88,7 +88,7 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
     /** @var stdClass $comp2 Competency to be added to the framework. */
     protected $comp2 = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
         if (!api::is_cm_comptency_grading_enabled()) {
             $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
         }
@@ -490,7 +490,7 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
             api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'coursemodule', 'DESC');
             $this->fail('Must fail because grading competency in course module is disabled');
         } catch (\Exception $ex) {
-            $this->assertContains('Grading competency in course module is disabled', $ex->getMessage());
+            $this->assertStringContainsString('Grading competency in course module is disabled', $ex->getMessage());
         }
         // Enable grading competency in course module.
         api::set_is_cm_comptency_grading_enabled(true);

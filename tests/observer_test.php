@@ -57,7 +57,7 @@ class report_lpmonitoring_observer_testcase extends advanced_testcase {
     /** @var stdClass creator context. */
     protected $contextcreator = null;
 
-    protected function setUp() {
+    protected function setUp(): void {
 
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
