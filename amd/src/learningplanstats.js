@@ -202,7 +202,7 @@ define(['jquery',
                             });
                         }
                         templates.runTemplateJS(js);
-                        self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .label.cr-scalename');
+                        self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .badge.cr-scalename');
                     });
                     defer.resolve();
                 }).fail(function(exp) {
@@ -280,7 +280,7 @@ define(['jquery',
                                 self.destroyDialogue
                             );
                             templates.runTemplateJS(js);
-                            self.colorContrast.apply('.moodle-dialogue-base .label.cr-scalename');
+                            self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
                         }).fail(notification.exception);
                 });
             }

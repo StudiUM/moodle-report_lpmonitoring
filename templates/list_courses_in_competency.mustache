@@ -38,10 +38,10 @@
             <td><a target="_blank" href="{{{url}}}" title="{{coursename}}">{{coursename}}</a></td>
             <td>
                 {{#rated}}
-               <span class="label label-info">{{#str}}yes{{/str}}</span>
+               <span class="badge badge-success">{{#str}}yes{{/str}}</span>
                {{/rated}}
                {{^rated}}
-               <span class="label">{{#str}}no{{/str}}</span>
+               <span class="badge badge-danger">{{#str}}no{{/str}}</span>
                {{/rated}}
             </td>
         </tr>

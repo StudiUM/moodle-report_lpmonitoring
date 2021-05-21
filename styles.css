@@ -340,7 +340,7 @@
     margin: 0;
 }
 .competencyreport .truncate,
-.label.cr-scalename.truncate {
+.badge.cr-scalename.truncate {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -355,7 +355,7 @@
     line-height: 25px;
     font-size: 22px;
 }
-.competencyreport .modal-dialog td span.label {
+.competencyreport .modal-dialog td span.badge {
     font-size: 12px;
 }
 .competencyreport .widget_stats {
@@ -624,7 +624,7 @@
 .competencyreport .fautocomplete input[type="text"] {
     margin-bottom: 2px;
 }
-.competencyreport .fautocomplete .label-info span {
+.competencyreport .fautocomplete .badge-info span {
     padding: 2px 4px;
 }
 
@@ -741,16 +741,16 @@
 .cr-caption {
     max-width: 100%;
 }
-.label.cr-scalename {
+.badge.cr-scalename {
     color: #000;
     font-size: 13px;
     text-shadow: none;
     vertical-align: middle;
 }
-.finalrating .label.cr-scalename.truncate {
+.finalrating .badge.cr-scalename.truncate {
     max-width: calc(100% - 100px);
 }
-.label.cr-scalename.light-color {
+.badge.cr-scalename.light-color {
     color: #fff;
 }
 
@@ -1403,7 +1403,7 @@
     font-size: 0.7em;
     display: inline;
 }
-.plan-info-container .table-list-users span.nav-small.label {
+.plan-info-container .table-list-users span.nav-small.badge {
     display: inline-block;
 }
 .plan-info-container .table-list-users .nav-list-users-displayinfo {
@@ -1638,11 +1638,6 @@ ul.detail-comp-tab li a::first-letter {
 }
 .competencyreport .table-scroll .summary-parent th, .competencyreport .table-scroll .summary-parent td {
     background-color: #D9D9D9;
-}
-
-.path-report-lpmonitoring .well {
-    padding: 0.7rem;
-    margin-bottom: 0.5rem;
 }
 .lpmonitoringdialogue .row {
     width: 100%;

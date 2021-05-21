@@ -733,7 +733,7 @@ define(['jquery',
                             $('.competencyreport .competency-detail a.collapse-link').css('visibility', '');
                         }
                         templates.runTemplateJS(js);
-                        self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .label.cr-scalename');
+                        self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .badge.cr-scalename');
                     });
                 });
             });
@@ -963,7 +963,7 @@ define(['jquery',
                         if (results.hasratingincm !== false && self.cmcompgradingEnabled) {
                             self.ApplyDonutGraph(results.competencyid, results, true);
                         }
-                        self.colorContrast.apply('#comp-' + results.competencyid + ' .x_content .tile-stats .label.cr-scalename');
+                        self.colorContrast.apply('#comp-' + results.competencyid + ' .x_content .tile-stats .badge.cr-scalename');
                     });
                     templates.render('report_lpmonitoring/competency_proficiency', results).done(function(html, js) {
                         $('#comp-' + results.competencyid + ' span.level').html(html);
@@ -1381,7 +1381,7 @@ define(['jquery',
                                 },
                                 self.destroyDialogue
                             );
-                            self.colorContrast.apply('.moodle-dialogue-base .label.cr-scalename');
+                            self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
                         }).fail(notification.exception);
                 });
             }
@@ -1411,7 +1411,7 @@ define(['jquery',
                                 },
                                 self.destroyDialogue
                             );
-                            self.colorContrast.apply('.moodle-dialogue-base .label.cr-scalename');
+                            self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
                         }).fail(notification.exception);
                 });
             }

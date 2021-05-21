@@ -83,7 +83,7 @@ class behat_report_lpmonitoring extends behat_base {
                 $xpath = "//div[contains(., '$compname')]/div/div/div/div/div[contains(@class, '$targetclass')]";
                 break;
             case 'finalrate':
-                $xpath = "//div[contains(., '$compname')]/div/div/div/div/div/span[contains(@class, 'label')]";
+                $xpath = "//div[contains(., '$compname')]/div/div/div/div/div/span[contains(@class, 'badge')]";
                 break;
             case 'level':
                 $xpath = "//span[contains(@class, '$targetclass') and ancestor-or-self::div/h4/a[contains(., '$compname')]]";
