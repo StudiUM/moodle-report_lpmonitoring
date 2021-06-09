@@ -55,6 +55,39 @@ if ($hassiteconfig && get_config('core_competency', 'enabled')) {
     );
     $ADMIN->add('reports', $statsadminpage);
 
+    $settingspage = new admin_settingpage('userpdfexportlpmonitoring', new lang_string('userreportpdf', 'report_lpmonitoring'));
+
+    if ($ADMIN->fulltree) {
+        // Border colour setting.
+        $settingspage->add(new admin_setting_configcolourpicker('report_lpmonitoring/bordercolour',
+                get_string('bordercolour', 'report_lpmonitoring'),
+                get_string('bordercolourdesc', 'report_lpmonitoring'),
+                '#000000'));
+
+        // Logo file setting.
+        $settingspage->add(new admin_setting_configstoredfile('report_lpmonitoring/userpdflogo',
+                get_string('userpdflogo', 'report_lpmonitoring'), get_string('userpdflogodesc', 'report_lpmonitoring'),
+                'pdflogo', 0, ['maxfiles' => 1, 'accepted_types' => ['.jpg', '.png']]));
+
+        // Student ID mappping setting.
+        $userfields = $DB->get_records('user_info_field');
+        $mappingoptions = array();
+        $mappingoptions['id'] = get_string('moodleuserid', 'report_lpmonitoring');
+
+        if (isset($userfields) && is_array($userfields) && count($userfields) > 0) {
+            foreach ($userfields as $userfield) {
+                $mappingoptions['profile_field_' . $userfield->shortname] = $userfield->name;
+            }
+        }
+
+        $settingspage->add(new admin_setting_configselect('report_lpmonitoring/studentidmapping',
+                get_string('studentidmapping', 'report_lpmonitoring'),
+                get_string('studentidmappingdesc', 'report_lpmonitoring'),
+                'id', $mappingoptions));
+    }
+
+    $ADMIN->add('competencies', $settingspage);
+
     // No report settings.
     $settings = null;
 }
