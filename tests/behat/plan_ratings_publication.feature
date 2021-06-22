@@ -54,8 +54,8 @@ Feature: Manage publication of ratings in learning plans
     And I follow "Profile" in the user menu
     And I follow "Learning plans"
     And I follow "Medicine Year 1"
-    And I should see "-" in "Competency B" row "Rating" column of "generaltable" table
-    And I should see "-" in "Competency B" row "Proficient" column of "generaltable" table
+    And I should see "-" in "Competency B" row "Rating" column of "dataTable" table
+    And I should see "-" in "Competency B" row "Proficient" column of "dataTable" table
     And I log out
     # Login as learning plan admin
     And I log in as "lpmanager"
@@ -87,8 +87,8 @@ Feature: Manage publication of ratings in learning plans
     And I follow "Profile" in the user menu
     And I follow "Learning plans"
     And I follow "Medicine Year 1"
-    And I should see "not qualified" in "Competency B" row "Rating" column of "generaltable" table
-    And I should see "No" in "Competency B" row "Proficient" column of "generaltable" table
+    And I should see "not qualified" in "Competency B" row "Rating" column of "dataTable" table
+    And I should see "No" in "Competency B" row "Proficient" column of "dataTable" table
 
   Scenario: Manage learning plan ratings publication [learning plan level]
     Given I click on "Hide ratings for this template" of edit menu in the "Medicine Year 1" row
@@ -134,8 +134,8 @@ Feature: Manage publication of ratings in learning plans
     And I follow "Profile" in the user menu
     And I follow "Learning plans"
     And I follow "Medicine Year 1"
-    And I should see "not qualified" in "Competency B" row "Rating" column of "generaltable" table
-    And I should see "No" in "Competency B" row "Proficient" column of "generaltable" table
+    And I should see "not qualified" in "Competency B" row "Rating" column of "dataTable" table
+    And I should see "No" in "Competency B" row "Proficient" column of "dataTable" table
 
   Scenario: Manage learning plan ratings publication [reset display rating in learning plan]
     Given I log out
@@ -178,8 +178,8 @@ Feature: Manage publication of ratings in learning plans
     And I follow "Profile" in the user menu
     And I follow "Learning plans"
     And I follow "Medicine Year 1"
-    And I should see "-" in "Competency B" row "Rating" column of "generaltable" table
-    And I should see "-" in "Competency B" row "Proficient" column of "generaltable" table
+    And I should see "-" in "Competency B" row "Rating" column of "dataTable" table
+    And I should see "-" in "Competency B" row "Proficient" column of "dataTable" table
     And I log out
     # Login as learning plan admin
     And I log in as "appreciator"
@@ -215,5 +215,5 @@ Feature: Manage publication of ratings in learning plans
     And I follow "Profile" in the user menu
     And I follow "Learning plans"
     And I follow "Medicine Year 1"
-    And I should see "not qualified" in "Competency B" row "Rating" column of "generaltable" table
-    And I should see "No" in "Competency B" row "Proficient" column of "generaltable" table
+    And I should see "not qualified" in "Competency B" row "Rating" column of "dataTable" table
+    And I should see "No" in "Competency B" row "Proficient" column of "dataTable" table

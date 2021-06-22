@@ -998,9 +998,31 @@
 .lpmonitoringdialogue .dataTables_paginate {
     text-align: center;
 }
-.competencyreport .form-autocomplete-suggestions .nbratinguser {
-    float:right;
-    margin-left: 40px;
+.competencyreport .main_container {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+.competencyreport .main_container .button-bulkdefaultrating {
+    width: auto;
+    align-self: flex-end;
+}
+.competencyreport ul.form-autocomplete-suggestions li {
+    display: flex;
+    flex-wrap: nowrap;
+}
+.competencyreport ul.form-autocomplete-suggestions li:not(:first-child):not(:last-child) {
+    border-bottom: 0.5px solid #ccc;
+}
+.competencyreport .form-autocomplete-suggestions li::before {
+    content: "";
+}
+.competencyreport .form-autocomplete-suggestions li>span.userplan-fullname {
+    margin-right: 1rem;
+}
+.competencyreport .form-autocomplete-suggestions li>span.nbratinguser {
+    margin-left: auto;
+    margin-right: 0.5rem;
 }
 .competencyreport .compstats .tile_count .tile_stats_count .incourse {
     font-size: 1.6em;
@@ -1660,4 +1682,36 @@ ul.detail-comp-tab li a::first-letter {
 .summary-table tr:not(.summary-parent) .light-color,
 #report-content .table-scroll td.evaluation a.light-color {
     color: #FFF;
+}
+
+@media (max-width: 998px) {
+    .competencyreport .form-autocomplete-suggestions li {
+        flex-direction: column;
+    }
+    .competencyreport .form-autocomplete-suggestions li>span.userplan-fullname {
+        margin: 0;
+        margin-bottom: 0.5rem;
+    }
+    .competencyreport .form-autocomplete-suggestions li>span.nbratinguser {
+        margin: 0;
+    }
+}
+#reportFilter,
+.competencyreport .plan-info-container {
+    width: 100%;
+}
+.lpmonitoringdialogue .dataTables_wrapper {
+    display: flex;
+    flex-direction: column;
+}
+.lpmonitoringdialogue .dataTables_paginate.paging_simple_numbers {
+    margin-top: 1rem;
+}
+
+.competencyreport .scalevalue input[aria-labelledby="scalevalues"] {
+    width: unset;
+}
+#page-report-lpmonitoring-index .comment-list,
+#page-report-lpmonitoring-index .comment-ctrl {
+    font-size: 1rem;
 }
