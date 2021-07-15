@@ -1,14 +1,20 @@
 .competencyreport .checkbox {
     padding-left: 5px;
 }
-.competencyreport #scale .checkbox {
-    padding-left: 20px;
+.competencyreport #scale .checkbox,
+.competencyreport .checkbox {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
 }
 .competencyreport .checkbox label {
     display: inline-block;
     vertical-align: middle;
     position: relative;
     padding-left: 5px;
+}
+.competencyreport .checkbox label i.fa.fa-square {
+    margin-right: 0.2rem;
 }
 .competencyreport .checkbox label::before {
     content: "";
