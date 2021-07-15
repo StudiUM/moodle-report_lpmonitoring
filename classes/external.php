@@ -1725,4 +1725,200 @@ class external extends external_api {
     public static function data_for_user_competency_summary_in_course_returns() {
         return lpmonitoring_user_competency_summary_in_course_exporter::get_read_structure();
     }
+
+    /**
+     * Returns description of get_user_pdfs parameters.
+     * @return external_function_parameters
+     */
+    public static function get_user_pdfs_parameters() {
+        return new external_function_parameters(
+            array(
+                'users' => new external_multiple_structure(
+                    new external_single_structure(
+                        array(
+                            'user' => new external_value(PARAM_RAW, 'User identifier. Currently configured to use ' .
+                                    \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
+                                    'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more ' .
+                                    'details.'),
+
+                            'cohort' => new external_value(PARAM_RAW, 'idnumber of cohort (optional). If set, will only include ' .
+                                    'plans in the PDF that are associated with the given cohort (in the ' .
+                                    'competency_templatecohort table).', VALUE_OPTIONAL),
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * Returns description of get_user_pdf parameters.
+     * @return external_single_parameters
+     */
+    public static function get_user_pdf_parameters() {
+        return new external_function_parameters(
+            array(
+                'params' => new external_single_structure(
+                    array(
+                        'user' => new external_value(PARAM_RAW, 'User identifier. Currently configured to use ' .
+                                \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
+                                'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more ' .
+                                'details.'),
+
+                        'cohort' => new external_value(PARAM_RAW, 'idnumber of cohort (optional). If set, will only include ' .
+                                'plans in the PDF that are associated with the given cohort (in the ' .
+                                'competency_templatecohort table).', VALUE_OPTIONAL),
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * Returns description of get_user_pdfs return value.
+     * @return external_multiple_structure
+     */
+    public static function get_user_pdfs_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'user' => new external_value(PARAM_RAW, 'User identifier. Currently configured to use ' .
+                            \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
+                            'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more details.'),
+
+                    'timecreated' => new external_value(PARAM_INT, 'Unix timestamp of the date / time the PDF was created.'),
+
+                    'pdf' => new external_value(PARAM_RAW, 'Base 64 encoded string of the PDF file that was generated.'),
+
+                    'cohort' => new external_value(PARAM_RAW, 'idnumber of cohort (optional). If set, will only include plans ' .
+                            'in the PDF that are associated with the given cohort (in the competency_templatecohort table).',
+                            VALUE_OPTIONAL),
+                )
+            )
+        );
+    }
+
+    /**
+     * Returns description of get_user_pdf return value.
+     * @return external_single_structure
+     */
+    public static function get_user_pdf_returns() {
+        return new external_single_structure(
+            array(
+                'user' => new external_value(PARAM_RAW, 'User identifier. Currently configured to use ' .
+                        \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
+                        'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more details.'),
+
+                'timecreated' => new external_value(PARAM_INT, 'Unix timestamp of the date / time the PDF was created.'),
+
+                'pdf' => new external_value(PARAM_RAW, 'Base 64 encoded string of the PDF file that was generated.'),
+
+                'cohort' => new external_value(PARAM_RAW, 'idnumber of cohort (optional). If set, will only include plans ' .
+                        'in the PDF that are associated with the given cohort (in the competency_templatecohort table).',
+                        VALUE_OPTIONAL),
+            )
+        );
+    }
+
+    /**
+     * Generates and sends the requested PDFs, base64 encoded.
+     * @param  array $users Array of users with user and cohort (optional) as keys.
+     * @return array With the PDF, timecreated, cohort and user ID for each user requested.
+     */
+    public static function get_user_pdfs($users) {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/pdflib.php');
+
+        $params = self::validate_parameters(self::get_user_pdfs_parameters(), array('users' => $users));
+
+        $studentidfield = \get_config('report_lpmonitoring', 'studentidmapping');
+
+        if ($studentidfield != 'id') {
+            $shortname = explode("profile_field_", $studentidfield)[1];
+        }
+
+        $users = array();
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('moodle/competency:planview', $context);
+
+        foreach ($params['users'] as $user) {
+
+            $user = (object)$user;
+
+            if (isset($user->cohort)) {
+                $cohort = $user->cohort;
+            } else {
+                $cohort = false;
+            }
+
+            // An exception gets thrown if we can't find a unique user or if there are no plans / competencies.
+            try {
+                if ($studentidfield != 'id') {
+                    $userid = \report_lpmonitoring\external\user_pdf::get_userid_from_profile_field($shortname, $user->user);
+                } else {
+                    $userid = $user->user;
+                }
+
+                $userpdf = new \report_lpmonitoring\external\user_pdf($userid, $cohort);
+                $user->pdf = $userpdf->get_encoded_pdf();
+                $user->timecreated = $userpdf->timecreated;
+            } catch (\Exception $e) {
+                // If there's a problem, return false / 0 (along with the user / cohort parameters we originally received).
+                $user->pdf = false;
+                $user->timecreated = 0;
+            }
+
+            $users[] = (array)$user;
+        }
+        return $users;
+    }
+
+    /**
+     * Generates and sends the requested PDF, base64 encoded.
+     * @param array $params Associative array with user and cohort (optional) to generate a PDF for.
+     * @return array With the PDF, timecreated, cohort and user ID for each user requested.
+     */
+    public static function get_user_pdf($params) {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/pdflib.php');
+
+        $params = self::validate_parameters(self::get_user_pdf_parameters(), array('params' => $params));
+
+        $studentidfield = \get_config('report_lpmonitoring', 'studentidmapping');
+
+        if ($studentidfield != 'id') {
+            $shortname = explode("profile_field_", $studentidfield)[1];
+        }
+
+        $context = context_system::instance();
+        self::validate_context($context);
+        require_capability('moodle/competency:planview', $context);
+
+        $params = (object)$params['params'];
+
+        if (isset($params->cohort)) {
+            $cohort = $params->cohort;
+        } else {
+            $cohort = false;
+        }
+
+        // An exception gets thrown if we can't find a unique user or if there are no plans / competencies.
+        try {
+            if ($studentidfield != 'id') {
+                $userid = \report_lpmonitoring\external\user_pdf::get_userid_from_profile_field($shortname, $params->user);
+            } else {
+                $userid = $params->user;
+            }
+
+            $userpdf = new \report_lpmonitoring\external\user_pdf($userid, $cohort);
+            $params->pdf = $userpdf->get_encoded_pdf();
+            $params->timecreated = $userpdf->timecreated;
+        } catch (\Exception $e) {
+            // If there's a problem, return false / 0 (along with the user / cohort parameters we originally received).
+            $params->pdf = false;
+            $params->timecreated = 0;
+        }
+        return (array)$params;
+    }
 }

@@ -242,5 +242,23 @@ $functions = array(
         'capabilities' => 'moodle/competency:planview',
         'ajax'         => true
     ),
+    'report_lpmonitoring_get_user_pdfs' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'get_user_pdfs',
+        'classpath'    => '',
+        'description'  => 'Get many users\' reports in PDF format',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:planview',
+        'ajax'         => true
+    ),
+    'report_lpmonitoring_get_user_pdf' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'get_user_pdf',
+        'classpath'    => '',
+        'description'  => 'Get the user\'s report in PDF format',
+        'type'         => 'read',
+        'capabilities' => 'moodle/competency:planview',
+        'ajax'         => true
+    ),
 );
 

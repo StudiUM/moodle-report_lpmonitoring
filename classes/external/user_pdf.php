@@ -23,9 +23,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 namespace report_lpmonitoring\external;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class for generating a PDF export of users' learning plans.
@@ -57,14 +57,18 @@ class user_pdf {
     /** NLINESPAGEOTHER The number of lines we can fit on pages other than page one in the PDF. */
     const NLINESPAGEOTHER = 44; // Recommendation: 44 for Letter, 47 for A4.
 
+    /** COHORTMATCHOVERRIDE Whether or not to call the cohort_match_override function to match the users' cohorts. */
+    const COHORTMATCHOVERRIDE = true;
+
     /**
      * Class constructor. Populates the class according to the given user.
      *
      * @param int $userid The user ID of the user we want to generate the PDF for.
+     * @param string $cohort The cohort idnumber to include (will check the competency_templatecohort table).
      * @return void
      * @throws Exception if no plans are found for the given user.
      */
-    public function __construct($userid) {
+    public function __construct($userid, $cohort = false) {
         global $DB, $CFG;
 
         $studentidfield = \get_config('report_lpmonitoring', 'studentidmapping');
@@ -91,8 +95,9 @@ class user_pdf {
             $this->idfieldname = 'ID';
         }
 
+        $this->timecreated = time();
         $this->pdfreporttitle = get_string("pdfreporttitle", "report_lpmonitoring", $this->user->studentname);
-        $this->dategenerated = get_string("dategenerated", "report_lpmonitoring", userdate(time()));
+        $this->dategenerated = get_string("dategenerated", "report_lpmonitoring", userdate($this->timecreated));
 
         $plans = \core_competency\api::list_user_plans($userid);
 
@@ -103,6 +108,11 @@ class user_pdf {
         $firstpage = true;
 
         foreach ($plans as $planid => $plan) {
+            // If we passed the $cohort parameter and we don't get a match, ignore the learning plan for this PDF.
+            if ($cohort && !$this->cohort_match($planid, $userid, $cohort)) {
+                unset($plans[$planid]);
+                continue;
+            }
             $competencies = \report_lpmonitoring\external::list_plan_competencies($planid);
 
             // Don't bother if this plan has no competencies.
@@ -171,6 +181,14 @@ class user_pdf {
             $this->plans[] = $tmpplan;
         }
 
+        // Check again. We might have removed all the elements if we're looking for a specific cohort / template.
+        if (count($plans) == 0 && !$cohort) {
+            throw new \Exception(get_string("noplansforusererror", "report_lpmonitoring", $userid));
+        } else if (count($plans) == 0 && $cohort) {
+            // Nothing found for specific cohort. Call with cohort == false to generate PDF regardless of cohorts.
+            self::__construct($userid, false);
+        }
+
         // If we get here and $this->plans is 0, it means we found no competencies for any of the plans.
         // Throw an exception, because we have nothing useful to write to a PDF file.
         if (!is_array($this->plans) || count($this->plans) == 0) {
@@ -199,16 +217,16 @@ class user_pdf {
         $context->incms = ucfirst(get_string('incms', 'report_lpmonitoring'));
         $context->pdfreporttitle = $this->pdfreporttitle;
         $context->dategenerated = $this->dategenerated;
-        $context->pdfimage = $this->get_logo_path();
+        $context->pdfimage = $this->get_logo_base64();
         return $context;
     }
 
     /**
-     * Get the path for the logo to use in the user report PDF.
+     * Get the base64 encoded logo to use in the user report PDF.
      *
-     * @return string The path to access the image.
+     * @return string The base64 encoded image.
      */
-    private function get_logo_path() {
+    private function get_logo_base64() {
         global $CFG;
         $logo = \get_config('report_lpmonitoring', 'userpdflogo');
 
@@ -232,7 +250,9 @@ class user_pdf {
 
         $filepath = "$tmpdir/$filename";
         $file->copy_content_to($filepath);
-        return $filepath;
+        $base64 = "@" . \base64_encode(\file_get_contents($filepath));
+
+        return $base64;
     }
 
     /**
@@ -277,5 +297,99 @@ class user_pdf {
         $pdf->AddPage();
         $pdf->WriteHTML($this->get_html(), true, false, true, false, '');
         return base64_encode($pdf->Output('ignored', 'S'));
+    }
+
+    /**
+     * Returns the Moodle ID of the user identified by $fieldname and $value.
+     * Useful if we are using a unique identifier other than the Moodle user ID.
+     *
+     * @param string $fieldname The shortname of the field we're looking at in the user_info_field table.
+     * @param string $value The value of the fieldname we're looking for in the user_info_data table.
+     * @throws Exception If the number of results isn't equal to exactly 1.
+     * @return int The Moodle user ID.
+     */
+    public static function get_userid_from_profile_field($fieldname, $value) {
+        global $DB;
+
+        $results = $DB->get_records_sql("SELECT u.id FROM {user} u
+                                            INNER JOIN {user_info_data} d ON d.userid = u.id
+                                            INNER JOIN {user_info_field} f ON f.id = d.fieldid
+                                            WHERE f.shortname = ? AND d.data = ?",
+                                            array($fieldname, $value));
+        if (count($results) !== 1) {
+            throw new \Exception(get_string("profilefieldnotuniqueerror", "report_lpmonitoring", count($results)));
+        } else {
+            return array_keys($results)[0];
+        }
+    }
+
+    /**
+     * Function to check if the user's plan is linked to the given cohort.
+     * We look at the cohort's idnumber and see if that cohort is in the
+     * competency_templatecohort table for the given user / plan combination.
+     *
+     * @param int $planid The learning plan ID
+     * @param int $userid The Moodle user ID
+     * @param string $cohort The idnumber of the cohort
+     * @return bool True if we found a match, false otherwise.
+     */
+    private function cohort_match($planid, $userid, $cohort) {
+        global $DB;
+
+        // The default behaviour is to match the cohort parameter with the cohort.idnumber.
+        // You can override this behaviour by editing the function cohort_match_override below.
+        if ($this->COHORTMATCHOVERRIDE == true) {
+            return $this->cohort_match_override($planid, $userid, $cohort);
+        }
+
+        $cohortmatch = $DB->get_records_sql("SELECT p.id FROM {competency_plan} p
+                                INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.templateid
+                                INNER JOIN {cohort} c ON c.id = tc.cohortid
+                                WHERE p.id = :planid AND c.idnumber = :cohort AND p.userid = :userid" ,
+                                array('planid' => $planid, 'cohort' => $cohort, 'userid' => $userid));
+
+        if (count($cohortmatch) == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * We override the cohort_match function because at the University of
+     * Montreal, our cohort idnumbers are formulated as follows: <programnumber>-<sessionnumber>.
+     * For the get_user_pdf webservice, we expect the $cohort parameter to only
+     * be the programnumber. So this function overrides the default behaviour to accommodate.
+     *
+     * @param int $planid The learning plan ID
+     * @param int $userid The Moodle user ID
+     * @param string $progno The program number at U de M
+     * @return bool True if we found a match, false otherwise.
+     */
+    private function cohort_match_override($planid, $userid, $progno) {
+        global $DB;
+
+        $cohortmatch = $DB->get_records_sql("SELECT p.id FROM {competency_plan} p
+                            INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.templateid
+                            INNER JOIN {cohort} c ON c.id = tc.cohortid
+                            WHERE " . $DB->sql_like('c.idnumber', ':progno') . "
+                            AND p.id = :planid AND p.userid = :userid" ,
+                            array('planid' => $planid, 'progno' => $DB->sql_like_escape($progno) . '-%', 'userid' => $userid));
+
+        // Nothing found. Try with origtemplateid before giving up.
+        if (count($cohortmatch) == 0) {
+            $cohortmatch = $DB->get_records_sql("SELECT p.id FROM {competency_plan} p
+                                INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.origtemplateid
+                                INNER JOIN {cohort} c ON c.id = tc.cohortid
+                                WHERE " . $DB->sql_like('c.idnumber', ':progno') . "
+                                AND p.id = :planid AND p.userid = :userid" ,
+                                array('planid' => $planid, 'progno' => $DB->sql_like_escape($progno) . '-%', 'userid' => $userid));
+        }
+
+        if (count($cohortmatch) == 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
