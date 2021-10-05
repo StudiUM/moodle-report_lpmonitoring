@@ -48,6 +48,9 @@ class user_pdf {
     /** @var string Various CSS rules for rendering with PDF with TCPDF->WriteHTML(). */
     private $styles = null;
 
+    /** @var array An array of plan IDs to "force". Other plans won't be included. */
+    private $forceplans = null;
+
     /** COMPLINESOVERHEAD The number of lines that are printed out with each competency, regardless of the # of scale items. */
     const COMPLINESOVERHEAD = 6;
 
@@ -65,10 +68,11 @@ class user_pdf {
      *
      * @param int $userid The user ID of the user we want to generate the PDF for.
      * @param string $cohort The cohort idnumber to include (will check the competency_templatecohort table).
+     * @param array $forceplans Array of plan IDs to "force". Other plans won't be considered.
      * @return void
      * @throws Exception if no plans are found for the given user.
      */
-    public function __construct($userid, $cohort = false) {
+    public function __construct($userid, $cohort = false, $forceplans = null) {
         global $DB, $CFG;
 
         $studentidfield = \get_config('report_lpmonitoring', 'studentidmapping');
@@ -108,6 +112,12 @@ class user_pdf {
         $firstpage = true;
 
         foreach ($plans as $planid => $plan) {
+
+            if (!is_null($forceplans) && !in_array($planid, $forceplans)) {
+                unset($plans[$planid]);
+                continue;
+            }
+
             // If we passed the $cohort parameter and we don't get a match, ignore the learning plan for this PDF.
             if ($cohort && !$this->cohort_match($planid, $userid, $cohort)) {
                 unset($plans[$planid]);
@@ -186,7 +196,9 @@ class user_pdf {
             throw new \Exception(get_string("noplansforusererror", "report_lpmonitoring", $userid));
         } else if (count($plans) == 0 && $cohort) {
             // Nothing found for specific cohort. Call with cohort == false to generate PDF regardless of cohorts.
-            self::__construct($userid, false);
+            if (!is_null($this->forceplans) && is_array($this->forceplans) && count($this->forceplans) > 0) {
+                self::__construct($userid, false, $this->forceplans);
+            }
         }
 
         // If we get here and $this->plans is 0, it means we found no competencies for any of the plans.
@@ -338,7 +350,7 @@ class user_pdf {
 
         // The default behaviour is to match the cohort parameter with the cohort.idnumber.
         // You can override this behaviour by editing the function cohort_match_override below.
-        if ($this->COHORTMATCHOVERRIDE == true) {
+        if (self::COHORTMATCHOVERRIDE == true) {
             return $this->cohort_match_override($planid, $userid, $cohort);
         }
 
@@ -387,6 +399,21 @@ class user_pdf {
         }
 
         if (count($cohortmatch) == 0) {
+            // Save plan IDs that have no cohort association into $this->forceplans.
+            // If the constructor doesn't come up with any plans related to the cohort, we'll
+            // recall the constructor with whatever IDs we have in $this->forceplans as a failover.
+            $pid = $DB->get_field_sql("SELECT p.id FROM {competency_plan} p
+                                WHERE p.templateid NOT IN
+                                (SELECT tc.templateid FROM {competency_templatecohort} tc
+                                 WHERE tc.templateid = p.templateid OR tc.templateid = p.origtemplateid)
+                                AND p.id = :planid AND p.userid = :userid",
+                                array('planid' => $planid, 'userid' => $userid));
+            if ($pid) {
+                if (is_null($this->forceplans)) {
+                    $this->forceplans = array();
+                }
+                $this->forceplans[] = $pid;
+            }
             return false;
         } else {
             return true;
