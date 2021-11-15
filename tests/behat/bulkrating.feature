@@ -9,8 +9,7 @@ Feature: Bulk rating
     And I log in as "appreciator"
     And I am on course index
     When I follow "Medicine"
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
-    And I follow "Monitoring of learning plans"
+    And I select "Reports" from secondary navigation
     Then I should see "Bulk rating for all students for all competencies"
     # Rate Pablo.
     And I set the field "templateSelectorReport" to "Medicine Year 1"
@@ -25,7 +24,7 @@ Feature: Bulk rating
     # Go to bulk rating page.
     And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
+    And I select "Reports" from secondary navigation
     And I should see "Bulk rating for all students for all competencies"
     And I follow "Bulk rating for all students for all competencies"
 
@@ -58,8 +57,7 @@ Feature: Bulk rating
     # Check that students have been rated, except Pablo (who was already rated).
     And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
-    And I follow "Monitoring of learning plans"
+    And I select "Reports" from secondary navigation
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list
@@ -86,8 +84,7 @@ Feature: Bulk rating
     # Check that students have been rated, including Pablo (who was already rated).
     And I am on course index
     And I follow "Medicine"
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
-    And I follow "Monitoring of learning plans"
+    And I select "Reports" from secondary navigation
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list

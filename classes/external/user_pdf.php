@@ -25,8 +25,6 @@
 
 namespace report_lpmonitoring\external;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class for generating a PDF export of users' learning plans.
  *

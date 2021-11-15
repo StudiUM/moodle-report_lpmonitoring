@@ -225,9 +225,11 @@ class behat_report_lpmonitoring extends behat_base {
         } else {
             // Header can be in thead or tbody (first row), following xpath should work.
             $theadheaderxpath = "thead/tr[1]/th[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
-                    $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
+                    $columnliteral . "] or div[normalize-space(text())=" .
+                    $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
             $tbodyheaderxpath = "tbody/tr[1]/td[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
-                    $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
+                    $columnliteral . "] or div[normalize-space(text())=" .
+                    $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
 
             // Check if column exists.
             $columnheaderxpath = $tablexpath . "[" . $theadheaderxpath . " | " . $tbodyheaderxpath . "]";
@@ -341,15 +343,13 @@ class behat_report_lpmonitoring extends behat_base {
         }
         return new moodle_url('/course/index.php', ['categoryid' => $categoryid]);
 
-        
-
         throw new Exception('Unrecognised core page type "' . $type . '."');
     }
 
     /**
      * Go to the lpmonitoring page for category.
      *
-     * @When I am on :category lpmonitoring page 
+     * @When I am on :category lpmonitoring page
      * @param string $category
      */
     public function i_on_category_lpmonitoring_page($category) {

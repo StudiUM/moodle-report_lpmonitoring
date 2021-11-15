@@ -22,7 +22,7 @@
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
@@ -41,12 +41,13 @@ use tool_cohortroles\api as tool_cohortroles_api;
 /**
  * External testcase.
  *
+ * @covers     \report_lpmonitoring\api
  * @package    report_lpmonitoring
  * @author     Serge Gauthier <serge.gauthier.2@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report_lpmonitoring_external_testcase extends externallib_advanced_testcase {
+class external_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -75,9 +76,9 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $creator = $dg->create_user(array('firstname' => 'Creator'));
         $appreciator = $dg->create_user(array('firstname' => 'Appreciator'));
 
-        $this->contextcreator = context_user::instance($creator->id);
-        $this->contextappreciator = context_user::instance($appreciator->id);
-        $syscontext = context_system::instance();
+        $this->contextcreator = \context_user::instance($creator->id);
+        $this->contextappreciator = \context_user::instance($appreciator->id);
+        $syscontext = \context_system::instance();
 
         $this->rolecreator = create_role('Creator role', 'rolecreator', 'learning plan manager role description');
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $this->rolecreator, $syscontext->id);
@@ -217,7 +218,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $framework = $cpg->create_framework();
 
         $result = external::read_report_competency_config($framework->get('id'), $scale->id);
-        $result = (object) external_api::clean_returnvalue(external::read_report_competency_config_returns(), $result);
+        $result = (object) \external_api::clean_returnvalue(external::read_report_competency_config_returns(), $result);
 
         $this->assertEquals($framework->get('id'), $result->competencyframeworkid);
         $this->assertEquals($scale->id, $result->scaleid);
@@ -252,13 +253,9 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $record['scaleconfiguration'] = json_encode($scaleconfig);
 
         $this->setUser($this->appreciator);
-
-        try {
-            external::create_report_competency_config($framework->get('id'), $scale->id, json_encode($scaleconfig));
-            $this->fail('Configuration can not be created when user does not have capability');
-        } catch (required_capability_exception $e) {
-            $this->assertTrue(true);
-        }
+        $msgexception = 'Sorry, but you do not currently have permissions to do that (Manage competency frameworks).';
+        $this->expectExceptionMessage($msgexception);
+        external::create_report_competency_config($framework->get('id'), $scale->id, json_encode($scaleconfig));
     }
 
     /**
@@ -283,7 +280,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $record['scaleconfiguration'] = json_encode($scaleconfig);
 
         $result = external::create_report_competency_config($framework->get('id'), $scale->id, json_encode($scaleconfig));
-        $result = (object) external_api::clean_returnvalue(external::create_report_competency_config_returns(), $result);
+        $result = (object) \external_api::clean_returnvalue(external::create_report_competency_config_returns(), $result);
 
         $this->assertEquals($framework->get('id'), $result->competencyframeworkid);
         $this->assertEquals($scale->id, $result->scaleid);
@@ -331,14 +328,10 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $record['scaleconfiguration'] = json_encode($scaleconfig);
 
         $this->setUser($this->appreciator);
-
-        try {
-            external::update_report_competency_config($framework->get('id'), $scale->id,
-                json_encode($scaleconfig));
-            $this->fail('Configuration can not be updated when user does not have capability');
-        } catch (required_capability_exception $e) {
-            $this->assertTrue(true);
-        }
+        $msgexception = 'Sorry, but you do not currently have permissions to do that (Manage competency frameworks).';
+        $this->expectExceptionMessage($msgexception);
+        external::update_report_competency_config($framework->get('id'), $scale->id,
+            json_encode($scaleconfig));
     }
 
     /**
@@ -377,12 +370,12 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
 
         $result = external::update_report_competency_config($framework->get('id'), $scale->id,
                 json_encode($scaleconfig));
-        $result = external_api::clean_returnvalue(external::update_report_competency_config_returns(), $result);
+        $result = \external_api::clean_returnvalue(external::update_report_competency_config_returns(), $result);
 
         $this->assertTrue($result);
 
         $reportconfig = external::read_report_competency_config($framework->get('id'), $scale->id);
-        $reportconfig = (object) external_api::clean_returnvalue(external::read_report_competency_config_returns(), $reportconfig);
+        $reportconfig = (object) \external_api::clean_returnvalue(external::read_report_competency_config_returns(), $reportconfig);
 
         $this->assertEquals($reportconfig->competencyframeworkid, $framework->get('id'));
         $this->assertEquals($reportconfig->scaleid, $scale->id);
@@ -662,7 +655,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scaleconfig[] = array('id' => 3, 'name' => 'C',  'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -712,10 +705,10 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $datacm = get_coursemodule_from_id('data', $data->cmid);
 
         // Insert student grades for the activity.
-        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'data', 'iteminstance' => $data->id,
+        $gi = \grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'data', 'iteminstance' => $data->id,
             'courseid' => $c1->id));
         $datagrade = 50;
-        $gradegrade = new grade_grade();
+        $gradegrade = new \grade_grade();
         $gradegrade->itemid = $gi->id;
         $gradegrade->userid = $u1->id;
         $gradegrade->rawgrade = $datagrade;
@@ -740,18 +733,18 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $courseitem = \grade_item::fetch_course_item($c1->id);
         $result = $courseitem->update_final_grade($u1->id, 67, 'import', null);
 
-        $context = context_course::instance($c1->id);
+        $context = \context_course::instance($c1->id);
         $this->assign_good_letter_boundary($context->id);
 
         // Assign final grade for the course C2.
         $courseitem = \grade_item::fetch_course_item($c2->id);
         $result = $courseitem->update_final_grade($u1->id, 88, 'import', null);
 
-        $context = context_course::instance($c2->id);
+        $context = \context_course::instance($c2->id);
         $this->assign_good_letter_boundary($context->id);
 
         $result = external::get_competency_detail($u1->id, $comp1->get('id'), $plan->get('id'));
-        $result = (object) external_api::clean_returnvalue(external::get_competency_detail_returns(), $result);
+        $result = (object) \external_api::clean_returnvalue(external::get_competency_detail_returns(), $result);
 
         $this->assertEquals($result->competencyid, $comp1->get('id'));
         $this->assertTrue($result->hasevidence);
@@ -1083,7 +1076,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scaleconfig[] = array('id' => 3, 'name' => 'C',  'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -1262,8 +1255,8 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
     public function test_search_templates() {
         $user = $this->getDataGenerator()->create_user();
         $category = $this->getDataGenerator()->create_category();
-        $syscontextid = context_system::instance()->id;
-        $catcontextid = context_coursecat::instance($category->id)->id;
+        $syscontextid = \context_system::instance()->id;
+        $catcontextid = \context_coursecat::instance($category->id)->id;
 
         // User role.
         $userrole = create_role('User role', 'userrole', 'learning plan user role description');
@@ -1279,13 +1272,9 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->setUser($user);
         assign_capability('moodle/competency:templateview', CAP_PROHIBIT, $userrole, $syscontextid, true);
         accesslib_clear_all_caches_for_unit_testing();
-        try {
-            external::search_templates($syscontextid, '', 0, 10, 'children', false);
-            $this->fail('Invalid permissions');
-        } catch (required_capability_exception $e) {
-            // All good.
-            $this->assertTrue(true);
-        }
+        $msgexception = 'Sorry, but you do not currently have permissions to do that (View learning plan templates).';
+        $this->expectExceptionMessage($msgexception);
+        external::search_templates($syscontextid, '', 0, 10, 'children', false);
 
         // User with category permissions.
         assign_capability('moodle/competency:templateview', CAP_PREVENT, $userrole, $syscontextid, true);
@@ -1388,7 +1377,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scalefilterin = '';
         $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterin);
 
-        $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
+        $result = (object) \external_api::clean_returnvalue(external::read_plan_returns(), $result);
         // Test full navigation count.
         $this->assertCount(2, $result->fullnavigation);
         // Check plan for user 1 is found.
@@ -1412,7 +1401,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scalefilterin = '';
         $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterin);
 
-        $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
+        $result = (object) \external_api::clean_returnvalue(external::read_plan_returns(), $result);
 
         // Check plan for user 1 is found.
         $this->assertEquals($result->plan['id'], $plan1->get('id'));
@@ -1544,7 +1533,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scalefilterincourse = 'course';
         $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterincourse);
 
-        $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
+        $result = (object) \external_api::clean_returnvalue(external::read_plan_returns(), $result);
         // Test full navigation count.
         $this->assertCount(1, $result->fullnavigation);
         // Check plan for user 1 is found.
@@ -1564,7 +1553,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scalefilterincourse = 'course';
         $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterincourse);
 
-        $result = (object) external_api::clean_returnvalue(external::read_plan_returns(), $result);
+        $result = (object) \external_api::clean_returnvalue(external::read_plan_returns(), $result);
 
         // Check plan for user 1 is found.
         $this->assertEquals($result->plan['id'], $plan1->get('id'));
@@ -1582,7 +1571,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
 
         // Create some users.
         $u1 = $dg->create_user(array(
@@ -1686,7 +1675,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
 
         // Create some users.
         $u1 = $dg->create_user(array(
@@ -1764,7 +1753,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
 
         // Create some users.
         $u1 = $dg->create_user(array(
@@ -1898,7 +1887,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $f1->get('id');
         $record->scaleid = $f1->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -1919,7 +1908,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scaleconfig[] = array('id' => 3, 'color' => '#FF00FF');
         $scaleconfig[] = array('id' => 4, 'color' => '#00FF00');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $f2->get('id');
         $record->scaleid = $f2->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -2298,7 +2287,7 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $scaleconfig[] = array('id' => 1, 'color' => '#AAAAAA');
         $scaleconfig[] = array('id' => 2, 'color' => '#BBBBBB');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $f1->get('id');
         $record->scaleid = $f1->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);

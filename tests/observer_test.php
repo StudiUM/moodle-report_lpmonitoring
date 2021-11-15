@@ -22,7 +22,7 @@
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
@@ -32,12 +32,13 @@ use report_lpmonitoring\report_competency_config;
 /**
  * Observer tests.
  *
+ * @covers     \report_lpmonitoring\observer
  * @package    report_lpmonitoring
  * @author     Serge Gauthier <serge.gauthier.2@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report_lpmonitoring_observer_testcase extends advanced_testcase {
+class observer_test extends \advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -66,9 +67,9 @@ class report_lpmonitoring_observer_testcase extends advanced_testcase {
         $creator = $dg->create_user(array('firstname' => 'Creator'));
         $appreciator = $dg->create_user(array('firstname' => 'Appreciator'));
 
-        $this->contextcreator = context_user::instance($creator->id);
-        $this->contextappreciator = context_user::instance($appreciator->id);
-        $syscontext = context_system::instance();
+        $this->contextcreator = \context_user::instance($creator->id);
+        $this->contextappreciator = \context_user::instance($appreciator->id);
+        $syscontext = \context_system::instance();
 
         $this->rolecreator = create_role('Creator role', 'rolecreator', 'learning plan manager role description');
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $this->rolecreator, $syscontext->id);

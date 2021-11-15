@@ -26,8 +26,6 @@
 namespace report_lpmonitoring\task;
 use \report_lpmonitoring\api;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Adhoc task handling rating users in learning plan templates.
  *

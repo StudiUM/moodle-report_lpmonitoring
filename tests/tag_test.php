@@ -22,7 +22,7 @@
  * @copyright  2018 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
@@ -36,12 +36,13 @@ use core\invalid_persistent_exception;
 /**
  * Tags tests.
  *
+ * @covers     \report_lpmonitoring
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2018 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report_lpmonitoring_tags_testcase extends advanced_testcase {
+class tag_test extends \advanced_testcase {
 
     /**
      * manage tags.
@@ -55,43 +56,43 @@ class report_lpmonitoring_tags_testcase extends advanced_testcase {
         $user1 = $dg->create_user(array('lastname' => 'Austin', 'firstname' => 'Sharon'));
         $user2 = $dg->create_user(array('lastname' => 'Cortez', 'firstname' => 'Jonathan'));
         $user3 = $dg->create_user(array('lastname' => 'Underwood', 'firstname' => 'Alicia'));
-        $user1context = context_user::instance($user1->id);
-        $user2context = context_user::instance($user2->id);
-        $user3context = context_user::instance($user3->id);
+        $user1context = \context_user::instance($user1->id);
+        $user2context = \context_user::instance($user2->id);
+        $user3context = \context_user::instance($user3->id);
 
         $plan1 = $lpg->create_plan(array('userid' => $user1->id));
         $plan2 = $lpg->create_plan(array('userid' => $user2->id));
         $plan3 = $lpg->create_plan(array('userid' => $user3->id));
         // Test add tags.
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plan1->get('id'), $user1context, 'Tag plan 1 and 2');
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plan2->get('id'), $user2context, 'Tag plan 1 and 2');
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plan3->get('id'), $user3context, 'Tag plan 3');
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plan1->get('id'), $user1context, 'Tag plan 1 and 2');
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plan2->get('id'), $user2context, 'Tag plan 1 and 2');
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plan3->get('id'), $user3context, 'Tag plan 3');
 
-        $collid = core_tag_collection::get_default();
-        $tag12 = core_tag_tag::get_by_name($collid, 'Tag plan 1 and 2', '*');
+        $collid = \core_tag_collection::get_default();
+        $tag12 = \core_tag_tag::get_by_name($collid, 'Tag plan 1 and 2', '*');
         $this->assertEquals('Tag plan 1 and 2', $tag12->get_display_name());
         $items = $tag12->get_tagged_items('report_lpmonitoring', 'competency_plan');
         $this->assertCount(2, $items);
         $this->assertEquals($plan1->get('id'), $items[$plan1->get('id')]->id);
         $this->assertEquals($plan2->get('id'), $items[$plan2->get('id')]->id);
         // Test tag : Tag plan 3.
-        $items = core_tag_tag::get_by_name($collid, 'Tag plan 3', '*')->get_tagged_items('report_lpmonitoring', 'competency_plan');
+        $items = \core_tag_tag::get_by_name($collid, 'Tag plan 3', '*')->get_tagged_items('report_lpmonitoring', 'competency_plan');
         $this->assertCount(1, $items);
         $this->assertEquals($plan3->get('id'), $items[$plan3->get('id')]->id);
         // Test delete tags.
-        core_tag_tag::remove_item_tag('report_lpmonitoring', 'competency_plan', $plan1->get('id'), 'Tag plan 1 and 2');
-        $tags = core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $plan1->get('id'));
+        \core_tag_tag::remove_item_tag('report_lpmonitoring', 'competency_plan', $plan1->get('id'), 'Tag plan 1 and 2');
+        $tags = \core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $plan1->get('id'));
         $this->assertEmpty($tags);
-        core_tag_tag::remove_item_tag('report_lpmonitoring', 'competency_plan', $plan2->get('id'), 'Tag plan 1 and 2');
-        $tags = core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $plan2->get('id'));
+        \core_tag_tag::remove_item_tag('report_lpmonitoring', 'competency_plan', $plan2->get('id'), 'Tag plan 1 and 2');
+        $tags = \core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $plan2->get('id'));
         $this->assertEmpty($tags);
-        core_tag_tag::remove_item_tag('report_lpmonitoring', 'competency_plan', $plan3->get('id'), 'Tag plan 3');
-        $tags = core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $plan3->get('id'));
+        \core_tag_tag::remove_item_tag('report_lpmonitoring', 'competency_plan', $plan3->get('id'), 'Tag plan 3');
+        $tags = \core_tag_tag::get_item_tags('report_lpmonitoring', 'competency_plan', $plan3->get('id'));
         $this->assertEmpty($tags);
 
-        $tag = core_tag_tag::get_by_name($collid, 'Tag plan 1 and 2', '*');
+        $tag = \core_tag_tag::get_by_name($collid, 'Tag plan 1 and 2', '*');
         $this->assertFalse($tag);
-        $tag = core_tag_tag::get_by_name($collid, 'Tag plan 3', '*');
+        $tag = \core_tag_tag::get_by_name($collid, 'Tag plan 3', '*');
         $this->assertFalse($tag);
     }
 }

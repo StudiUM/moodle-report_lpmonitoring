@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace report_lpmonitoring\event;
-defined('MOODLE_INTERNAL') || die();
 
 use report_lpmonitoring\api;
 use report_lpmonitoring\report_competency_config;

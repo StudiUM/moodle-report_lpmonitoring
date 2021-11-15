@@ -22,7 +22,7 @@
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
@@ -35,13 +35,13 @@ use core\invalid_persistent_exception;
 
 /**
  * API tests.
- *
+ * @covers     \report_lpmonitoring\api
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report_lpmonitoring_api_testcase extends advanced_testcase {
+class api_test extends \advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -97,9 +97,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $creator = $dg->create_user(array('firstname' => 'Creator'));
         $appreciator = $dg->create_user(array('firstname' => 'Appreciator'));
 
-        $this->contextcreator = context_user::instance($creator->id);
-        $this->contextappreciator = context_user::instance($appreciator->id);
-        $syscontext = context_system::instance();
+        $this->contextcreator = \context_user::instance($creator->id);
+        $this->contextappreciator = \context_user::instance($appreciator->id);
+        $syscontext = \context_system::instance();
 
         $this->rolecreator = create_role('Creator role', 'rolecreator', 'learning plan manager role description');
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $this->rolecreator, $syscontext->id);
@@ -120,7 +120,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->setAdminUser();
         // Create category.
         $this->category = $dg->create_category(array('name' => 'Cat test 1'));
-        $cat1ctx = context_coursecat::instance($this->category->id);
+        $cat1ctx = \context_coursecat::instance($this->category->id);
 
         // Create templates in category.
         $this->templateincategory = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
@@ -201,7 +201,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         // Generate plans for cohort.
         core_competency_api::create_plans_from_template_cohort($this->templateincategory->get('id'), $cohort->id);
         // Create plan from template for Stephanie.
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
 
         $roleid = create_role('Appreciator role', 'roleappreciatortest', 'learning plan appreciator role description');
         assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
@@ -288,8 +288,8 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $c4scaleconfig[] = array('name' => 'L', 'id' => 3, 'scaledefault' => 0, 'proficient' => 1);
         $c4scaleconfig[] = array('name' => 'M', 'id' => 4, 'scaledefault' => 1, 'proficient' => 1);
 
-        $catctx = context_coursecat::instance($cat->id);
-        $sysctx = context_system::instance();
+        $catctx = \context_coursecat::instance($cat->id);
+        $sysctx = \context_system::instance();
 
         // Create a list of frameworks.
         $framework1 = $lpg->create_framework(array(
@@ -375,19 +375,15 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
 
         $this->setUser($this->appreciator);
-
-        try {
-            api::create_report_competency_config($record);
-            $this->fail('Configuration can not be created when user does not have capability');
-        } catch (required_capability_exception $e) {
-            $this->assertTrue(true);
-        }
+        $msgexception = 'Sorry, but you do not currently have permissions to do that (Manage competency frameworks).';
+        $this->expectExceptionMessage($msgexception);
+        api::create_report_competency_config($record);
     }
 
     /**
@@ -407,7 +403,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -439,7 +435,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 2, 'color' => '#BBBBB');
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -469,7 +465,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id + 10;
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -499,7 +495,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale->id + 10;
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -546,13 +542,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $record->scaleconfiguration = json_encode($scaleconfig);
 
         $this->setUser($this->appreciator);
-
-        try {
-            api::update_report_competency_config($record);
-            $this->fail('Configuration can not be updated when user does not have capability');
-        } catch (required_capability_exception $e) {
-            $this->assertTrue(true);
-        }
+        $msgexception = 'Sorry, but you do not currently have permissions to do that (Manage competency frameworks).';
+        $this->expectExceptionMessage($msgexception);
+        api::update_report_competency_config($record);
     }
 
     /**
@@ -636,12 +628,8 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $record->scaleconfiguration = json_encode($scaleconfig);
         $record->scaleid = 0;
 
-        try {
-            api::update_report_competency_config($record);
-            $this->fail('Report competency configuration can not be updated if does not existe');
-        } catch (Exception $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectExceptionMessage('Can not update: configuration does not exist');
+        api::update_report_competency_config($record);
     }
 
     /**
@@ -677,12 +665,8 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         $record->scaleconfiguration = json_encode($scaleconfig);
 
-        try {
-            api::create_report_competency_config($record);
-            $this->fail('Report competency configuration can not be created if already exist');
-        } catch (Exception $e) {
-            $this->assertTrue(true);
-        }
+        $this->expectExceptionMessage('Can not create: configuration already exist');
+        api::create_report_competency_config($record);
     }
 
     /**
@@ -710,13 +694,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $record = $reportconfig->to_record();
 
         $this->setUser($this->appreciator);
-
-        try {
-            api::delete_report_competency_config($framework->get('id'), $scale->id);
-            $this->fail('Configuration can not be deleted when user does not have capability');
-        } catch (required_capability_exception $e) {
-            $this->assertTrue(true);
-        }
+        $msgexception = 'Sorry, but you do not currently have permissions to do that (Manage competency frameworks).';
+        $this->expectExceptionMessage($msgexception);
+        api::delete_report_competency_config($framework->get('id'), $scale->id);
     }
 
     /**
@@ -819,12 +799,8 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         $this->setUser($this->appreciatorforcategory);
         // Test we can not read Stephanie learning plan (do not belong to the cohort).
-        try {
-            api::read_plan($planstephanie->get('id'), $this->templateincategory->get('id'));
-            $this->fail("We don't have read plan permission for Stephanie Grant");
-        } catch (Exception $ex) {
-            $this->assertStringContainsString('Stepanie Grant', $ex->getMessage());
-        }
+        $this->expectExceptionMessage('Sorry, but you do not currently have permissions to view learning plan for Stepanie Grant');
+        api::read_plan($planstephanie->get('id'), $this->templateincategory->get('id'));
     }
 
     /**
@@ -1032,7 +1008,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
                     'scaleconfiguration' => $c2scaleconfig));
         $c2 = $cpg->create_competency(array('competencyframeworkid' => $framework->get('id'), 'shortname' => 'c2'));
         $cat1 = $dg->create_category();
-        $cat1ctx = context_coursecat::instance($cat1->id);
+        $cat1ctx = \context_coursecat::instance($cat1->id);
         $template = $cpg->create_template(array('contextid' => $cat1ctx->id));
         $user1 = $dg->create_user(array('firstname' => 'User11', 'lastname' => 'Lastname1'));
         $user2 = $dg->create_user(array('firstname' => 'User12', 'lastname' => 'Lastname2'));
@@ -1402,7 +1378,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'name' => 'C',  'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -1453,10 +1429,10 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $datacm = get_coursemodule_from_id('data', $data->cmid);
 
         // Insert student grades for the activity.
-        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'data', 'iteminstance' => $data->id,
+        $gi = \grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'data', 'iteminstance' => $data->id,
             'courseid' => $c1->id));
         $datagrade = 50;
-        $gradegrade = new grade_grade();
+        $gradegrade = new \grade_grade();
         $gradegrade->itemid = $gi->id;
         $gradegrade->userid = $u1->id;
         $gradegrade->rawgrade = $datagrade;
@@ -1481,14 +1457,14 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $courseitem = \grade_item::fetch_course_item($c1->id);
         $result = $courseitem->update_final_grade($u1->id, 67, 'import', null);
 
-        $context = context_course::instance($c1->id);
+        $context = \context_course::instance($c1->id);
         $this->assign_good_letter_boundary($context->id);
 
         // Assign final grade for the course C2.
         $courseitem = \grade_item::fetch_course_item($c2->id);
         $result = $courseitem->update_final_grade($u1->id, 88, 'import', null);
 
-        $context = context_course::instance($c2->id);
+        $context = \context_course::instance($c2->id);
         $this->assign_good_letter_boundary($context->id);
 
         $gradeitem = \grade_item::fetch_course_item($c1->id);
@@ -1572,7 +1548,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         global $DB;
 
         $this->resetAfterTest(true);
-        $generator = phpunit_util::get_data_generator();
+        $generator = \phpunit_util::get_data_generator();
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
         $mpg = $dg->get_plugin_generator('report_lpmonitoring');
@@ -1618,7 +1594,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'name' => 'C',  'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -1631,7 +1607,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'name' => 'Y',  'color' => '#YYYYY');
         $scaleconfig[] = array('id' => 4, 'name' => 'Z',  'color' => '#ZZZZZ');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scalecomp->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -1681,10 +1657,10 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $datacm = get_coursemodule_from_id('data', $data->cmid);
 
         // Insert student grades for the activity.
-        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'data', 'iteminstance' => $data->id,
+        $gi = \grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'data', 'iteminstance' => $data->id,
             'courseid' => $c1->id));
         $datagrade = 50;
-        $gradegrade = new grade_grade();
+        $gradegrade = new \grade_grade();
         $gradegrade->itemid = $gi->id;
         $gradegrade->userid = $u1->id;
         $gradegrade->rawgrade = $datagrade;
@@ -1709,14 +1685,14 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $courseitem = \grade_item::fetch_course_item($c1->id);
         $result = $courseitem->update_final_grade($u1->id, 81, 'import', null);
 
-        $context = context_course::instance($c1->id);
+        $context = \context_course::instance($c1->id);
         $this->assign_good_letter_boundary($context->id);
 
         // Assign final grade for the course C2.
         $courseitem = \grade_item::fetch_course_item($c2->id);
         $result = $courseitem->update_final_grade($u1->id, 45, 'import', null);
 
-        $context = context_course::instance($c2->id);
+        $context = \context_course::instance($c2->id);
         $this->assign_good_letter_boundary($context->id);
 
         $result = api::get_competency_detail($u1->id, $comp1->get('id'), $plan->get('id'));
@@ -1837,7 +1813,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'name' => 'C',  'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -1916,19 +1892,16 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         // Create plan from template for Stephanie.
         $planstephanie = core_competency_api::create_plan_from_template($this->templateincategory->get('id'), $this->user3->id);
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
         $this->setUser($this->appreciatorforcategory);
         // Test we can read the first plan for the template (Rebecca).
         $result = api::read_plan(0, $this->templateincategory->get('id'));
         $this->assertEquals($this->user1->id, $result->current->get('userid'));
 
         // Test we can not read competency stats because of permissions for Stephanie user competency.
-        try {
-            api::get_competency_statistics($this->comp1->get('id'), $this->templateincategory->get('id'));
-            $this->fail("We don't have read plan permission for Stephanie Grant");
-        } catch (Exception $ex) {
-            $this->assertStringContainsString('Stepanie Grant', $ex->getMessage());
-        }
+        $msgexception = 'Sorry, but you do not currently have permissions to view user competency for Stepanie Grant';
+        $this->expectExceptionMessage($msgexception);
+        api::get_competency_statistics($this->comp1->get('id'), $this->templateincategory->get('id'));
     }
 
     /**
@@ -1985,7 +1958,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'name' => 'C',  'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale1->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -1998,7 +1971,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'name' => 'Y',  'color' => '#YYYYY');
         $scaleconfig[] = array('id' => 4, 'name' => 'Z',  'color' => '#ZZZZZ');
 
-        $record = new stdclass();
+        $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $scale2->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -2079,9 +2052,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
     public function test_search_templates() {
         $user = $this->getDataGenerator()->create_user();
         $category = $this->getDataGenerator()->create_category();
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
         $syscontextid = $syscontext->id;
-        $catcontext = context_coursecat::instance($category->id);
+        $catcontext = \context_coursecat::instance($category->id);
         $catcontextid = $catcontext->id;
 
         // User role.
@@ -2098,13 +2071,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->setUser($user);
         assign_capability('moodle/competency:templateview', CAP_PROHIBIT, $userrole, $syscontextid, true);
         accesslib_clear_all_caches_for_unit_testing();
-        try {
-            api::search_templates($syscontext, '', 0, 10, 'children', false);
-            $this->fail('Invalid permissions');
-        } catch (required_capability_exception $e) {
-            // All good.
-            $this->assertTrue(true);
-        }
+        $msgexception = 'Sorry, but you do not currently have permissions to do that (View learning plan templates).';
+        $this->expectExceptionMessage($msgexception);
+        api::search_templates($syscontext, '', 0, 10, 'children', false);
 
         // User with category permissions.
         assign_capability('moodle/competency:templateview', CAP_PREVENT, $userrole, $syscontextid, true);
@@ -2167,11 +2136,11 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->setUser($this->creator);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
 
         $this->setAdminUser();
         $category2 = $dg->create_category(array('name' => 'Cat test 2'));
-        $cat2ctx = context_coursecat::instance($category2->id);
+        $cat2ctx = \context_coursecat::instance($category2->id);
 
         $appreciator2 = $dg->create_user(array('firstname' => 'Appreciator2'));
         role_assign($this->roleappreciator, $appreciator2->id, $cat2ctx);
@@ -2223,25 +2192,25 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $tag5 = 'Tag 5';
 
         // Add tags to the learning plans of both cohorts.
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, $tag1);
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, $tag2);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, $tag1);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, $tag2);
 
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, $tag1);
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, $tag3);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, $tag1);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, $tag3);
 
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, $tag1);
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, $tag4);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, $tag1);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, $tag4);
 
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, $tag4);
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, $tag5);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, $tag4);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, $tag5);
 
-        $collid = core_tag_area::get_collection('report_lpmonitoring', 'competency_plan');
+        $collid = \core_tag_area::get_collection('report_lpmonitoring', 'competency_plan');
 
-        $tag1id = core_tag_tag::get_by_name($collid, $tag1)->id;
-        $tag2id = core_tag_tag::get_by_name($collid, $tag2)->id;
-        $tag3id = core_tag_tag::get_by_name($collid, $tag3)->id;
-        $tag4id = core_tag_tag::get_by_name($collid, $tag4)->id;
-        $tag5id = core_tag_tag::get_by_name($collid, $tag5)->id;
+        $tag1id = \core_tag_tag::get_by_name($collid, $tag1)->id;
+        $tag2id = \core_tag_tag::get_by_name($collid, $tag2)->id;
+        $tag3id = \core_tag_tag::get_by_name($collid, $tag3)->id;
+        $tag4id = \core_tag_tag::get_by_name($collid, $tag4)->id;
+        $tag5id = \core_tag_tag::get_by_name($collid, $tag5)->id;
 
         // Begin tests.
         $alltags = array($tag1id => $tag1, $tag2id => $tag2, $tag3id => $tag3, $tag4id => $tag4, $tag5id => $tag5);
@@ -2293,11 +2262,11 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $this->setUser($this->creator);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
 
         $this->setAdminUser();
         $category2 = $dg->create_category(array('name' => 'Cat test 2'));
-        $cat2ctx = context_coursecat::instance($category2->id);
+        $cat2ctx = \context_coursecat::instance($category2->id);
 
         $appreciator2 = $dg->create_user(array('firstname' => 'Appreciator2'));
         role_assign($this->roleappreciator, $appreciator2->id, $cat2ctx);
@@ -2349,25 +2318,25 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         $tag5 = 'Tag 5';
 
         // Add tags to the learning plans of both cohorts.
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, $tag1);
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, $tag2);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, $tag1);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user1->get('id'), $syscontext, $tag2);
 
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, $tag1);
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, $tag3);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, $tag1);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort1user2->get('id'), $syscontext, $tag3);
 
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, $tag1);
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, $tag4);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, $tag1);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user1->get('id'), $syscontext, $tag4);
 
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, $tag4);
-        core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, $tag5);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, $tag4);
+        \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plancohort2user2->get('id'), $syscontext, $tag5);
 
-        $collid = core_tag_area::get_collection('report_lpmonitoring', 'competency_plan');
+        $collid = \core_tag_area::get_collection('report_lpmonitoring', 'competency_plan');
 
-        $tag1id = core_tag_tag::get_by_name($collid, $tag1)->id;
-        $tag2id = core_tag_tag::get_by_name($collid, $tag2)->id;
-        $tag3id = core_tag_tag::get_by_name($collid, $tag3)->id;
-        $tag4id = core_tag_tag::get_by_name($collid, $tag4)->id;
-        $tag5id = core_tag_tag::get_by_name($collid, $tag5)->id;
+        $tag1id = \core_tag_tag::get_by_name($collid, $tag1)->id;
+        $tag2id = \core_tag_tag::get_by_name($collid, $tag2)->id;
+        $tag3id = \core_tag_tag::get_by_name($collid, $tag3)->id;
+        $tag4id = \core_tag_tag::get_by_name($collid, $tag4)->id;
+        $tag5id = \core_tag_tag::get_by_name($collid, $tag5)->id;
 
         // Begin tests.
 
@@ -2582,7 +2551,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         // Test read template permission for apreciator.
         // Create templates in category.
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
         $template = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $syscontext->id));
 
         // Set current user to appreciator.
@@ -2673,7 +2642,7 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
         // Check that the event data is valid.
         $this->assertInstanceOf('\core\event\competency_user_competency_viewed_in_course', $event);
         $this->assertEquals($ucc->get('id'), $event->objectid);
-        $this->assertEquals(context_course::instance($course->id)->id, $event->contextid);
+        $this->assertEquals(\context_course::instance($course->id)->id, $event->contextid);
         $this->assertEquals($ucc->get('userid'), $event->relateduserid);
         $this->assertEquals($course->id, $event->courseid);
         $this->assertEquals($this->comp1->get('id'), $event->other['competencyid']);

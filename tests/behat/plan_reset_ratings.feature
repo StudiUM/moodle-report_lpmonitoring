@@ -9,9 +9,8 @@ Feature: Reset ratings for user competencies
     And I log in as "appreciator"
     And I am on course index
     When I follow "Medicine"
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
+    And I select "Reports" from secondary navigation
     Then I should see "Monitoring of learning plans"
-    And I follow "Monitoring of learning plans"
 
   Scenario: Reset rating for one competency
     Given I set the field "templateSelectorReport" to "Medicine Year 2"

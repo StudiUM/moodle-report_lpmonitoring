@@ -23,7 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace report_lpmonitoring\output;
-defined('MOODLE_INTERNAL') || die();
 
 use renderable;
 use renderer_base;
