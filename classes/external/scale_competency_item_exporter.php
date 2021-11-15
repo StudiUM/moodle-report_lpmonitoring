@@ -38,12 +38,28 @@ use renderer_base;
  */
 class scale_competency_item_exporter extends \core\external\exporter {
 
+    /**
+     * Returns a list of objects that are related to this persistent.
+     *
+     * Only objects listed here can be cached in this object.
+     *
+     * The class name can be suffixed:
+     * - with [] to indicate an array of values.
+     * - with ? to indicate that 'null' is allowed.
+     *
+     * @return array of 'propertyname' => array('type' => classname, 'required' => true)
+     */
     protected static function define_related() {
         return array('courses' => '\\stdClass[]',
                      'cms' => '\\stdClass[]',
                      'relatedinfo' => '\\stdClass');
     }
 
+    /**
+     * Return the list of properties.
+     *
+     * @return array
+     */
     protected static function define_properties() {
         return array(
             'value' => array(
@@ -58,6 +74,11 @@ class scale_competency_item_exporter extends \core\external\exporter {
         );
     }
 
+    /**
+     * Return the list of additional properties used only for display.
+     *
+     * @return array other properties
+     */
     protected static function define_other_properties() {
         return array(
             'nbcourse' => array(
@@ -77,6 +98,12 @@ class scale_competency_item_exporter extends \core\external\exporter {
         );
     }
 
+    /**
+     * Get the additional values to inject while exporting.
+     *
+     * @param renderer_base $output The renderer.
+     * @return array Keys are the property names, values are their values.
+     */
     protected function get_other_values(renderer_base $output) {
 
         $result = new \stdClass();

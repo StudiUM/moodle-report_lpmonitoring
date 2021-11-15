@@ -15,7 +15,7 @@ Feature: Reset ratings for user competencies
 
   Scenario: Reset rating for one competency
     Given I set the field "templateSelectorReport" to "Medicine Year 2"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Robert"
+    And I open the autocomplete suggestions list
     And I click on "Robert Smith" item in the autocomplete list
     And I press "Apply"
     And I should see "Not proficient" in "level" of the competency "Competency A"
@@ -31,7 +31,7 @@ Feature: Reset ratings for user competencies
 
   Scenario: Reset rating for all competencies
     Given I set the field "templateSelectorReport" to "Medicine Year 2"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Robert"
+    And I open the autocomplete suggestions list
     And I click on "Robert Smith" item in the autocomplete list
     And I press "Apply"
     And I should see "Not proficient" in "level" of the competency "Competency A"

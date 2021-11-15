@@ -14,7 +14,7 @@ Feature: Bulk rating
     Then I should see "Bulk rating for all students for all competencies"
     # Rate Pablo.
     And I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"
+    And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
     And I toggle the "Competency A" detail
@@ -61,7 +61,7 @@ Feature: Bulk rating
     And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"
+    And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
     And I toggle the "Competency A" detail
@@ -89,7 +89,7 @@ Feature: Bulk rating
     And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"
+    And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
     And I toggle the "Competency A" detail

@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Lpmonitoring report locallib.
+ *
  * @package   report_lpmonitoring
  * @copyright 2018 Université de Montréal
  * @author    Issam Taboubi <issam.taboubi@umontreal.ca>

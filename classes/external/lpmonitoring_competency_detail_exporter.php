@@ -43,6 +43,11 @@ use report_lpmonitoring\external\report_user_evidence_summary_exporter;
  */
 class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
 
+    /**
+     * Return the list of additional properties used only for display.
+     *
+     * @return array other properties
+     */
     public static function define_other_properties() {
         return array(
             'competencyid' => array(
@@ -120,6 +125,12 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
         );
     }
 
+    /**
+     * Get the additional values to inject while exporting.
+     *
+     * @param renderer_base $output The renderer.
+     * @return array Keys are the property names, values are their values.
+     */
     protected function get_other_values(renderer_base $output) {
 
         $data = $this->data;

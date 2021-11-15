@@ -142,6 +142,7 @@ class external extends external_api {
      * @param int $scalefilterin Apply the scale filters on grade in plan, course or course module.
      * @param string $scalesortorder The scale sort order ('ASC'/'DESC').
      * @param boolean $withcomments Only plans with comments.
+     * @param boolean $withplans Only with at least 2 plans.
      *
      * @return boolean
      */

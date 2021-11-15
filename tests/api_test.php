@@ -1493,9 +1493,9 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
 
         $gradeitem = \grade_item::fetch_course_item($c1->id);
         $gradegrade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $u1->id));
-        
+
         $result = api::get_competency_detail($u1->id, $comp1->get('id'), $plan->get('id'));
-        
+
         $gradeitem = \grade_item::fetch_course_item($c1->id);
         $gradegrade = new \grade_grade(array('itemid' => $gradeitem->id, 'userid' => $u1->id));
 
@@ -2591,7 +2591,8 @@ class report_lpmonitoring_api_testcase extends advanced_testcase {
             api::add_rating_task($template->get('id'), true, "");
             $this->fail('Must fail user does not have permissions to view learning plan templates.');
         } catch (\Exception $ex) {
-            $this->assertStringContainsString('Sorry, but you do not currently have permissions to do that (View learning plan templates)',
+            $this->assertStringContainsString('Sorry, but you do not currently have '
+            .'permissions to do that (View learning plan templates)',
                     $ex->getMessage());
         }
 

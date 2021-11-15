@@ -13,7 +13,7 @@ Feature: Manage learning plans comments
 
   Scenario: Manage learning plans comments (as appreciator)
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Rebecca"
+    And I open the autocomplete suggestions list
     And I click on "Rebecca Armenta" item in the autocomplete list
     When I press "Apply"
     Then I should see "1" in the ".comments-stats" "css_element"
@@ -44,7 +44,7 @@ Feature: Manage learning plans comments
   Scenario: Manage learning plans comments (as appreciator and as student)
     # Create a comment as appreciator
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"
+    And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list
     When I press "Apply"
     Then I should see "0" in the ".comments-stats" "css_element"
@@ -82,7 +82,7 @@ Feature: Manage learning plans comments
     And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     And I follow "Monitoring of learning plans"
     And I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Pablo"
+    And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
     And I should see "2" in the ".comments-stats" "css_element"

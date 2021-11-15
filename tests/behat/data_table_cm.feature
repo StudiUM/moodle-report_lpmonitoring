@@ -16,7 +16,7 @@ Feature: Display learning plan ratings details
 
   Scenario: Filter user learning plan by scales values in activities
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    When I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    When I open the autocomplete suggestions list
     Then I should see "Pablo Menendez" item in the autocomplete list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
@@ -63,7 +63,7 @@ Feature: Display learning plan ratings details
 
   Scenario: Check with a course hidden for students
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    When I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    When I open the autocomplete suggestions list
     Then I should see "Pablo Menendez" item in the autocomplete list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
@@ -85,7 +85,7 @@ Feature: Display learning plan ratings details
 
   Scenario: Filter the data table on competencies and courses.
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    When I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    When I open the autocomplete suggestions list
     Then I should see "Pablo Menendez" item in the autocomplete list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
@@ -114,7 +114,7 @@ Feature: Display learning plan ratings details
 
   Scenario: Filter the data table by scale values
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    When I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Rebecca"
+    When I open the autocomplete suggestions list
     Then I should see "Rebecca Armenta" item in the autocomplete list
     And I click on "Rebecca Armenta" item in the autocomplete list
     And I press "Apply"

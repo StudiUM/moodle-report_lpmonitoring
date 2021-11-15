@@ -38,12 +38,23 @@ use core_competency\url;
  */
 class report_user_evidence_summary_exporter extends user_evidence_summary_exporter {
 
+    /**
+     * Return the list of additional properties used only for display.
+     *
+     * @return array other properties
+     */
     protected static function define_other_properties() {
         $properties = parent::define_other_properties();
         $properties['userevidenceurl'] = array('type' => PARAM_RAW);
         return $properties;
     }
 
+    /**
+     * Get the additional values to inject while exporting.
+     *
+     * @param renderer_base $output The renderer.
+     * @return array Keys are the property names, values are their values.
+     */
     protected function get_other_values(renderer_base $output) {
         $id = $this->persistent->get('id');
         $othervalues = parent::get_other_values($output);

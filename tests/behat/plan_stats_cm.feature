@@ -15,7 +15,7 @@ Feature: Display learning plan template statistics in course modules
     And I follow "Statistics for learning plans"
 
   Scenario: Read template competencies statistics in course modules
-    Given I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Medicine"
+    Given I open the autocomplete suggestions list
     And I should see "Medicine Year 1" item in the autocomplete list
     And I click on "Medicine Year 1" item in the autocomplete list
     And I click on "//label[contains(., 'Rating in activity')]" "xpath_element"

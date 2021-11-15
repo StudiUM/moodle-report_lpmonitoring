@@ -14,7 +14,7 @@ Feature: Display learning plan template statistics
     And I follow "Statistics for learning plans"
 
   Scenario: Read template competencies statistics
-    Given I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Medicine"
+    Given I open the autocomplete suggestions list
     And I should see "Medicine Year 1" item in the autocomplete list
     And I should see "Medicine Year 2" item in the autocomplete list
     And I click on "Medicine Year 2" item in the autocomplete list
@@ -50,7 +50,7 @@ Feature: Display learning plan template statistics
     And I should see "William Presley" in the "Linked users" "dialogue"
 
   Scenario: Read template competencies statistics in course
-    Given I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Medicine"
+    Given I open the autocomplete suggestions list
     And I should see "Medicine Year 1" item in the autocomplete list
     And I click on "Medicine Year 1" item in the autocomplete list
     And I click on "//label[contains(., 'Rating in course')]" "xpath_element"

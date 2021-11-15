@@ -37,6 +37,11 @@ use context_system;
  */
 class evaluations_exporter extends \core\external\exporter {
 
+    /**
+     * Return the list of additional properties used only for display.
+     *
+     * @return array other properties
+     */
     protected static function define_other_properties() {
         return array(
             'iscourse' => array(
@@ -57,6 +62,12 @@ class evaluations_exporter extends \core\external\exporter {
         );
     }
 
+    /**
+     * Get the additional values to inject while exporting.
+     *
+     * @param renderer_base $output The renderer.
+     * @return array Keys are the property names, values are their values.
+     */
     protected function get_other_values(renderer_base $output) {
         $evaluationdata = $this->data;
         $result = new \stdClass();

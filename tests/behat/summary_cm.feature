@@ -15,7 +15,7 @@ Feature: Display learning plan summary
 
   Scenario: View the competency summary in courses, activities or both
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    When I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    When I open the autocomplete suggestions list
     Then I should see "Pablo Menendez" item in the autocomplete list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
@@ -91,7 +91,7 @@ Feature: Display learning plan summary
 
   Scenario: View the competency summary for a plan with competencies of level 1 and 2 both assessed
     Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])[last()]" to "Pablo"
+    And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I set the field "studentPlansSelectorReport" to "Pablo plan level 1 and 2"
     When I press "Apply"

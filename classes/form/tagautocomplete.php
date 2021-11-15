@@ -51,7 +51,7 @@ class tagautocomplete extends MoodleQuickForm_tags {
      */
     public function __construct($elementname = null, $elementlabel = null, $options = array(), $attributes = null) {
         // The id MUST be unique or the javascript won't work correctly.
-        // (The element won't be shown the second time a modal is rendered.)
+        // The element won't be shown the second time a modal is rendered.
         $attributes['id'] = str_replace('.', '', 'tags' . microtime(true));
         parent::__construct($elementname, $elementlabel, $options, $attributes);
     }

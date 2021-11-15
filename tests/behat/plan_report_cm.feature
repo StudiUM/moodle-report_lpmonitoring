@@ -20,13 +20,15 @@ Feature: Display learning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[text()='Rating in activity']" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    And I open the autocomplete suggestions list
     Then I should see "Pablo Menendez" item in the autocomplete list
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
+    And I open the autocomplete suggestions list
     And I should see "Rebecca Armenta" item in the autocomplete list
+    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Reb"
     And I should not see "Cynthia Reyes" item in the autocomplete list
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
+    And I open the autocomplete suggestions list
     And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
     And I should see "Rebecca Armenta" item in the autocomplete list
     And I should see "Cynthia Reyes" item in the autocomplete list
@@ -59,7 +61,7 @@ Feature: Display learning plan ratings details
 
   Scenario: Read user competency detail
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
+    And I open the autocomplete suggestions list
     And I click on "Pablo Menendez" item in the autocomplete list
     When I press "Apply"
     Then I should see "Competency A"

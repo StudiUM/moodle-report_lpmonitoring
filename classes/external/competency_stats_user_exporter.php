@@ -38,6 +38,11 @@ use renderer_base;
  */
 class competency_stats_user_exporter extends exporter {
 
+    /**
+     * Return the list of properties.
+     *
+     * @return array
+     */
     protected static function define_properties() {
         return array(
             'email' => array(
@@ -46,6 +51,11 @@ class competency_stats_user_exporter extends exporter {
         );
     }
 
+    /**
+     * Return the list of additional properties used only for display.
+     *
+     * @return array other properties
+     */
     protected static function define_other_properties() {
         return array(
             'fullname' => array(
@@ -66,6 +76,12 @@ class competency_stats_user_exporter extends exporter {
         );
     }
 
+    /**
+     * Get the additional values to inject while exporting.
+     *
+     * @param renderer_base $output The renderer.
+     * @return array Keys are the property names, values are their values.
+     */
     protected function get_other_values(renderer_base $output) {
 
         $userexporter = new user_summary_exporter($this->data, '*', \MUST_EXIST);

@@ -817,6 +817,8 @@ class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
 class api extends nontestable_api {
     /**
      * Change value for the iscmcompetencygradingenabled variable.
+     *
+     * @param bool $value True or false value for iscmcompetencygradingenabled
      */
     public static function set_is_cm_comptency_grading_enabled($value) {
         self::$iscmcompetencygradingenabled = $value;

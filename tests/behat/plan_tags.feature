@@ -15,7 +15,7 @@ Feature: Manage learning plans tags
 
   Scenario: Manage leaning plans tags
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Rebecca"
+    And I open the autocomplete suggestions list
     And I click on "Rebecca Armenta" item in the autocomplete list
     And I press "Apply"
     And I should see "Tag(s)"
@@ -81,7 +81,7 @@ Feature: Manage learning plans tags
 
   Scenario: Filter user learning plan with tags comments
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Rebecca"
+    And I open the autocomplete suggestions list
     And I click on "Rebecca Armenta" item in the autocomplete list
     And I press "Apply"
     And I should see "Tag(s)"
@@ -103,7 +103,7 @@ Feature: Manage learning plans tags
 
   Scenario: Filter user learning plan with tags no comments
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Cynthia"
+    And I open the autocomplete suggestions list
     And I click on "Cynthia Reyes" item in the autocomplete list
     And I press "Apply"
     And I should see "Tag(s)"
@@ -125,7 +125,7 @@ Feature: Manage learning plans tags
 
   Scenario: Filter user learning plan with tags no comments
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
-    And I set the field with xpath "//input[contains(@id, 'form_autocomplete_input')]" to "Cynthia"
+    And I open the autocomplete suggestions list
     And I click on "Cynthia Reyes" item in the autocomplete list
     And I press "Apply"
     And I should see "Tag(s)"

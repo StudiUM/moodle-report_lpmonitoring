@@ -37,6 +37,11 @@ use context_system;
  */
 class summary_evaluations_exporter extends \core\external\exporter {
 
+    /**
+     * Return the list of additional properties used only for display.
+     *
+     * @return array other properties
+     */
     protected static function define_other_properties() {
         return array(
             'number' => array(

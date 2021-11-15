@@ -17,13 +17,20 @@
  * Privacy Subsystem implementation for report_lpmonitoring.
  *
  * @package    report_lpmonitoring
- * @auhtor     Issam Taboubi <issam.taboubi@umontreal.ca>
+ * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace report_lpmonitoring\privacy;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Lpmonitoring report provider.
+ *
+ * @copyright  2021 Université de Montréal
+ * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class provider implements \core_privacy\local\metadata\null_provider {
 
     /**

@@ -40,6 +40,11 @@ use core_comment\external\comment_area_exporter;
  */
 class stats_plan_exporter extends exporter {
 
+    /**
+     * Return the list of additional properties used only for display.
+     *
+     * @return array other properties
+     */
     public static function define_other_properties() {
         return array(
             'nbcompetenciesnotrated' => array(
@@ -66,11 +71,28 @@ class stats_plan_exporter extends exporter {
         );
     }
 
+    /**
+     * Returns a list of objects that are related to this persistent.
+     *
+     * Only objects listed here can be cached in this object.
+     *
+     * The class name can be suffixed:
+     * - with [] to indicate an array of values.
+     * - with ? to indicate that 'null' is allowed.
+     *
+     * @return array of 'propertyname' => array('type' => classname, 'required' => true)
+     */
     protected static function define_related() {
         // We cache the scale so it does not need to be retrieved from the framework every time.
         return array('plan' => 'core_competency\\plan');
     }
 
+    /**
+     * Get the additional values to inject while exporting.
+     *
+     * @param renderer_base $output The renderer.
+     * @return array Keys are the property names, values are their values.
+     */
     protected function get_other_values(renderer_base $output) {
 
         $result = new \stdClass();

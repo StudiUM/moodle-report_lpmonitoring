@@ -282,11 +282,10 @@ class api {
         $template = core_competency_api::read_template($templateid);
         $context = $template->get_context();
 
-        $extrasearchfields = array();
-        if (!empty($CFG->showuseridentity)) {
-            $extrasearchfields = explode(',', $CFG->showuseridentity);
-        }
-        $fields = \user_picture::fields('u', $extrasearchfields);
+        $userfieldsapi = \core_user\fields::for_identity($context, false)->with_userpic();
+        $fields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
+        $extrasearchfields = $userfieldsapi->get_required_fields([\core_user\fields::PURPOSE_IDENTITY]);
+
         list($wheresql, $whereparams) = users_search_sql($query, 'u', true, $extrasearchfields);
         list($sortsql, $sortparams) = users_order_by_sql('u', $query, $context);
 
@@ -1032,7 +1031,7 @@ class api {
      * @param string $tablealias alias of template table in the SQL query
      * @return array of two elements - SQL condition and array of named parameters
      */
-    static protected function get_template_query_search($search, $tablealias = '') {
+    protected static function get_template_query_search($search, $tablealias = '') {
         global $DB;
         $params = array();
         if (empty($search)) {
@@ -1062,7 +1061,7 @@ class api {
      * @param int $competencyid The competency ID
      * @return bool True if record exist
      */
-    static protected function has_records_for_competency_user_in_plan($planid, $competencyid) {
+    protected static function has_records_for_competency_user_in_plan($planid, $competencyid) {
         global $DB;
         $sql = "SELECT c.*
                   FROM {" . user_competency_plan::TABLE . "} ucp
@@ -1111,6 +1110,7 @@ class api {
      * Get the plans with a specific tag (but only plans that the user can view).
      *
      * @param int $tagid The tag id.
+     * @param bool $withcomments Only plans with comments.
      * @return array( array(
      *                      'profileimage' => user_picture,
      *                      'profileimagesmall' => user_picture,
@@ -1337,7 +1337,6 @@ class api {
      * then the user viewed the data, so we log the info.
      *
      * @param user_competency_course|int $usercoursecompetencyorid The user competency course object or its ID.
-     * @param int $courseid The course ID
      * @return bool
      */
     public static function user_competency_viewed_in_course($usercoursecompetencyorid) {
@@ -1362,7 +1361,7 @@ class api {
      * @param int|plan $planorid The plan, or its ID.
      * @return Boolean If we have to display or not the rating for plan
      */
-    static public function has_to_display_rating_for_plan($planorid) {
+    public static function has_to_display_rating_for_plan($planorid) {
         if (self::$isdisplayratingenabled) {
             return \tool_lp\api::has_to_display_rating_for_plan($planorid);
         }
@@ -1375,7 +1374,7 @@ class api {
      * @param int|plan $planorid The plan, or its ID.
      * @return Boolean If we have a display rating set for plan
      */
-    static public function can_reset_display_rating_for_plan($planorid) {
+    public static function can_reset_display_rating_for_plan($planorid) {
         if (self::$isdisplayratingenabled) {
             return \tool_lp\api::can_reset_display_rating_for_plan($planorid);
         }
@@ -1388,10 +1387,11 @@ class api {
      * @param int|plan $planorid The plan, or its ID.
      * @return Boolean If we have to display or not the rating for plan
      */
-    static public function has_to_display_rating($planorid) {
+    public static function has_to_display_rating($planorid) {
         if (self::$isdisplayratingenabled) {
             return \tool_lp\api::has_to_display_rating($planorid);
         }
         return true;
     }
 }
+
