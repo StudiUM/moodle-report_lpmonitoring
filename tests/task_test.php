@@ -22,7 +22,7 @@
  * @copyright 2019 Université de Montréal
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -34,12 +34,13 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 /**
  * Template competency report Task tests.
  *
+ * @covers    \report_lpmonitoring\task
  * @package   report_lpmonitoring
  * @author    Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright 2019 Université de Montréal
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report_lpmonitoring_task_testcase extends externallib_advanced_testcase {
+class task_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in category context. */
     protected $appreciatorforcategory = null;
@@ -74,7 +75,7 @@ class report_lpmonitoring_task_testcase extends externallib_advanced_testcase {
         $this->setAdminUser();
         // Create category.
         $this->category = $dg->create_category(array('name' => 'Cat test 1'));
-        $cat1ctx = context_coursecat::instance($this->category->id);
+        $cat1ctx = \context_coursecat::instance($this->category->id);
 
         // Create templates in category.
         $this->templateincategory = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
@@ -146,7 +147,7 @@ class report_lpmonitoring_task_testcase extends externallib_advanced_testcase {
         // Generate plans for cohort.
         core_competency_api::create_plans_from_template_cohort($this->templateincategory->get('id'), $cohort->id);
         // Create plans from template.
-        $syscontext = context_system::instance();
+        $syscontext = \context_system::instance();
 
         $roleid = create_role('Appreciator role', 'roleappreciatortest', 'learning plan appreciator role description');
         assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);

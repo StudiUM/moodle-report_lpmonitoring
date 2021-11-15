@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig && get_config('core_competency', 'enabled')) {
-    $systemcontextid = context_system::instance()->id;
+    $systemcontextid = \context_system::instance()->id;
 
     // Competency frameworks scale colors settings page.
     $adminpage = new admin_externalpage(

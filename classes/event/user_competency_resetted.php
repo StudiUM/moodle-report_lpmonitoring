@@ -27,7 +27,6 @@ namespace report_lpmonitoring\event;
 
 use core\event\base;
 use core_competency\user_competency;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * User competency grade resetted event class.

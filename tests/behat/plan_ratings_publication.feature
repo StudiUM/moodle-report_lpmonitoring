@@ -10,7 +10,7 @@ Feature: Manage publication of ratings in learning plans
     And I log in as "lpmanager"
     And I am on course index
     When I follow "Medicine"
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
+    And I select "More" from secondary navigation
     Then I should see "Learning plan templates"
     And I follow "Learning plan templates"
 

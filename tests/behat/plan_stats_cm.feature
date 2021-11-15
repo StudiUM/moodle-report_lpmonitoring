@@ -10,9 +10,9 @@ Feature: Display learning plan template statistics in course modules
     And I log in as "appreciator"
     And I am on course index
     When I follow "Medicine"
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
-    Then I should see "Statistics for learning plans"
-    And I follow "Statistics for learning plans"
+    And I select "Reports" from secondary navigation
+    Then the "jump" select box should contain "Statistics for learning plans"
+    And I select "Statistics for learning plans" from the "jump" singleselect
 
   Scenario: Read template competencies statistics in course modules
     Given I open the autocomplete suggestions list

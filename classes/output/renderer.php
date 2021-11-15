@@ -25,8 +25,6 @@
 
 namespace report_lpmonitoring\output;
 
-defined('MOODLE_INTERNAL') || die;
-
 use plugin_renderer_base;
 use report_lpmonitoring\api;
 
