@@ -16,7 +16,7 @@
 /**
  * Reset grade dialogue.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/resetgrade_dialogue
  * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
  * @copyright  2019 Université de Montréal
  */

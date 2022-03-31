@@ -16,7 +16,7 @@
 /**
  * Module to show a popup to view or add comments to a learning plan.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/comments_popup
  * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,8 +27,9 @@ define(['jquery',
         'core/str',
         'core/ajax',
         'core/templates',
-        'tool_lp/dialogue'],
-    function($, notification, str, ajax, templates, Dialogue) {
+        'core/modal_factory',
+        'core/modal_events'],
+    function($, notification, str, ajax, templates, ModalFactory, ModalEvents) {
 
         /**
          * Constructor.
@@ -60,12 +61,6 @@ define(['jquery',
         CommentsPopup.prototype.selector_nbcomments = '';
 
         /**
-         * @var {string} selector_commentlist  The CSS selector for the comment list.
-         * @private
-         */
-        CommentsPopup.prototype.selector_commentlist = ".moodle-dialogue-wrap .comment-list";
-
-        /**
          * @var {Dialogue} popup  The popup window (Dialogue).
          * @private
          */
@@ -85,13 +80,16 @@ define(['jquery',
          */
         CommentsPopup.prototype.handleClick = function(e) {
             e.preventDefault();
+            var trigger = $(e.target);
             var self = this;
-            ajax.call([{
+            var requests = ajax.call([{
                 methodname : 'report_lpmonitoring_get_comment_area_for_plan',
-                args: { planid: self.planid },
-                done: self.commentareaLoaded.bind(self),
-                fail: notification.exception
+                args: { planid: self.planid }
             }]);
+            $.when.apply($, requests).then(function(context) {
+                self.commentareaLoaded.bind(this)(context, trigger);
+                return;
+            }.bind(this)).catch(notification.exception);
         };
 
         /**
@@ -99,21 +97,49 @@ define(['jquery',
          *
          * @method commentareaLoaded
          * @param {Object} commentarea
+         * @param {Object} trigger
          */
-        CommentsPopup.prototype.commentareaLoaded = function(commentarea) {
+        CommentsPopup.prototype.commentareaLoaded = function(commentarea, trigger) {
             var self = this;
             // We have to display user info in popup.
-            templates.render('report_lpmonitoring/comment_area', commentarea).done(function(html, js) {
-                str.get_string('commentsedit', 'report_lpmonitoring').done(function(title) {
-                    self.popup = new Dialogue(title, html, self.open.bind(self, js), self.close.bind(self), true);
-                    $("body").on('DOMSubtreeModified', self.selector_commentlist, self.checkPopupSize.bind(self));
-                }).fail(notification.exception);
-            }).fail(notification.exception);
+            return str.get_string('commentsedit', 'report_lpmonitoring').done(function(title) {
+                return ModalFactory.create({
+                    type: ModalFactory.types.DEFAULT,
+                    title: title,
+                    body: templates.render('report_lpmonitoring/comment_area', commentarea),
+                    large: true
+                }).done(function(modal) {
+                    // Keep a reference to the modal.
+                    self.popup = modal;
+                    modal.getRoot().on(ModalEvents.hidden, function() {
+                        self.close();
+                        self.focusContentItem(trigger);
+                    }.bind(this));
+                    self.popup.show();
+                }.bind(this));
+        }).fail(notification.exception);
+        };
+
+        /**
+         * Focus the given content item or the first focusable element within
+         * the content item.
+         *
+         * @method focusContentItem
+         * @param {object} item The content item jQuery element
+         */
+        CommentsPopup.prototype.focusContentItem = function(item) {
+            var focusable = 'input:not([type="hidden"]), a[href], button, textarea, select, [tabindex]';
+            if (item.is(focusable)) {
+                item.focus();
+            } else {
+                item.find(focusable).first().focus();
+            }
         };
 
         /**
          * Open the popup.
          *
+         * @param {String} js
          * @method open
          */
         CommentsPopup.prototype.open = function(js) {
@@ -137,39 +163,8 @@ define(['jquery',
             requests[0].then(function (commentarea) {
                 $(self.selector_nbcomments).text(commentarea.count);
             });
-
-            // Destroy the popup.
-            $("body").off('DOMSubtreeModified', self.selector_commentlist);
-            self.popup.close();
+            self.popup.destroy();
             self.popup = null;
-        };
-
-        /**
-         * Checks if all comments can be seen in the popup, and if not, show the popup full screen.
-         *
-         * @method checkPopupSize
-         */
-        CommentsPopup.prototype.checkPopupSize = function() {
-            var self = this;
-
-            var newSize = $(self.selector_commentlist).height();
-            // If the height of the comment area has changed and is bigger than before.
-            if( newSize > self.actual_size ) {
-                var bb = self.popup.yuiDialogue.get('boundingBox');
-
-                // If the comments cannot be completly seen in the window, show fullscreen.
-                if( $('.moodle-dialogue').height() > bb.get('winHeight')) {
-                    bb.addClass('moodle-dialogue-fullscreen');
-
-                    bb.setStyles({'left': null,
-                        'top': null,
-                        'width': null,
-                        'height': null,
-                        'right': null,
-                        'bottom': null});
-                }
-            }
-            self.actual_size = newSize;
         };
 
         return {

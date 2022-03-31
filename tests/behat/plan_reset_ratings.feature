@@ -21,6 +21,7 @@ Feature: Reset ratings for user competencies
     And I should see "Not proficient" in "level" of the competency "Competency A"
     And I should see "Not proficient" in "level" of the competency "Competency B"
     And I toggle the "Competency A" detail
+    And I wait "1" seconds
     And "//div[@class='reset-grade' and ancestor-or-self::div[contains(., 'Competency A')]]/a" "xpath_element" should be visible
     And I click on "//div[@class='reset-grade' and ancestor-or-self::div[contains(., 'Competency A')]]/a" "xpath_element"
     And "Reset" "dialogue" should be visible

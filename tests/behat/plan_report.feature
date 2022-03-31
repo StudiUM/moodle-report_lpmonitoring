@@ -48,7 +48,7 @@ Feature: Display learning plan ratings details
   Scenario: Read user learning plan filtered by user
     Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
     And the "Apply" "button" should be disabled
-    And I open the autocomplete suggestions list
+    And I click on ".studentfilter .form-autocomplete-downarrow" "css_element"
     And I click on "Stepanie Grant" item in the autocomplete list
     And the "studentPlansSelectorReport" select box should contain "Medicine Year 1"
     And the "studentPlansSelectorReport" select box should contain "My custom learing plan"
@@ -67,7 +67,7 @@ Feature: Display learning plan ratings details
   Scenario: Read own learning plan filtered by user
     Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
     And the "Apply" "button" should be disabled
-    And I open the autocomplete suggestions list
+    And I click on ".studentfilter .form-autocomplete-downarrow" "css_element"
     And I click on "Stepanie Grant" item in the autocomplete list
     And the "studentPlansSelectorReport" select box should contain "Medicine Year 1"
     And the "studentPlansSelectorReport" select box should contain "My custom learing plan"
@@ -82,7 +82,7 @@ Feature: Display learning plan ratings details
     And I press "Apply"
     And I should see "Stepanie Grant" in the ".currentplan" "css_element"
     And I should see "No competencies have been linked to this learning plan."
-    And I open the autocomplete suggestions list
+    And I click on ".studentfilter .form-autocomplete-downarrow" "css_element"
     And I click on "Pablo Menendez" item in the autocomplete list
     And the "studentPlansSelectorReport" select box should contain "Medicine Year 1"
     And the "studentPlansSelectorReport" select box should contain "Pablo learing plan"
@@ -124,13 +124,14 @@ Feature: Display learning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[text()='Rating in course']" "xpath_element"
-    And I open the autocomplete suggestions list
+    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
     Then I should see "Pablo Menendez" item in the autocomplete list
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
-    And I should see "No suggestions" in the "//ul[@class='form-autocomplete-suggestions']" "xpath_element"
+    And I press the escape key
+    And I should not see "Rebecca Armenta" in the "//div[contains(@class, 'templatefilter')]//ul[@class='form-autocomplete-suggestions']" "xpath_element"
+    And I should not see "Cynthia Reyes" in the "//div[contains(@class, 'templatefilter')]//ul[@class='form-autocomplete-suggestions']" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I open the autocomplete suggestions list
+    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
     And I should see "Rebecca Armenta" item in the autocomplete list
     And I should see "Cynthia Reyes" item in the autocomplete list
 
@@ -140,17 +141,20 @@ Feature: Display learning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[contains(., 'Final rating')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "S"
-    Then I should see "(1) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
-    And I should see "Frederic Simson" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
-    And I should see "(2) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
-    And I should see "Robert Smith" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
+    And I click on "Users from this template" "field"
+    And I type "S"
+    Then I should see "(1) rating" in the "//div[contains(@class, 'templatefilter')]//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
+    And I should see "Frederic Simson" in the "//div[contains(@class, 'templatefilter')]//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
+    And I should see "(2) rating" in the "//div[contains(@class, 'templatefilter')]//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
+    And I should see "Robert Smith" in the "//div[contains(@class, 'templatefilter')]//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I click on "//label[contains(., 'Sort in descending order')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "S"
-    And I should see "(2) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
-    And I should see "Robert Smith" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
-    And I should see "(1) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
-    And I should see "Frederic Simson" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
+    And I click on "Users from this template" "field"
+    And I press the backspace key
+    And I type "S"
+    And I should see "(2) rating" in the "//div[contains(@class, 'templatefilter')]//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
+    And I should see "Robert Smith" in the "//div[contains(@class, 'templatefilter')]//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
+    And I should see "(1) rating" in the "//div[contains(@class, 'templatefilter')]//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
+    And I should see "Frederic Simson" in the "//div[contains(@class, 'templatefilter')]//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I press "Apply"
     And I should see "Robert Smith" in the ".currentplan" "css_element"
     And I should see "Frederic Simson" in the ".nexplan" "css_element"
@@ -165,13 +169,16 @@ Feature: Display learning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[text()='Rating in course']" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
+    And I click on "Users from this template" "field"
+    And I type "a"
     Then I should see "(3) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Donald Fletcher" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(8) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I should see "Pablo Menendez" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I click on "//label[contains(., 'Sort in descending order')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
+    And I click on "Users from this template" "field"
+    And I press the backspace key
+    And I type "a"
     And I should see "(8) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Pablo Menendez" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(3) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
@@ -187,19 +194,24 @@ Feature: Display learning plan ratings details
   Scenario: Filter user learning plan with comments
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
     And I click on "//a[contains(@class, 'moreless-toggler')]" "xpath_element"
-    And I open the autocomplete suggestions list
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
+    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
+    And I press the escape key
+    And I click on "Users from this template" "field"
+    And I type "Re"
     And I should see "Rebecca Armenta" item in the autocomplete list
     And I should not see "comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Cynthia Reyes" item in the autocomplete list
     And I should not see "comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
-    And I open the autocomplete suggestions list
+    And I press the escape key
+    And I click on "Users from this template" "field"
+    And I press the backspace key
+    And I press the backspace key
     And I should see "Pablo Menendez" item in the autocomplete list
     When I press "Apply"
     Then I should see "Rebecca Armenta" in the ".currentplan" "css_element"
     And I should see "Donald Fletcher" in the ".nexplan" "css_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'at least one comment')]" "xpath_element"
-    And I open the autocomplete suggestions list
+    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
     And I should see "Rebecca Armenta" item in the autocomplete list
     And I should see "(1) comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Stepanie Grant" item in the autocomplete list
@@ -333,14 +345,16 @@ Feature: Display learning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//div[contains(@class, 'fradio')]/span/label[contains(@for, 'scalefilterplan')]" "xpath_element"
-    And I open the autocomplete suggestions list
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "m"
+    And I click on "Users from this template" "field"
+    And I type "m"
     Then I should not see "William Presley" item in the autocomplete list
     And I should see "Robert Smith" item in the autocomplete list
     And I should see "Frederic Simson" item in the autocomplete list
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I open the autocomplete suggestions list
+    And I click on "Users from this template" "field"
+    And I press the backspace key
+    And I type "m"
     And I should see "Robert Smith" item in the autocomplete list
     And I should see "William Presley" item in the autocomplete list
     And I should see "Frederic Simson" item in the autocomplete list

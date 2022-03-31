@@ -16,7 +16,7 @@
 /**
  * Module to enable inline editing of a comptency grade.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/user_competency_popup
  * @author     Jean-Philippe Gaudreau <jp.gaudreau@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,14 +27,15 @@ define(['jquery',
         'core/str',
         'core/ajax',
         'core/templates',
-        'tool_lp/dialogue'],
-    function($, notification, str, ajax, templates, Dialogue) {
+        'core/modal_factory',
+        'core/modal_events'],
+    function($, notification, str, ajax, templates, ModalFactory, ModalEvents) {
 
         /**
          * UserCompetencyPopup
          *
-         * @param {String} The regionSelector
-         * @param {String} The userCompetencySelector
+         * @param {String} regionSelector The regionSelector
+         * @param {String} userCompetencySelector The userCompetencySelector
          */
         var UserCompetencyPopup = function(regionSelector, userCompetencySelector) {
             this._regionSelector = regionSelector;
@@ -63,12 +64,12 @@ define(['jquery',
             var requests = ajax.call([{
                 methodname : 'tool_lp_data_for_user_competency_summary_in_plan',
                 args: { competencyid: self._competencyId , planid: self._planId },
-                done: self._contextLoaded.bind(self),
                 fail: notification.exception
             }]);
 
             // Log the user competency viewed in plan event.
             requests[0].then(function (result) {
+                self._contextLoaded.bind(self)(result, cell);
                 var eventMethodName = 'core_competency_user_competency_viewed_in_plan';
                 // Trigger core_competency_user_competency_plan_viewed event instead if plan is already completed.
                 if (result.plan.iscompleted) {
@@ -87,16 +88,42 @@ define(['jquery',
          *
          * @method _contextLoaded
          * @param {Object} context
+         * @param {Object} trigger
          */
-        UserCompetencyPopup.prototype._contextLoaded = function(context) {
+        UserCompetencyPopup.prototype._contextLoaded = function(context, trigger) {
             var self = this;
-            // We have to display user info in popup.
-            templates.render('tool_lp/user_competency_summary_in_plan', context).done(function(html, js) {
-                str.get_string('usercompetencysummary', 'report_competency').done(function(title) {
-                    self.popup = new Dialogue(title, html, templates.runTemplateJS.bind(templates, js),
-                        self._refresh.bind(self), true);
-                }).fail(notification.exception);
+            return str.get_string('usercompetencysummary', 'report_competency').done(function(title) {
+                return ModalFactory.create({
+                    type: ModalFactory.types.DEFAULT,
+                    title: title,
+                    body: templates.render('tool_lp/user_competency_summary_in_plan', context),
+                    large: true
+                }, trigger).done(function(modal) {
+                    // Keep a reference to the modal.
+                    self.popup = modal;
+                    self.popup.getRoot().on(ModalEvents.hidden, function() {
+                        self.focusContentItem(trigger);
+                        self._refresh();
+                    });
+                    self.popup.show();
+                }.bind(this));
             }).fail(notification.exception);
+        };
+
+        /**
+         * Focus the given content item or the first focusable element within
+         * the content item.
+         *
+         * @method focusContentItem
+         * @param {object} item The content item jQuery element
+         */
+        UserCompetencyPopup.prototype.focusContentItem = function(item) {
+            var focusable = 'input:not([type="hidden"]), a[href], button, textarea, select, [tabindex]';
+            if (item.is(focusable)) {
+                item.focus();
+            } else {
+                item.find(focusable).first().focus();
+            }
         };
 
         /**
@@ -108,11 +135,10 @@ define(['jquery',
         /**
          * Destroy DOM after close.
          *
-         * @param Dialogue
-         * @function
+         * @method close
          */
         UserCompetencyPopup.prototype.close = function() {
-            this.popup.close();
+            this.popup.destroy();
             this.popup = null;
         };
 

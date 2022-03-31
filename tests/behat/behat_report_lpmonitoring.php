@@ -225,9 +225,9 @@ class behat_report_lpmonitoring extends behat_base {
         } else {
             // Header can be in thead or tbody (first row), following xpath should work.
             $theadheaderxpath = "thead/tr[1]/th[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
-                    $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])]";
+                    $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
             $tbodyheaderxpath = "tbody/tr[1]/td[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
-                    $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])]";
+                    $columnliteral . "] or div[normalize-space(text())=" . $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
 
             // Check if column exists.
             $columnheaderxpath = $tablexpath . "[" . $theadheaderxpath . " | " . $tbodyheaderxpath . "]";
@@ -258,17 +258,6 @@ class behat_report_lpmonitoring extends behat_base {
             $locatorexceptionmsg = $value . '" in "' . $row . '" row with column "' . $column;
             throw new ElementNotFoundException($this->getSession(), "\n$columnvaluexpath\n\n".'Column value', null,
                     $locatorexceptionmsg);
-        } else {
-            // Checks if the corresponding node is visible (loop until a visible node is found).
-            foreach ($columnnode as $node) {
-                if ($node->isVisible()) {
-                    return;
-                }
-            }
-            throw new ExpectationException(
-                '"' . $value . '" in "' . $row . '" row with column "' . $column . '" of table "' .$table. ' "is not visible',
-                $this->getSession()
-            );
         }
     }
 
@@ -318,6 +307,60 @@ class behat_report_lpmonitoring extends behat_base {
         if (!api::is_display_rating_enabled()) {
             throw new \Moodle\BehatExtension\Exception\SkippedException;
         }
+    }
+
+    /**
+     * Convert page names to URLs for steps like 'When I am on the "[identifier]" "[page type]" page'.
+     *
+     * Recognised page names are:
+     * | Page type                  | Identifier meaning        | description                          |
+     * | Category                   | category idnumber         | List of courses in that category.    |
+     * | Course                     | course shortname          | Main course home pag                 |
+     * | Activity                   | activity idnumber         | Start page for that activity         |
+     * | Activity editing           | activity idnumber         | Edit settings page for that activity |
+     * | [modname] Activity         | activity name or idnumber | Start page for that activity         |
+     * | [modname] Activity editing | activity name or idnumber | Edit settings page for that activity |
+     *
+     * Examples:
+     *
+     * When I am on the "Welcome to ECON101" "forum activity" page logged in as student1
+     *
+     * @param string $type identifies which type of page this is, e.g. 'Category page'.
+     * @param string $identifier identifies the particular page, e.g. 'test-cat'.
+     * @return moodle_url the corresponding URL.
+     * @throws Exception with a meaningful error message if the specified page cannot be found.
+     */
+    protected function resolve_core_page_instance_url(string $type, string $identifier): moodle_url {
+        global $DB;
+
+        $type = strtolower($type);
+
+        $categoryid = $this->get_category_id($identifier);
+        if (!$categoryid) {
+            throw new Exception('The specified category with idnumber "' . $identifier . '" does not exist');
+        }
+        return new moodle_url('/course/index.php', ['categoryid' => $categoryid]);
+
+        
+
+        throw new Exception('Unrecognised core page type "' . $type . '."');
+    }
+
+    /**
+     * Go to the lpmonitoring page for category.
+     *
+     * @When I am on :category lpmonitoring page 
+     * @param string $category
+     */
+    public function i_on_category_lpmonitoring_page($category) {
+
+        $categoryid = $this->get_category_id($category);
+        $categorycontext = context_coursecat::instance($categoryid);
+        if (!$categoryid) {
+            throw new Exception('The specified category with idnumber "' . $category . '" does not exist');
+        }
+        $url = new moodle_url('/report/lpmonitoring/index.php', ['pagecontextid' => $categorycontext->id]);
+        $this->execute('behat_general::i_visit', [$url]);
     }
 
 }

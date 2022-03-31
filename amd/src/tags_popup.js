@@ -16,7 +16,7 @@
 /**
  * Manage tags for a learning plan popup.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/tags_popup
  * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
  * @copyright  2019 Université de Montréal
  */
@@ -93,6 +93,10 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
                     this.modal.setBody(this.getBody());
                 }.bind(this));
 
+                modal.getRoot().on(ModalEvents.hidden, function() {
+                    modal.destroy();
+                }.bind(this));
+
                 // We want to hide the submit buttons of the form every time it is opened.
                 this.modal.getRoot().on(ModalEvents.bodyRendered, function() {
                     this.modal.getRoot().find('[data-groupname=buttonar]').addClass('hidden');
@@ -110,6 +114,7 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
 
         /**
          * @method getBody
+         * @param {Object} formdata
          * @private
          * @return {Promise}
          */

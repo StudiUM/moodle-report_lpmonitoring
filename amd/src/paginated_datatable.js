@@ -16,7 +16,7 @@
 /**
  * Apply dataTable on HTML table.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/paginated_datatable
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2016 Université de Montréal
  */
@@ -159,10 +159,14 @@ define(['jquery', 'core/str', 'core/config', 'core/notification', 'report_lpmoni
                     diacriticsMap[letters[j]] = defaultDiacriticsRemovalMap [i].base;
                 }
             }
-
+            /**
+             * Remove diacritics.
+             * @param {String} str
+             * @return {String} replace
+             */
             function removeDiacritics(str) {
                 str = str.replace(/(<([^>]+)>)/ig, "");
-                return str.replace(/[^\u0000-\u007E]/g, function (a) {
+                return str.replace(/[^\\u0000-\\u007E]/g, function (a) {
                     return diacriticsMap[a] || a;
                 });
             }

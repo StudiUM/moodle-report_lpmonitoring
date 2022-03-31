@@ -7,8 +7,7 @@ Feature: Manage configuration for monitoring of learning plans report
   Background:
     Given the lpmonitoring fixtures exist
     And I log in as "appreciator"
-    And I am on course index
-    And I follow "Medicine"
+    And I am on the "Medicine" "Category" page
     And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
     Then I should see "Competencies scale colors"
     And I follow "Competencies scale colors"
@@ -25,14 +24,13 @@ Feature: Manage configuration for monitoring of learning plans report
     And I set the field with xpath "//input[@name='good']" to "#38ea3a"
     And I press "Save"
     Then I should see "scale were saved successfully"
-# Reactiver ce code dans tache MDLUM-6027
-#    And I set the field "templateselector" to "Choose a competency framework"
-#    And the "scaleselector" select box should contain "No scale available"
-#    And the "scaleselector" "select" should be disabled
-#    And I set the field "templateselector" to "Framework Medicine (Medicine)"
-#    And I set the field "scaleselector" to "Scale default"
-#    And "//input[@name='not good' and @value='#ea1022']" "xpath_element" should exist
-#    And "//input[@name='good' and @value='#38ea3a']" "xpath_element" should exist
+    And I set the field "templateselector" to "Choose a competency framework"
+    And the "scaleselector" select box should contain "No scale available"
+    And the "scaleselector" "select" should be disabled
+    And I set the field "templateselector" to "Framework Medicine (Medicine)"
+    And I set the field "scaleselector" to "Scale default"
+    And "//input[@name='not good' and @value='#ea1022']" "xpath_element" should exist
+    And "//input[@name='good' and @value='#38ea3a']" "xpath_element" should exist
 
   Scenario: Update colors configuration
     Given I set the field "templateselector" to "Framework Medicine (Medicine)"

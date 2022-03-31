@@ -20,16 +20,18 @@ Feature: Display learning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[text()='Rating in activity']" "xpath_element"
-    And I open the autocomplete suggestions list
+    And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
     Then I should see "Pablo Menendez" item in the autocomplete list
-    And I open the autocomplete suggestions list
     And I should see "Rebecca Armenta" item in the autocomplete list
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Reb"
+    And I press the escape key
+    And I click on "Users from this template" "field"
+    And I type "Reb"
     And I should not see "Cynthia Reyes" item in the autocomplete list
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I open the autocomplete suggestions list
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Re"
+    And I press the escape key
+    And I click on "Users from this template" "field"
+    And I press the backspace key
     And I should see "Rebecca Armenta" item in the autocomplete list
     And I should see "Cynthia Reyes" item in the autocomplete list
 
@@ -40,13 +42,16 @@ Feature: Display learning plan ratings details
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[contains(., 'Rating in activity')]" "xpath_element"
     And I click on "//label[contains(., 'Sort in ascending order')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "e"
+    And I click on "Users from this template" "field"
+    And I type "e"
     Then I should see "(3) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Pablo Menendez" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(6) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I should see "Rebecca Armenta" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I click on "//label[contains(., 'Sort in descending order')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "e"
+    And I click on "Users from this template" "field"
+    And I press the backspace key
+    And I type "e"
     And I should see "(6) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Rebecca Armenta" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(3) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"

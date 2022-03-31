@@ -16,7 +16,7 @@
 /**
  * Fieldset toggler.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/fieldsettoggler
  * @author     Gilles-Philippe Leblanc <gilles-philippe.leblanc@umontreal.ca>
  * @copyright  2016 Université de Montréal
  */

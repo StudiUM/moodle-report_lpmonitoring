@@ -21,7 +21,7 @@
  * The goal of applying lighter text color for these elements
  * to improve contrast.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/colorcontrast
  * @author     Gilles-Philippe Leblanc <gilles-philippe.leblanc@umontreal.ca>
  * @copyright  2016 Université de Montréal
  */
@@ -58,9 +58,9 @@ define(['jquery'],
          * Calculate luminance ratio.
          *
          * @name   luminance
-         * @param {Number} red
-         * @param {Number} green
-         * @param {Number} blue
+         * @param {Number} r red
+         * @param {Number} g green
+         * @param {Number} b blue
          * @return {Number}
          * @function
          */
@@ -76,6 +76,7 @@ define(['jquery'],
          * Apply the color contrast to desired selector.
          *
          * @name   apply
+         * @param {String} colorContrastSelector
          * @return {Void}
          * @function
          */

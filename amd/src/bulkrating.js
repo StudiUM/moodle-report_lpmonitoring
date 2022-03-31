@@ -16,7 +16,7 @@
 /**
  * Bulk rating.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/bulkrating
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2019 Université de Montréal
  */
@@ -28,7 +28,7 @@ define(['jquery',
 
         /**
          * Default scales values object.
-         * @param {Number} The template id
+         * @param {Number} templateid The template id
          */
         var BulkRating = function(templateid) {
             this.templateid = templateid;

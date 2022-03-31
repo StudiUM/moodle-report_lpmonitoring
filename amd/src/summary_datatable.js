@@ -16,7 +16,7 @@
 /**
  * Apply dataTable on HTML table for summary.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/summary_datatable
  * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
  * @copyright  2019 Université de Montréal
  */
@@ -30,6 +30,7 @@ define(['jquery', 'report_lpmonitoring/paginated_datatable', 'report_lpmonitorin
              * @param {string} tableSelector The CSS selector used for the table.
              * @param {string} summaryfilterName The name of the filter radio buttons.
              * @param {string} searchSelector The CSS selector used for the table search input.
+             * @param {string} totalSelector The CSS selector used for total.
              * @param {string} coursesSelector The CSS selector used for courses columns and cells.
              * @param {string} activitiesSelector The CSS selector used for activities columns and cells.
              */

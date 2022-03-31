@@ -16,7 +16,7 @@
 /**
  * Learning plan report navigation.
  *
- * @package    report_learningplan
+ * @module     report_lpmonitoring/learningplan
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2016 Université de Montréal
  */
@@ -28,15 +28,17 @@ define(['jquery',
     'core/str',
     'core/chartjs',
     'core/form-autocomplete',
-    'tool_lp/dialogue',
+    'core/modal_factory',
+    'core/modal_events',
     'report_lpmonitoring/user_competency_popup',
     'tool_lp/grade_user_competency_inline',
     'report_lpmonitoring/fieldsettoggler',
     'report_lpmonitoring/colorcontrast',
     'report_lpmonitoring/paginated_datatable',
     'report_lpmonitoring/resetgrade_dialogue'],
-    function($, templates, ajax, notification, str, Chart, autocomplete, Dialogue, Popup, InlineGrader, fieldsettoggler,
-            colorcontrast, DataTable, ResetGradeDialogue) {
+    function($, templates, ajax, notification, str, Chart, autocomplete, ModalFactory, ModalEvents,
+        Popup, InlineGrader, fieldsettoggler,
+        colorcontrast, DataTable, ResetGradeDialogue) {
 
         /**
          * Learning plan report.
@@ -236,6 +238,7 @@ define(['jquery',
         /**
          * Triggered when the tags are modified in a user plan. Reloads the tags filter, if this filter is currently selected.
          * @name   reloadTagsIfNeeded
+         * @param {Event} event
          * @return {Void}
          * @function
          */
@@ -619,8 +622,8 @@ define(['jquery',
          * Load list of competencies of a specified plan.
          *
          * @name   loadListCompetencies
-         * @param  {Object} Plan
-         * @param  {Object} Loader element
+         * @param  {Object} plan
+         * @param  {Object} elementloading element
          * @return {Void}
          * @function
          */
@@ -668,8 +671,8 @@ define(['jquery',
          *
          * @name  loadCompetencyDetail
          * @param {Object[]} competencies
-         * @param {Object} Plan
-         * @param {Object} loader element
+         * @param {Object} plan
+         * @param {Object} element loader
          * @return {Void}
          * @function
          */
@@ -742,7 +745,7 @@ define(['jquery',
         /**
          * Load the report tab.
          *
-         * @param {Object} Plan
+         * @param {Object} plan
          * @function
          */
         LearningplanReport.prototype.loadReportTab = function(plan) {
@@ -801,7 +804,7 @@ define(['jquery',
         /**
          * Load the summary tab.
          *
-         * @param {Object} Plan
+         * @param {Object} plan
          * @function
          */
         LearningplanReport.prototype.loadSummaryTab = function(plan) {
@@ -869,10 +872,10 @@ define(['jquery',
          * Apply inline grader for the rate button.
          *
          * @name  applyInlineGrader
-         * @param {Number} Competency ID
-         * @param {Number} User ID
-         * @param {Number} Plan ID
-         * @param {Number} Scale ID
+         * @param {Number} competencyid comp ID
+         * @param {Number} userid user ID
+         * @param {Number} planid plan ID
+         * @param {Number} scaleid scale ID
          * @return {Void}
          * @function
          */
@@ -901,9 +904,9 @@ define(['jquery',
          * Reload competency detail and proficiency.
          *
          * @name  reloadCompetencyDetail
-         * @param {Number} Competency ID
-         * @param {Number} User ID
-         * @param {Number} Plan ID
+         * @param {Number} competencyid Competency ID
+         * @param {Number} userid User ID
+         * @param {Number} planid Plan ID
          * @return {Void}
          * @function
          */
@@ -1180,39 +1183,32 @@ define(['jquery',
          * Display the list of evidences in competency.
          *
          * @name   displayEvidencelist
-         * @param {Object} Evidence list
+         * @param {Object} evidences Evidence list
+         * @param {Object} trigger element
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.displayEvidencelist = function(evidences) {
+        LearningplanReport.prototype.displayEvidencelist = function(evidences, trigger) {
             var self = this;
             if (evidences.listevidence.length > 0) {
-                str.get_string('listofevidence', 'tool_lp').done(
-                function(titledialogue) {
-                    templates.render('report_lpmonitoring/list_evidences_in_competency', evidences)
-                        .done(function(html) {
-                            // Show the dialogue.
-                            new Dialogue(
-                                titledialogue,
-                                html,
-                                function(){
-                                    DataTable.apply('#listevidencecompetency-' + evidences.competencyid, true, true);
-                                },
-                                self.destroyDialogue
-                            );
-                        }).fail(notification.exception);
-                });
+                str.get_string('listofevidence', 'tool_lp').done(function(title) {
+                    return ModalFactory.create({
+                        type: ModalFactory.types.DEFAULT,
+                        title: title,
+                        body: templates.render('report_lpmonitoring/list_evidences_in_competency', evidences),
+                        large: true
+                    }).done(function(modal) {
+                        modal.getRoot().on(ModalEvents.hidden, function() {
+                            modal.destroy();
+                            self.focusContentItem(trigger);
+                        }.bind(this));
+                        modal.getRoot().on(ModalEvents.bodyRendered, function() {
+                            DataTable.apply('#listevidencecompetency-' + evidences.competencyid, true, true);
+                        }.bind(this));
+                        modal.show();
+                    }.bind(this));
+                }).fail(notification.exception);
             }
-        };
-
-        /**
-         * destroy DOM after close.
-         *
-         * @param Dialogue
-         * @function
-         */
-        LearningplanReport.prototype.destroyDialogue = function(dialg) {
-            dialg.close();
         };
 
         /**
@@ -1220,27 +1216,30 @@ define(['jquery',
          *
          * @name   displayCourselist
          * @param {Object[]} listcourses
+         * @param {Object} trigger element
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.displayCourselist = function(listcourses) {
+        LearningplanReport.prototype.displayCourselist = function(listcourses, trigger) {
             var self = this;
             if (listcourses.listtotalcourses.length > 0) {
-                str.get_string('linkedcourses', 'tool_lp').done(
-                function(titledialogue) {
-                    templates.render('report_lpmonitoring/list_courses_in_competency', listcourses)
-                        .done(function(html) {
-                            // Show the dialogue.
-                            new Dialogue(
-                                titledialogue,
-                                html,
-                                function(){
-                                    DataTable.apply('#listcoursecompetency-' + listcourses.competencyid, true, true);
-                                },
-                                self.destroyDialogue
-                            );
-                        }).fail(notification.exception);
-                });
+                str.get_string('linkedcourses', 'tool_lp').done(function(title) {
+                    return ModalFactory.create({
+                        type: ModalFactory.types.DEFAULT,
+                        title: title,
+                        body: templates.render('report_lpmonitoring/list_courses_in_competency', listcourses),
+                        large: true
+                    }).done(function(modal) {
+                        modal.getRoot().on(ModalEvents.hidden, function() {
+                            modal.destroy();
+                            self.focusContentItem(trigger);
+                        }.bind(this));
+                        modal.getRoot().on(ModalEvents.bodyRendered, function() {
+                            DataTable.apply('#listcoursecompetency-' + listcourses.competencyid, true, true);
+                        }.bind(this));
+                        modal.show();
+                    }.bind(this));
+                }).fail(notification.exception);
             }
         };
 
@@ -1249,27 +1248,30 @@ define(['jquery',
          *
          * @name   displayCmlist
          * @param {Object[]} listcms
+         * @param {Object} trigger element
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.displayCmlist = function(listcms) {
+        LearningplanReport.prototype.displayCmlist = function(listcms, trigger) {
             var self = this;
             if (listcms.listtotalcms.length > 0) {
-                str.get_string('linkedcms', 'report_lpmonitoring').done(
-                function(titledialogue) {
-                    templates.render('report_lpmonitoring/list_cms_in_competency', listcms)
-                        .done(function(html) {
-                            // Show the dialogue.
-                            new Dialogue(
-                                titledialogue,
-                                html,
-                                function(){
-                                    DataTable.apply('#listcmcompetency-' + listcms.competencyid, true, true);
-                                },
-                                self.destroyDialogue
-                            );
-                        }).fail(notification.exception);
-                });
+                str.get_string('linkedcms', 'report_lpmonitoring').done(function(title) {
+                    return ModalFactory.create({
+                        type: ModalFactory.types.DEFAULT,
+                        title: title,
+                        body: templates.render('report_lpmonitoring/list_cms_in_competency', listcms),
+                        large: true
+                    }).done(function(modal) {
+                        modal.getRoot().on(ModalEvents.hidden, function() {
+                            modal.destroy();
+                            self.focusContentItem(trigger);
+                        }.bind(this));
+                        modal.getRoot().on(ModalEvents.bodyRendered, function() {
+                            DataTable.apply('#listcmcompetency-' + listcms.competencyid, true, true);
+                        }.bind(this));
+                        modal.show();
+                    }.bind(this));
+                }).fail(notification.exception);
             }
         };
 
@@ -1279,6 +1281,7 @@ define(['jquery',
          * @name   displayPlan
          * @param {Number} planid The learning plan ID
          * @param {Number} templateid The learning plan template ID
+         * @param {Number} tagid The tag ID
          * @return {Void}
          * @function
          */
@@ -1362,28 +1365,32 @@ define(['jquery',
          * Display the list of courses in competency.
          *
          * @name   displayScaleCourseList
+         * @param {Object[]} listcourses list of courses
+         * @param {Object} trigger element
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.displayScaleCourseList = function(listcourses) {
+        LearningplanReport.prototype.displayScaleCourseList = function(listcourses, trigger) {
             var self = this;
             if (listcourses.scalecompetencyitem.listcourses.length > 0) {
-                str.get_string('linkedcourses', 'tool_lp').done(
-                function(titledialogue) {
-                    templates.render('report_lpmonitoring/list_courses_in_scale_value', listcourses)
-                        .done(function(html) {
-                            // Show the dialogue.
-                            new Dialogue(
-                                titledialogue,
-                                html,
-                                function(){
-                                    DataTable.apply('#listscalecoursecompetency-' + listcourses.competencyid, true, true);
-                                },
-                                self.destroyDialogue
-                            );
+                str.get_string('linkedcourses', 'tool_lp').done(function(title) {
+                    return ModalFactory.create({
+                        type: ModalFactory.types.DEFAULT,
+                        title: title,
+                        body: templates.render('report_lpmonitoring/list_courses_in_scale_value', listcourses),
+                        large: true
+                    }).done(function(modal) {
+                        modal.getRoot().on(ModalEvents.hidden, function() {
+                            modal.destroy();
+                            self.focusContentItem(trigger);
+                        }.bind(this));
+                        modal.getRoot().on(ModalEvents.bodyRendered, function() {
+                            DataTable.apply('#listscalecoursecompetency-' + listcourses.competencyid, true, true);
                             self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
-                        }).fail(notification.exception);
-                });
+                        }.bind(this));
+                        modal.show();
+                    }.bind(this));
+                }).fail(notification.exception);
             }
         };
 
@@ -1392,28 +1399,47 @@ define(['jquery',
          *
          * @name   displayScaleCmList
          * @param {Object[]} listitems
+         * @param {Object} trigger element
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.displayScaleCmList = function(listitems) {
+        LearningplanReport.prototype.displayScaleCmList = function(listitems, trigger) {
             var self = this;
             if (listitems.scalecompetencyitem.listcms.length > 0) {
-                str.get_string('linkedcms', 'report_lpmonitoring').done(
-                function(titledialogue) {
-                    templates.render('report_lpmonitoring/list_cms_in_scale_value', listitems)
-                        .done(function(html) {
-                            // Show the dialogue.
-                            new Dialogue(
-                                titledialogue,
-                                html,
-                                function(){
-                                    DataTable.apply('#listscalecmcompetency-' + listitems.competencyid, true, true);
-                                },
-                                self.destroyDialogue
-                            );
+                str.get_string('linkedcms', 'report_lpmonitoring').done(function(title) {
+                    return ModalFactory.create({
+                        type: ModalFactory.types.DEFAULT,
+                        title: title,
+                        body: templates.render('report_lpmonitoring/list_cms_in_scale_value', listitems),
+                        large: true
+                    }).done(function(modal) {
+                        modal.getRoot().on(ModalEvents.hidden, function() {
+                            modal.destroy();
+                            self.focusContentItem(trigger);
+                        }.bind(this));
+                        modal.getRoot().on(ModalEvents.bodyRendered, function() {
+                            DataTable.apply('#listscalecmcompetency-' + listitems.competencyid, true, true);
                             self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
-                        }).fail(notification.exception);
-                });
+                        }.bind(this));
+                        modal.show();
+                    }.bind(this));
+                }).fail(notification.exception);
+            }
+        };
+
+        /**
+         * Focus the given content item or the first focusable element within
+         * the content item.
+         *
+         * @method focusContentItem
+         * @param {object} item The content item jQuery element
+         */
+        LearningplanReport.prototype.focusContentItem = function(item) {
+            var focusable = 'input:not([type="hidden"]), a[href], button, textarea, select, [tabindex]';
+            if (item.is(focusable)) {
+                item.focus();
+            } else {
+                item.find(focusable).first().focus();
             }
         };
 
@@ -1529,6 +1555,7 @@ define(['jquery',
             // Handle click on scale number courses.
             $(".competencyreport").on('click', 'a.scaleinfo', function(event) {
                 event.preventDefault();
+                var trigger = $(event.target).closest('td');
                 var competencyid = $(this).data("competencyid");
                 var scalevalue = $(this).data("scalevalue");
                 var type = $(this).data("type");
@@ -1539,9 +1566,9 @@ define(['jquery',
                     listitems.scalecompetencyitem = competencydetail.scalecompetencyitems[scalevalue - 1];
                     listitems.competencyid = competencyid;
                     if (type === 'incm') {
-                        self.displayScaleCmList(listitems);
+                        self.displayScaleCmList(listitems, trigger);
                     } else {
-                        self.displayScaleCourseList(listitems);
+                        self.displayScaleCourseList(listitems, trigger);
                     }
                 }
             });
@@ -1614,36 +1641,40 @@ define(['jquery',
             // Handle click on list evidence.
             $(".competencyreport").on('click', 'a.listevidence', function(event) {
                 event.preventDefault();
+                var trigger = $(event.target);
                 var competencyid = $(this).data('competencyid');
                 if (typeof self.competencies[competencyid] !== 'undefined') {
                     var listevidence = {};
                     listevidence.listevidence = self.competencies[competencyid].competencydetail.listevidence;
                     listevidence.competencyid = competencyid;
-                    self.displayEvidencelist(listevidence);
+                    self.displayEvidencelist(listevidence, trigger);
                 }
             });
 
             // Handle click on total number courses.
             $(".competencyreport").on('click', 'a.totalnbcourses', function(event) {
                 event.preventDefault();
+                var trigger = $(event.target);
                 var competencyid = $(this).data('competencyid');
                 if (typeof self.competencies[competencyid] !== 'undefined') {
                     var totallistcourses = {};
                     totallistcourses.listtotalcourses = self.competencies[competencyid].competencydetail.listtotalcourses;
                     totallistcourses.competencyid = competencyid;
-                    self.displayCourselist(totallistcourses);
+                    self.displayCourselist(totallistcourses, trigger);
                 }
             });
 
             // Handle click on total number of courses modules.
             $(".competencyreport").on('click', 'a.totalnbcms', function(event) {
                 event.preventDefault();
+                var trigger = $(event.target);
                 var competencyid = $(this).data('competencyid');
                 if (typeof self.competencies[competencyid] !== 'undefined') {
                     var totallistcms = {};
                     totallistcms.listtotalcms = self.competencies[competencyid].competencydetail.listtotalcms;
                     totallistcms.competencyid = competencyid;
-                    self.displayCmlist(totallistcms);
+
+                    self.displayCmlist(totallistcms, trigger);
                 }
             });
             // Handle click on rating tabs.
@@ -1707,7 +1738,7 @@ define(['jquery',
             /**
              * Main initialisation.
              *
-             * @param {Boolean} True if the report is for user view (student).
+             * @param {Boolean} userview True if the report is for user view (student).
              * @param {Boolean} cmcompgradingenabled True if grading in course module competency is enabled.
              * @return {LearningplanReport} A new instance of LearningplanReport.
              * @method init

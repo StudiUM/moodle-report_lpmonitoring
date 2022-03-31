@@ -24,7 +24,6 @@ Feature: Manage learning plans tags
     And "Edit tags" "dialogue" should be visible
     And I should see "No selection" in the "Edit tags" "dialogue"
     When I set the field "Tag(s)" to "student in difficulty"
-    And I press key "27" in the field "Tag(s)"
     And I click on "//button[contains(@data-action, 'save')]" "xpath_element"
     Then I should see "1" in the ".tags-stats" "css_element"
     And I click on "//label[contains(@for, 'tag')]" "xpath_element"
@@ -46,10 +45,12 @@ Feature: Manage learning plans tags
     And I click on ".nexplan" "css_element"
     And I should see "Donald Fletcher"
     And I click on "//a[contains(@data-action, 'managetagsmodal')]" "xpath_element"
-    And I set the field with xpath "//div[contains(@data-region, 'modal-container') and contains(@class, 'show')]//input[@aria-autocomplete='list']" to "brillant"
-    And I press key "27" in the field "Tag(s)"
-    And I set the field with xpath "//div[contains(@data-region, 'modal-container') and contains(@class, 'show')]//input[@aria-autocomplete='list']" to "talented"
-    And I press key "27" in the field "Tag(s)"
+    And I click on "Tag(s)" "field"
+    And I type "brillant"
+    And I press the enter key
+    And I click on "Tag(s)" "field"
+    And I type "talented"
+    And I press the enter key
     And I click on "//div[contains(@data-region, 'modal-container') and contains(@class, 'show')]//button[contains(@data-action, 'save')]" "xpath_element"
     And I should see "2" in the ".tags-stats" "css_element"
     And I click on ".nexplan" "css_element"
@@ -59,7 +60,6 @@ Feature: Manage learning plans tags
     And I should see "brillant" in the "//div[contains(@class, 'show') and contains(@data-region, 'modal-container')]//ul[@class='form-autocomplete-suggestions']" "xpath_element"
     And I should see "talented" in the "//div[contains(@class, 'show') and contains(@data-region, 'modal-container')]//ul[@class='form-autocomplete-suggestions']" "xpath_element"
     And I set the field with xpath "//div[contains(@class, 'show') and contains(@data-region, 'modal-container')]//input[@aria-autocomplete='list']" to "brillant"
-    And I press key "27" in the field "Tag(s)"
     And I click on "//div[contains(@class, 'show') and contains(@data-region, 'modal-container')]//button[contains(@data-action, 'save')]" "xpath_element"
     And I should see "1" in the ".tags-stats" "css_element"
     And I click on "//label[contains(@for, 'tag')]" "xpath_element"
@@ -90,7 +90,6 @@ Feature: Manage learning plans tags
     And "Edit tags" "dialogue" should be visible
     And I should see "No selection" in the "Edit tags" "dialogue"
     When I set the field "Tag(s)" to "student in difficulty"
-    And I press key "27" in the field "Tag(s)"
     And I click on "//button[contains(@data-action, 'save')]" "xpath_element"
     Then I should see "1" in the ".tags-stats" "css_element"
     And I click on "//label[contains(@for, 'tag')]" "xpath_element"
@@ -112,7 +111,6 @@ Feature: Manage learning plans tags
     And "Edit tags" "dialogue" should be visible
     And I should see "No selection" in the "Edit tags" "dialogue"
     When I set the field "Tag(s)" to "brilliant student"
-    And I press key "27" in the field "Tag(s)"
     And I click on "//button[contains(@data-action, 'save')]" "xpath_element"
     Then I should see "1" in the ".tags-stats" "css_element"
     And I click on "//label[contains(@for, 'tag')]" "xpath_element"
@@ -134,7 +132,6 @@ Feature: Manage learning plans tags
     And "Edit tags" "dialogue" should be visible
     And I should see "No selection" in the "Edit tags" "dialogue"
     When I set the field "Tag(s)" to "brilliant student"
-    And I press key "27" in the field "Tag(s)"
     And I click on "//button[contains(@data-action, 'save')]" "xpath_element"
     Then I should see "1" in the ".tags-stats" "css_element"
     And I click on "//label[contains(@for, 'tag')]" "xpath_element"

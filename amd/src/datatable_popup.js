@@ -16,14 +16,16 @@
 /**
  * Popup to view detail of competency for a user, for a course or course module.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/datatable_popup
  * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or laterer
  */
 
-define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates', 'tool_lp/dialogue'],
-        function($, notification, str, ajax, templates, Dialogue) {
+define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates',
+        'core/modal_factory',
+        'core/modal_events'],
+        function($, notification, str, ajax, templates, ModalFactory, ModalEvents) {
 
             /**
              * DatatablePopup
@@ -33,6 +35,22 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates'
              */
             var DatatablePopup = function(regionSelector, userCompetencySelector) {
                 $(regionSelector).on('click', userCompetencySelector, this._handleClick.bind(this));
+            };
+
+            /**
+             * Focus the given content item or the first focusable element within
+             * the content item.
+             *
+             * @method focusContentItem
+             * @param {object} item The content item jQuery element
+             */
+            DatatablePopup.prototype.focusContentItem = function(item) {
+                var focusable = 'input:not([type="hidden"]), a[href], button, textarea, select, [tabindex]';
+                if (item.is(focusable)) {
+                    item.focus();
+                } else {
+                    item.find(focusable).first().focus();
+                }
             };
 
             /**
@@ -70,7 +88,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates'
                 }
 
                 $.when.apply($, requests).then(function(context) {
-                    this._contextLoaded.bind(this)(context);
+                    this._contextLoaded.bind(this)(context, cell);
                     return;
                 }.bind(this)).catch(notification.exception);
             };
@@ -80,8 +98,9 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates'
              *
              * @method _contextLoaded
              * @param {Object} context
+             * @param {Object} trigger
              */
-            DatatablePopup.prototype._contextLoaded = function(context) {
+            DatatablePopup.prototype._contextLoaded = function(context, trigger) {
                 var self = this;
                 // We have to display user info in popup.
                 context.displayuser = true;
@@ -92,21 +111,21 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax', 'core/templates'
                 if (typeof context.coursemodule !== 'undefined') {
                     templatepath = 'report_cmcompetency/user_competency_summary_in_coursemodule';
                 }
-                templates.render(templatepath, context).done(function(html, js) {
-                    str.get_string('usercompetencysummary', 'report_competency').done(function(title) {
-                        (new Dialogue(title, html, templates.runTemplateJS.bind(templates, js), self.destroyDialogue, true));
-                    }).fail(notification.exception);
-                }).fail(notification.exception);
-            };
 
-            /**
-             * Destroy DOM after close.
-             *
-             * @param Dialogue
-             * @function
-             */
-            DatatablePopup.prototype.destroyDialogue = function(dialg) {
-                dialg.close();
+                return str.get_string('usercompetencysummary', 'report_competency').done(function(title) {
+                    return ModalFactory.create({
+                        type: ModalFactory.types.DEFAULT,
+                        title: title,
+                        body: templates.render(templatepath, context),
+                        large: true
+                    }, trigger).done(function(modal) {
+                        modal.getRoot().on(ModalEvents.hidden, function() {
+                            self.focusContentItem(trigger);
+                            modal.destroy();
+                        });
+                        modal.show();
+                    }.bind(this));
+                }).fail(notification.exception);
             };
 
             return DatatablePopup;

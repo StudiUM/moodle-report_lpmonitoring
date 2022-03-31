@@ -64,7 +64,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         set_config('pushcourseratingstouserplans', 0, 'core_competency');
 
         // Create category.
-        $cat1 = $datagenerator->create_category(array('name' => 'Medicine'));
+        $cat1 = $datagenerator->create_category(array('name' => 'Medicine', 'shortname' => 'Medicine'));
         $cat1ctx = context_coursecat::instance($cat1->id);
 
         // Create course.

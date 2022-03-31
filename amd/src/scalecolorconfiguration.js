@@ -16,7 +16,7 @@
 /**
  * Scale color configuration.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/scalecolorconfiguration
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2016 Université de Montréal
  */
@@ -168,7 +168,6 @@ define(['jquery',
          * Triggered when a scale is selected.
          *
          * @name   scaleChangeHandler
-         * @param  {Event} e
          * @return {Void}
          * @function
          */

@@ -16,7 +16,7 @@
 /**
  * Apply dataTable on HTML table for report.
  *
- * @package    report_lpmonitoring
+ * @module     report_lpmonitoring/report_datatable
  * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
  * @copyright  2019 Université de Montréal
  */
@@ -33,10 +33,11 @@ define(['jquery',
              * @param {string} tableSelector The CSS selector used for the table.
              * @param {string} reportfilterName The name of the filter radio buttons.
              * @param {string} searchSelector The CSS selector used for the table search input.
-             * @param {string} searchCoumnsSelector The CSS selector used for the table search input in course/activity.
+             * @param {string} searchColumnsSelector The CSS selector used for the table search input in course/activity.
              * @param {string} reportScaleSelector The CSS selector used for the scale report input.
              * @param {string} coursesSelector The CSS selector used for courses columns and cells.
              * @param {string} activitiesSelector The CSS selector used for activities columns and cells.
+             * @param {string} filterscalevalue The filter scale value
              */
             var ReportDataTable = function(tableSelector, reportfilterName, searchSelector, searchColumnsSelector,
             reportScaleSelector, coursesSelector, activitiesSelector, filterscalevalue) {

@@ -8,13 +8,11 @@ Feature: Display learning plan ratings details
     Given the lpmonitoring fixtures exist
     And I log in as "appreciator"
     And I am on course index
-    When I follow "Medicine"
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
-    Then I should see "Monitoring of learning plans"
-    And I follow "Monitoring of learning plans"
+    When I am on "Medicine" lpmonitoring page
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
-    And I should see "Pablo Menendez" item in the autocomplete list
+    And I open the autocomplete suggestions list
+    Then I should see "Pablo Menendez" item in the autocomplete list
     And I click on "Pablo Menendez" item in the autocomplete list
     And I press "Apply"
 
@@ -39,14 +37,14 @@ Feature: Display learning plan ratings details
     And I should see "not qualified" in the "//tr[contains(@class, 'even')]/td[contains(@class, 'course-cell')][2]//a" "xpath_element"
     And I click on "//tr[contains(@class, 'even')]/td[contains(@class, 'course-cell')][2]//a" "xpath_element"
     And "User competency summary" "dialogue" should be visible
-    And I should see "Competency B" in the ".moodle-dialogue-base[aria-hidden='false'] .competency-heading" "css_element"
+    And I should see "Competency B" in the "User competency summary" "dialogue"
     And I should see "not qualified" dd in "Rating" dt
     And I should see "The competency rating was manually set in the course 'Course: Genetic'." dd in "Evidence" dt
     And I click on "Close" "button" in the "User competency summary" "dialogue"
 
     # We double check with an other User.
-    And I click on "//a[contains(@class, 'prevplan')]" "xpath_element"
-    And I click on "//a[contains(@class, 'prevplan')]" "xpath_element"
+    And I open the autocomplete suggestions list
+    And I click on "Donald Fletcher" item in the autocomplete list
     And I should see "good" in the "//tr[contains(@class, 'odd')]/td[contains(@class, 'course-cell')][2]//a" "xpath_element"
     And I click on "//tr[contains(@class, 'odd')]/td[contains(@class, 'course-cell')][2]//a" "xpath_element"
     And "User competency summary" "dialogue" should be visible
@@ -60,13 +58,13 @@ Feature: Display learning plan ratings details
     When I set the field with xpath "(//input[contains(@id, 'table-search-columns')])" to "Psycho"
     Then I should see "good" in "Competency A" row "Psychology" column of "main-table" table
     And I click on "//tr[contains(., 'Competency A')]//td[contains(@class, 'course-cell') and not(contains(@class, 'filtersearchhidden'))]//a" "xpath_element"
+    And I wait "1" seconds
     And "User competency summary" "dialogue" should be visible
     And I should see "Competency A" in the ".competency-heading" "css_element"
     And I should see "good" dd in "Rating" dt
     And I click on "Close" "button" in the "User competency summary" "dialogue"
     # Check the course is correctly hidden
-    And I am on course index
-    And I follow "Medicine"
+    And I am on the "Medicine" "Category" page
     And I should see "Genetic"
     And I should not see "Psychology"
 

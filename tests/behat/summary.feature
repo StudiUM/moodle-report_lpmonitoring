@@ -50,7 +50,7 @@ Feature: Display learning plan summary
 
   Scenario: View the competency summary for a plan with only level 1 competency
     Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
-    And I open the autocomplete suggestions list
+    And I click on ".studentfilter .form-autocomplete-downarrow" "css_element"
     And I click on "Pablo Menendez" item in the autocomplete list
     And I set the field "studentPlansSelectorReport" to "Pablo plan level 1 only"
     When I press "Apply"
@@ -62,7 +62,7 @@ Feature: Display learning plan summary
 
   Scenario: View the competency summary for a plan with competencies of level 1 and 2 both assessed
     Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
-    And I open the autocomplete suggestions list
+    And I click on ".studentfilter .form-autocomplete-downarrow" "css_element"
     And I click on "Pablo Menendez" item in the autocomplete list
     And I set the field "studentPlansSelectorReport" to "Pablo plan level 1 and 2"
     When I press "Apply"
