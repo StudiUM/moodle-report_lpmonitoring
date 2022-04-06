@@ -66,6 +66,10 @@ define(['jquery',
             $(this.templateSelector).on('change', this.templateChangeHandler.bind(this)).change();
             $(this.learningplanSelector).on('change', this.learningplanChangeHandler.bind(this)).change();
             $(this.studentSelector).on('change', this.studentChangeHandler.bind(this)).change();
+
+            $(this.cohortSelector).on('change',this.cohortChangeHandler.bind(this)).change();
+            $(this.cohortTemplateSelector).on('change',this.cohortTemplateHandler.bind(this)).change();
+
             $(this.studentPlansSelector).on('change', this.studentPlansChangeHandler.bind(this)).change();
             $(this.tagSelector).on('change', this.tagChangeHandler.bind(this)).change();
             $(this.learningplanTagSelector).on('change', this.learningplanTagChangeHandler.bind(this)).change();
@@ -103,10 +107,14 @@ define(['jquery',
         LearningplanReport.prototype.learningplanId = null;
         /** @var {Number} The learning plan ID from student. */
         LearningplanReport.prototype.studentLearningplanId = null;
+        /** @var {Number} The learning plan ID from cohort. */
+        LearningplanReport.prototype.cohortLearningplanId = null;
         /** @var {Number} The learning plan ID from tag. */
         LearningplanReport.prototype.tagLearningplanId = null;
         /** @var {String} The selected tag ID. */
         LearningplanReport.prototype.tagId = null;
+        /** @var {String} The selected cohort ID. */
+        LearningplanReport.prototype.cohortId = null;
         /** @var {Number} The user ID. */
         LearningplanReport.prototype.userId = null;
         /** @var {Boolean} If template option is selected. */
@@ -136,6 +144,12 @@ define(['jquery',
         LearningplanReport.prototype.learningplanSelector = '#learningplanSelectorReport';
         /** @var {String} The student selector. */
         LearningplanReport.prototype.studentSelector = '#studentSelectorReport';
+
+        /** @var {String} The cohort selector. */
+        LearningplanReport.prototype.cohortSelector = '#cohortSelectorReport';
+        /** @var {String} The cohort plan selector. */
+        LearningplanReport.prototype.cohortTemplateSelector = '#cohortTemplateSelectorReport';
+
         /** @var {String} The student plans selector. */
         LearningplanReport.prototype.studentPlansSelector = '#studentPlansSelectorReport';
         /** @var {String} The tag select box selector. */
@@ -569,6 +583,65 @@ define(['jquery',
         };
 
         /**
+         * Triggered when a cohort is selected.
+         *
+         * @name   cohortChangeHandler
+         * @param  {Event} e
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.cohortChangeHandler = function(e) {
+            var self = this;
+            self.cohortId = $(e.target).val();
+            if (self.cohortId !== null && self.cohortId !== '') {
+                var promise = ajax.call([{
+                    methodname: 'report_lpmonitoring_list_cohort_templates',
+                    args: {
+                        cohortid: self.cohortId
+                    }
+                }]);
+
+                promise[0].then(function(results) {
+                    // Reset options learning plans.
+                    $(self.cohortTemplateSelector + ' option').remove();
+                    if (results.length > 0) {
+                        $(self.cohortTemplateSelector).prop("disabled", false);
+                        str.get_string('selecttemplate', 'report_lpmonitoring').done(
+                            function(selecttemplate) {
+                                $(self.cohortTemplateSelector).append($('<option>').text(selecttemplate).val('0'));
+                                $.each(results, function(key, value) {
+                                    $(self.cohortTemplateSelector).append($('<option>').text(value.name).val(value.id));
+                                });
+                            }
+                        );
+                    } else {
+                        $(self.cohortTemplateselector).prop("disabled", true);
+                        str.get_string('nocohorttemplateavailable', 'report_lpmonitoring').done(
+                            function(nocohorttemplateavailable) {
+                                $(self.cohortTemplateSelector).append($('<option>').text(nocohorttemplateavailable).val('0'));
+                            }
+                        );
+                    }
+                }, notification.exception);
+            }
+            self.checkDataFormReady();
+        }
+
+        /**
+         * Triggered when a cohort template is selected.
+         *
+         * @name   cohortTemplateHandler
+         * @param  {Event} e
+         * @return {Void}
+         * @function
+         */
+        LearningplanReport.prototype.cohortTemplateHandler = function(e) {
+            var self = this;
+            self.templateId = $(e.target).val();
+            self.checkDataFormReady();
+        }
+
+        /**
          * Triggered when a student plans is selected.
          *
          * @name   studentPlansChangeHandler
@@ -593,7 +666,8 @@ define(['jquery',
             var self = this,
                 conditionByTemplate = false,
                 conditionStudent = false,
-                conditionByTag = false;
+                conditionByTag = false,
+                conditionCohort = false;
 
             if (self.userView === false) {
                 conditionByTemplate = $('#template').is(':checked') && $(self.templateSelector).val() !== '';
@@ -601,12 +675,18 @@ define(['jquery',
                         $(self.studentPlansSelector).val() !== null &&
                         $(self.studentPlansSelector).val() !== '';
                 conditionByTag = $('#tag').is(':checked') && $(self.tagSelector).val() !== '';
+                conditionCohort = $('#cohort').is(':checked') &&
+                        $(self.cohortSelector).val() !== null && $(self.cohortSelector).val() != '0' &&
+                        $(self.cohortTemplateSelector).val() !== null && $(self.cohortTemplateSelector).val() != '0';
             } else {
                 conditionStudent = $(self.studentPlansSelector).val() !== null &&
                         $(self.studentPlansSelector).val() !== '';
+                conditionCohort = $('#cohort').is(':checked') &&
+                        $(self.cohortSelector).val() !== null && $(self.cohortSelector).val() != '0' &&
+                        $(self.cohortTemplateSelector).val() !== null && $(self.cohortTemplateSelector).val() != '0';
             }
 
-            if (conditionByTemplate || conditionStudent || conditionByTag) {
+            if (conditionByTemplate || conditionStudent || conditionByTag || conditionCohort) {
                 $('#submitFilterReportButton').removeAttr('disabled');
             } else {
                 $('#submitFilterReportButton').attr('disabled', 'disabled');
@@ -926,6 +1006,7 @@ define(['jquery',
                     planid: planid,
                     scalefilterin: self.scalefilterin,
                     tagid: null,
+                    cohortid: null,
                     withcomments: false,
                     withplans: false
                 }
@@ -1040,9 +1121,12 @@ define(['jquery',
             var self = this;
             var templateSelected = $("#template").is(':checked');
             var tagSelected = $("#tag").is(':checked');
+            var cohortSelected = $("#cohort").is(':checked');
+
             var templateid = null;
             var planid = null;
             var tagid = null;
+            var cohortid = null;
             if (templateSelected === true) {
                 templateid = self.templateId;
                 planid = self.learningplanId;
@@ -1051,6 +1135,10 @@ define(['jquery',
             } else if (tagSelected === true) {
                 tagid = self.tagId;
                 planid = self.tagLearningplanId;
+            } else if (cohortSelected === true) {
+                templateid = self.templateId;
+                cohortid = self.cohortId;
+                planid = null;
             } else {
                 // Else = "#student" is selected.
                 planid = self.studentLearningplanId;
@@ -1062,7 +1150,7 @@ define(['jquery',
                 self.compDetailActiveTab = 'incourse';
             }
 
-            self.displayPlan(planid, templateid, tagid);
+            self.displayPlan(planid, templateid, tagid, cohortid);
         };
 
         /**
@@ -1277,10 +1365,12 @@ define(['jquery',
          * @name   displayPlan
          * @param {Number} planid The learning plan ID
          * @param {Number} templateid The learning plan template ID
+         * @param {Number} tagid The learning plan tag ID
+         * @param {Number} cohortid The cohort ID
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.displayPlan = function(planid, templateid, tagid) {
+        LearningplanReport.prototype.displayPlan = function(planid, templateid, tagid, cohortid) {
             var elementloading = null,
                     self = this;
             if($('#plan-user-info').length) {
@@ -1304,6 +1394,7 @@ define(['jquery',
                     scalefilterin: self.scalefilterin,
                     scalesortorder: self.scalesortorder,
                     tagid: parseInt(tagid),
+                    cohortid: parseInt(cohortid),
                     withcomments: self.withcomments,
                     withplans: self.withplans
                 }
@@ -1444,7 +1535,7 @@ define(['jquery',
 
                 promise[0].then(function() {
                     if (competencyid === null) {
-                        self.displayPlan(planid, self.templateId, self.tagId);
+                        self.displayPlan(planid, self.templateId, self.tagId, self.cohortId);
                     } else {
                         self.reloadCompetencyDetail(competencyid, userid, planid);
                     }
@@ -1468,7 +1559,10 @@ define(['jquery',
             var self = this;
             str.get_strings([
                 { key: 'selectuser', component: 'report_lpmonitoring' },
-                { key: 'nouserselected', component: 'report_lpmonitoring' }]
+                { key: 'nouserselected', component: 'report_lpmonitoring' },
+                { key: 'selectcohort', component: 'report_lpmonitoring' },
+                { key: 'nocohortselected', component: 'report_lpmonitoring' },
+            ]
             ).done(
                 function (strings) {
                     // Autocomplete users in templates.
@@ -1489,16 +1583,33 @@ define(['jquery',
                         false,
                         true,
                         strings[1]);
+                    // Autocomplete cohort.
+                    autocomplete.enhance(
+                        self.cohortSelector,
+                        false,
+                        'tool_lp/form-cohort-selector',
+                        strings[2],
+                        false,
+                        true,
+                        strings[3]);
+
                     if (self.userView === false) {
                         if ($('.competencyreport #student').is(':checked')) {
                             $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
                             $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
+                            $('.competencyreport .cohortfilter').toggleClass('disabled-option', true);
                         } else if ($('.competencyreport #tag').is(':checked')) {
                             $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
                             $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
+                            $('.competencyreport .cohortfilter').toggleClass('disabled-option', true);
+                        } else if ($('.competencyreport #cohort').is(':checked')) {
+                            $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
+                            $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
+                            $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
                         } else {
                             $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
                             $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
+                            $('.competencyreport .cohortfilter').toggleClass('disabled-option', true);
                         }
                     }
                     self.checkDataFormReady();
@@ -1549,6 +1660,7 @@ define(['jquery',
                     $('.competencyreport .studentfilter').toggleClass('disabled-option', false);
                     $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
                     $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .cohortfilter').toggleClass('disabled-option', true);
                 }
                 self.checkDataFormReady();
             });
@@ -1558,6 +1670,7 @@ define(['jquery',
                     $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
                     $('.competencyreport .templatefilter').toggleClass('disabled-option', false);
                     $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .cohortfilter').toggleClass('disabled-option', true);
                 }
                 self.checkDataFormReady();
             });
@@ -1568,6 +1681,18 @@ define(['jquery',
                     $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
                     $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
                     $('.competencyreport .tagfilter').toggleClass('disabled-option', false);
+                    $('.competencyreport .cohortfilter').toggleClass('disabled-option', true);
+                }
+                self.checkDataFormReady();
+            });
+
+            $('.competencyreport #cohort').on('change', function(){
+                if ($(this).is(':checked')){
+                    self.loadTags();
+                    $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
+                    $('.competencyreport .cohortfilter').toggleClass('disabled-option', false);
                 }
                 self.checkDataFormReady();
             });
@@ -1584,7 +1709,8 @@ define(['jquery',
                 var planid = $(this).data('planid');
                 var templateid = $(this).data('templateid');
                 var tagid = $(this).data('tagid');
-                self.displayPlan(planid, templateid, tagid);
+                var cohortid = $(this).data('cohortid');
+                self.displayPlan(planid, templateid, tagid, cohortid);
             });
 
             // User plan full navigation.
@@ -1606,7 +1732,8 @@ define(['jquery',
                 var planid = $(this).data('planid');
                 var templateid = $(this).data('templateid');
                 var tagid = $(this).data('tagid');
-                self.displayPlan(planid, templateid, tagid);
+                var cohortid = $(this).data('cohortid');
+                self.displayPlan(planid, templateid, tagid, cohortid);
             });
 
             // Handle click on list evidence.

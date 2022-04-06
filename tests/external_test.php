@@ -1730,13 +1730,13 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         $commentarea1->add('This is the comment #1 for user 1');
         $commentarea1->add('This is the comment #2 for user 1');
         // All users.
-        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, false);
+        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, null, false);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertCount(2, $result['fullnavigation']);
         $this->assertEquals(0, reset($result['fullnavigation'])['nbcomments']);
         $this->assertEquals(0, next($result['fullnavigation'])['nbcomments']);
         // With comments.
-        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, true);
+        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, null, true);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertCount(1, $result['fullnavigation']);
         $this->assertEquals(2, reset($result['fullnavigation'])['nbcomments']);
@@ -1744,13 +1744,13 @@ class report_lpmonitoring_external_testcase extends externallib_advanced_testcas
         // Add comments for user 2.
         $commentarea2->add('This is the comment #1 for user 2');
         // All users.
-        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, false);
+        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, null, false);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertCount(2, $result['fullnavigation']);
         $this->assertEquals(0, reset($result['fullnavigation'])['nbcomments']);
         $this->assertEquals(0, next($result['fullnavigation'])['nbcomments']);
         // With comments.
-        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, true);
+        $result = external::read_plan(null, $template->get('id'), '', '', 'ASC', null, null, true);
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertCount(2, $result['fullnavigation']);
         $this->assertEquals(2, reset($result['fullnavigation'])['nbcomments']);

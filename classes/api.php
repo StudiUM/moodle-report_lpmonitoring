@@ -591,6 +591,7 @@ class api {
      * @param boolean $scalefilterin Apply the scale filters on grade in plan, course or course module
      * @param string $sortorder Scale sort order
      * @param int $tagid The tag ID
+     * @param int $cohortid The cohort ID
      * @param int $withcomments Only plans with comments
      * @param int $withplans Only students with at least two plans
      * @return array((object) array(
@@ -600,7 +601,8 @@ class api {
      *                        ))
      */
     public static function read_plan($planid = null, $templateid = null, $scalesvalues = array(), $scalefilterin = '',
-            $sortorder = 'ASC', $tagid = null, $withcomments = false, $withplans = false) {
+            $sortorder = 'ASC', $tagid = null, $cohortid = null, $withcomments = false, $withplans = false) {
+        global $CFG;
 
         if (empty($planid) && empty($templateid) && empty($tagid)) {
             throw new coding_exception('A plan ID and/or a template ID and/or a tag ID must be specified');
@@ -618,6 +620,20 @@ class api {
             } else {
                 $userplans = array_values(self::search_users_by_templateid($templateid , '', $scalesvalues, $scalefilterin,
                         $sortorder, $withcomments, $withplans));
+
+                // Reduce the plan list to the members of the given cohort.
+                if (!empty($cohortid)) {
+                    require_once($CFG->dirroot.'/cohort/lib.php');
+
+                    $userplans2 = array();
+                    foreach ($userplans as $index => $plan) {
+                        if (cohort_is_member($cohortid, $plan['userid']) === true) {
+                            $userplans2[] = $userplans[$index];
+                        }
+                    }
+                    $userplans = $userplans2;
+                    unset($userplans2);
+                }
             }
             $currentindex = null;
             // We throw an exception if no plans are found.
