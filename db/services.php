@@ -242,5 +242,14 @@ $functions = array(
         'capabilities' => 'moodle/competency:planview',
         'ajax'         => true
     ),
+    'report_lpmonitoring_list_cohort_templates' => array(
+        'classname'    => 'report_lpmonitoring\external',
+        'methodname'   => 'list_cohort_templates',
+        'classpath'    => '',
+        'description'  => 'Get learning plan templates assigned to a given cohort',
+        'type'         => 'read',
+        'capabilities' => '',
+        'ajax'         => true
+    ),
 );
 

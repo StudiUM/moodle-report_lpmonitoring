@@ -655,6 +655,7 @@ class external extends external_api {
             'scalefilterin' => new external_value(PARAM_TEXT, 'Apply the scale filters on grade in plan, course or course module'),
             'scalesortorder' => new external_value(PARAM_TEXT, 'Scale sort order', VALUE_DEFAULT, 'ASC'),
             'tagid' => new external_value(PARAM_INT, 'The tag ID'),
+            'cohortid' => new external_value(PARAM_INT, 'The cohort ID'),
             'withcomments' => new external_value(PARAM_BOOL, 'Only plans with comments'),
             'withplans' => new external_value(PARAM_BOOL, 'Only students with at leats two plans')
         ));
@@ -670,12 +671,13 @@ class external extends external_api {
      * @param int $scalefilterin Apply the scale filters on grade in plan, course or course module
      * @param string $scalesortorder Scale sort order
      * @param int $tagid The tag ID
+     * @param int $cohortid The cohort ID
      * @param boolean $withcomments True to return only plans with at leat one comment
      * @param boolean $withplans True to return only students'plans with at leat two plans
      * @return array
      */
     public static function read_plan($planid, $templateid, $scalevalues = '', $scalefilterin = '',
-            $scalesortorder= 'ASC', $tagid = null, $withcomments = false, $withplans = false) {
+            $scalesortorder= 'ASC', $tagid = null, $cohortid = null, $withcomments = false, $withplans = false) {
         global $PAGE;
         $context = context_system::instance();
         self::validate_context($context);
@@ -687,13 +689,14 @@ class external extends external_api {
                     'scalefilterin' => $scalefilterin,
                     'scalesortorder' => $scalesortorder,
                     'tagid' => $tagid,
+                    'cohortid' => $cohortid,
                     'withcomments' => $withcomments,
                     'withplans' => $withplans
                 ));
 
         $plans = api::read_plan($params['planid'], $params['templateid'],
                 json_decode($params['scalevalues'], true), $params['scalefilterin'],
-                $params['scalesortorder'], $params['tagid'], $params['withcomments'], $params['withplans']);
+                $params['scalesortorder'], $params['tagid'], $params['cohortid'], $params['withcomments'], $params['withplans']);
         self::validate_context($plans->current->get_context());
 
         $output = $PAGE->get_renderer('report_lpmonitoring');
@@ -1724,5 +1727,70 @@ class external extends external_api {
      */
     public static function data_for_user_competency_summary_in_course_returns() {
         return lpmonitoring_user_competency_summary_in_course_exporter::get_read_structure();
+    }
+
+    /**
+     * Returns description of list_cohort_templates() parameters.
+     *
+     * @return \external_function_parameters
+     */
+    public static function list_cohort_templates_parameters() {
+        return new external_function_parameters(array(
+            'cohortid' => new external_value(PARAM_INT, 'The cohort ID'),
+        ));
+    }
+
+    /**
+     * Returns the learning plan templates which are assigned to the given cohort.
+     *
+     * @param int $cohortid The cohort id.
+     *
+     * @return array
+     */
+    public static function list_cohort_templates($cohortid) {
+        global $DB;
+
+        $params = self::validate_parameters(self::list_cohort_templates_parameters(),array(
+            'cohortid' => $cohortid
+        ));
+
+        $templateids = $DB->get_records('competency_templatecohort', ['cohortid' => $params['cohortid']], '', 'templateid') ;
+        $results = [];
+        if (!empty($templateids)) {
+            $templates = [];
+            foreach ($templateids as $templateid) {
+                $templates[] = $templateid->templateid ;
+            }
+
+            list($dbsql, $dbparam) = $DB->get_in_or_equal($templates);
+            $sql = "SELECT * FROM {competency_template} WHERE id $dbsql";
+            $records = $DB->get_records_sql($sql, $dbparam);
+
+            foreach ($records as $record) {
+                $list = [];
+                $list['name'] = $record->shortname;
+                $list['id'] = $record->id;
+                $results[] = $list;
+                unset($list);
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Returns description of list_cohort_users() result value.
+     *
+     * @return \external_description
+     */
+    public static function list_cohort_templates_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'id' => new external_value(PARAM_INT,'The template ID '),
+                    'name' => new external_value(PARAM_TEXT, 'The template\'s name'),
+                )
+            )
+        );
     }
 }

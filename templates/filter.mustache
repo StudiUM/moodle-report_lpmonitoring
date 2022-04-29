@@ -48,6 +48,12 @@
                     </div>
                     <div class="radio radio-primary">
                         <span>
+                            <input type="radio" name="optionfilter" id="cohort" value="cohort" aria-labelledby="optionfilter">
+                            <label for="cohort">{{#str}}cohort, cohort{{/str}}</label>
+                        </span>
+                    </div>
+                    <div class="radio radio-primary">
+                        <span>
                             <input type="radio" name="optionfilter" id="student" value="student" disabled="disabled" aria-labelledby="optionfilter">
                             <label for="student">{{#str}}user{{/str}}</label>
                         </span>
@@ -138,6 +144,27 @@
                             <a href="#" title="{{#str}}showmore, form{{/str}}" class="moreless-toggler show-toggler" role="button">{{#str}}showmore, form{{/str}}</a>
                             <a href="#" title="{{#str}}showless, form{{/str}}" class="moreless-toggler less-toggler hidden" role="button">{{#str}}showless, form{{/str}}</a>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="cohortfilter disabled-option">
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
+                        <label for="cohortSelectorReport">{{#str}}cohort, cohort{{/str}}</label>
+                    </div>
+                    <div class="felement fautocomplete col-md-9">
+                        <select data-includes="all" data-contextid="{{pagecontextid}}" id="cohortSelectorReport" class="form-control">
+                        </select>
+                    </div>
+                </div>
+                <div class="fitem form-group row">
+                    <div class="fitemtitle col-md-3">
+                        <label for="cohortTemplateSelectorReport">{{#str}}template, tool_lp{{/str}}</label>
+                    </div>
+                    <div class="felement col-md-9 form-inline">
+                        <select id="cohortTemplateSelectorReport" class="form-control custom-select" disabled="disabled">
+                            <option value="0">{{#str}}notemplateavailable, report_lpmonitoring{{/str}}</option>
+                        </select>
                     </div>
                 </div>
             </div>
