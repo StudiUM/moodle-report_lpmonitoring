@@ -37,7 +37,7 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
             this.contextid = contextid;
             this.planid = planid;
             this.selector_nbtags = selector_nbtags;
-            this.init(selector_button);
+            $(selector_button).on('click', this.init.bind(this));
         };
 
         /**
@@ -67,49 +67,74 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
         /**
          * Initialise the class.
          *
-         * @param {String} selector_button The CSS selector used to find triggers for the modal.
+         * @param {Event} e click event.
          * @private
          * @return {Promise}
          */
-        TagsPopup.prototype.init = function(selector_button) {
-            var triggers = $(selector_button);
+        TagsPopup.prototype.init = function(e) {
+            e.preventDefault();
+            var trigger = $(e.target);
             // Fetch the title string.
             return Str.get_string('tagsedit', 'report_lpmonitoring').then(function(title) {
                 // Create the modal.
                 return ModalFactory.create({
                     type: ModalFactory.types.SAVE_CANCEL,
-                    title: title,
-                    body: this.getBody()
-                }, triggers);
-            }.bind(this)).then(function(modal) {
-                // Keep a reference to the modal.
-                this.modal = modal;
+                    title: title
+                }).then(function(modal) {
+                    // Keep a reference to the modal.
+                    this.modal = modal;
 
-                // Forms are big, we want a big modal.
-                this.modal.setLarge();
+                    // Forms are big, we want a big modal.
+                    this.modal.setLarge();
+                    // We want to reset the form every time it is opened.
+                    this.modal.getRoot().on(ModalEvents.shown, function() {
+                        this.modal.setBody(this.getBody());
+                    }.bind(this));
+                    // We want to hide the submit buttons of the form every time it is opened.
+                    this.modal.getRoot().on(ModalEvents.bodyRendered, function() {
+                        this.modal.getRoot().find('[data-groupname=buttonar]').addClass('hidden');
+                    }.bind(this));
 
-                // We want to reset the form every time it is opened.
-                this.modal.getRoot().on(ModalEvents.shown, function() {
-                    this.modal.setBody(this.getBody());
+                    modal.getRoot().on(ModalEvents.hidden, function() {
+                        this.close();
+                        this.focusContentItem(trigger);
+                    }.bind(this));
+
+                    // We catch the modal save event, and use it to submit the form inside the modal.
+                    // Triggering a form submission will give JS validation scripts a chance to check for errors.
+                    this.modal.getRoot().on(ModalEvents.save, this.submitForm.bind(this));
+                    // We also catch the form submit event and use it to submit the form with ajax.
+                    this.modal.getRoot().on('submit', 'form', this.submitFormAjax.bind(this));
+
+                    this.modal.show();
                 }.bind(this));
-
-                modal.getRoot().on(ModalEvents.hidden, function() {
-                    modal.destroy();
-                }.bind(this));
-
-                // We want to hide the submit buttons of the form every time it is opened.
-                this.modal.getRoot().on(ModalEvents.bodyRendered, function() {
-                    this.modal.getRoot().find('[data-groupname=buttonar]').addClass('hidden');
-                }.bind(this));
-
-                // We catch the modal save event, and use it to submit the form inside the modal.
-                // Triggering a form submission will give JS validation scripts a chance to check for errors.
-                this.modal.getRoot().on(ModalEvents.save, this.submitForm.bind(this));
-                // We also catch the form submit event and use it to submit the form with ajax.
-                this.modal.getRoot().on('submit', 'form', this.submitFormAjax.bind(this));
-
-                return this.modal;
             }.bind(this));
+        };
+
+        /**
+         * Focus the given content item or the first focusable element within
+         * the content item.
+         *
+         * @method focusContentItem
+         * @param {object} item The content item jQuery element
+         */
+        TagsPopup.prototype.focusContentItem = function(item) {
+            var focusable = 'input:not([type="hidden"]), a[href], button, textarea, select, [tabindex]';
+            if (item.is(focusable)) {
+                item.focus();
+            } else {
+                item.find(focusable).first().focus();
+            }
+        };
+
+        /**
+         * Close the popup.
+         *
+         * @method close
+         */
+        TagsPopup.prototype.close = function() {
+            this.modal.destroy();
+            this.modal = null;
         };
 
         /**

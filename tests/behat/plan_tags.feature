@@ -20,7 +20,7 @@ Feature: Manage learning plans tags
     And I should see "Tag(s)"
     And I should see "0" in the ".tags-stats" "css_element"
     And I click on "//a[contains(@data-action, 'managetagsmodal')]" "xpath_element"
-    And "Edit tags" "dialogue" should be visible
+    And I should see "Edit tags" in the "//h5[contains(@class, 'modal-title') and contains(., 'Edit tags')]" "xpath_element"
     And I should see "No selection" in the "Edit tags" "dialogue"
     When I set the field "Tag(s)" to "student in difficulty"
     And I click on "//button[contains(@data-action, 'save')]" "xpath_element"
@@ -86,7 +86,7 @@ Feature: Manage learning plans tags
     And I should see "Tag(s)"
     And I should see "0" in the ".tags-stats" "css_element"
     And I click on "//a[contains(@data-action, 'managetagsmodal')]" "xpath_element"
-    And "Edit tags" "dialogue" should be visible
+    And I should see "Edit tags" in the "//h5[contains(@class, 'modal-title') and contains(., 'Edit tags')]" "xpath_element"
     And I should see "No selection" in the "Edit tags" "dialogue"
     When I set the field "Tag(s)" to "student in difficulty"
     And I click on "//button[contains(@data-action, 'save')]" "xpath_element"
@@ -107,7 +107,7 @@ Feature: Manage learning plans tags
     And I should see "Tag(s)"
     And I should see "0" in the ".tags-stats" "css_element"
     And I click on "//a[contains(@data-action, 'managetagsmodal')]" "xpath_element"
-    And "Edit tags" "dialogue" should be visible
+    And I should see "Edit tags" in the "//h5[contains(@class, 'modal-title') and contains(., 'Edit tags')]" "xpath_element"
     And I should see "No selection" in the "Edit tags" "dialogue"
     When I set the field "Tag(s)" to "brilliant student"
     And I click on "//button[contains(@data-action, 'save')]" "xpath_element"
@@ -128,7 +128,7 @@ Feature: Manage learning plans tags
     And I should see "Tag(s)"
     And I should see "0" in the ".tags-stats" "css_element"
     And I click on "//a[contains(@data-action, 'managetagsmodal')]" "xpath_element"
-    And "Edit tags" "dialogue" should be visible
+    And I should see "Edit tags" in the "//h5[contains(@class, 'modal-title') and contains(., 'Edit tags')]" "xpath_element"
     And I should see "No selection" in the "Edit tags" "dialogue"
     When I set the field "Tag(s)" to "brilliant student"
     And I click on "//button[contains(@data-action, 'save')]" "xpath_element"
