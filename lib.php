@@ -69,7 +69,7 @@ function report_lpmonitoring_extend_navigation_category_settings($navigation, $c
             $bulkratingnode->make_active();
         }
 
-        $reportsnode = navigation_node::create(get_string('reports'),
+        $reportsnode = navigation_node::create(get_string('competencyreports', 'report_lpmonitoring'),
                                                null,
                                                navigation_node::TYPE_CATEGORY,
                                                null,
