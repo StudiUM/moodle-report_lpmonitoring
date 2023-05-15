@@ -1393,7 +1393,7 @@
     color: #fff !important;
 }
 [data-region="blocks-lp-list-users"].lp-list-users-closed {
-    margin-left: -250px;
+    margin-left: -320px;
 }
 [data-region="blocks-lp-list-users"] {
     -moz-transition: margin .8s ease;
@@ -1714,4 +1714,8 @@ ul.detail-comp-tab li a::first-letter {
 #page-report-lpmonitoring-index .comment-list,
 #page-report-lpmonitoring-index .comment-ctrl {
     font-size: 1rem;
+}
+#page-report-lpmonitoring-stats .competencyreport {
+    width: 100%;
+    max-width: 100%;
 }

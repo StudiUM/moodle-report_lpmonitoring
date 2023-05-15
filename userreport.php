@@ -51,7 +51,7 @@ if (!$iscurrentuser) {
 // Set css.
 $PAGE->requires->css('/report/lpmonitoring/style/checkbox.css');
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('standard');
+$PAGE->set_pagelayout('report');
 $PAGE->set_url($url);
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
