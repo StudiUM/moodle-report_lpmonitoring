@@ -54,7 +54,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($url);
 $PAGE->set_title($title);
 $PAGE->set_heading($heading);
-$PAGE->set_pagelayout('admin');
+$PAGE->set_pagelayout('report');
 
 $output = $PAGE->get_renderer('report_lpmonitoring');
 
