@@ -22,7 +22,7 @@
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace report_lpmonitoring;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
@@ -44,7 +44,7 @@ use tool_cohortroles\api as tool_cohortroles_api;
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class external_cm_test extends \externallib_advanced_testcase {
+class report_lpmonitoring_external_cm_testcase extends externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -105,8 +105,8 @@ class external_cm_test extends \externallib_advanced_testcase {
         $creator = $dg->create_user(array('firstname' => 'Creator'));
         $appreciator = $dg->create_user(array('firstname' => 'Appreciator'));
 
-        $this->contextcreator = \context_user::instance($creator->id);
-        $this->contextappreciator = \context_user::instance($appreciator->id);
+        $this->contextcreator = context_user::instance($creator->id);
+        $this->contextappreciator = context_user::instance($appreciator->id);
         $syscontext = context_system::instance();
 
         $this->rolecreator = create_role('Creator role', 'rolecreator', 'learning plan manager role description');
