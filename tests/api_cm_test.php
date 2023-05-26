@@ -22,7 +22,7 @@
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace report_lpmonitoring;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
@@ -42,7 +42,7 @@ use core\invalid_persistent_exception;
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class api_cm_test extends \advanced_testcase {
+class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -101,9 +101,9 @@ class api_cm_test extends \advanced_testcase {
         $creator = $dg->create_user(array('firstname' => 'Creator'));
         $appreciator = $dg->create_user(array('firstname' => 'Appreciator'));
 
-        $this->contextcreator = \context_user::instance($creator->id);
-        $this->contextappreciator = \context_user::instance($appreciator->id);
-        $syscontext = \context_system::instance();
+        $this->contextcreator = context_user::instance($creator->id);
+        $this->contextappreciator = context_user::instance($appreciator->id);
+        $syscontext = context_system::instance();
 
         $this->rolecreator = create_role('Creator role', 'rolecreator', 'learning plan manager role description');
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $this->rolecreator, $syscontext->id);
@@ -124,7 +124,7 @@ class api_cm_test extends \advanced_testcase {
         $this->setAdminUser();
         // Create category.
         $this->category = $dg->create_category(array('name' => 'Cat test 1'));
-        $cat1ctx = \context_coursecat::instance($this->category->id);
+        $cat1ctx = context_coursecat::instance($this->category->id);
 
         // Create templates in category.
         $this->templateincategory = $cpg->create_template(array('shortname' => 'Medicine Year 1', 'contextid' => $cat1ctx->id));
@@ -151,7 +151,7 @@ class api_cm_test extends \advanced_testcase {
         $scaleconfig[] = array('id' => 1, 'name' => 'not good',  'color' => '#AAAAA');
         $scaleconfig[] = array('id' => 2, 'name' => 'good',  'color' => '#BBBBB');
 
-        $record = new \stdclass();
+        $record = new stdclass();
         $record->competencyframeworkid = $this->frameworkincategory->get('id');
         $record->scaleid = $scale->id;
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -216,7 +216,7 @@ class api_cm_test extends \advanced_testcase {
         // Generate plans for cohort.
         core_competency_api::create_plans_from_template_cohort($this->templateincategory->get('id'), $cohort->id);
         // Create plan from template for Stephanie.
-        $syscontext = \context_system::instance();
+        $syscontext = context_system::instance();
 
         $roleid = create_role('Appreciator role', 'roleappreciatortest', 'learning plan appreciator role description');
         assign_capability('moodle/competency:competencyview', CAP_ALLOW, $roleid, $cat1ctx->id);
@@ -315,7 +315,7 @@ class api_cm_test extends \advanced_testcase {
                     'scaleconfiguration' => $c2scaleconfig));
         $c2 = $cpg->create_competency(array('competencyframeworkid' => $framework->get('id'), 'shortname' => 'c2'));
         $cat1 = $dg->create_category();
-        $cat1ctx = \context_coursecat::instance($cat1->id);
+        $cat1ctx = context_coursecat::instance($cat1->id);
         $template = $cpg->create_template(array('contextid' => $cat1ctx->id));
         $user1 = $dg->create_user(array('firstname' => 'User11', 'lastname' => 'Lastname1'));
         $user2 = $dg->create_user(array('firstname' => 'User12', 'lastname' => 'Lastname2'));
@@ -486,7 +486,7 @@ class api_cm_test extends \advanced_testcase {
         $this->assertCount(0, $users);
 
         // Test search_users_by_templateid when grading competency in course module is disabled.
-        apitest::set_is_cm_comptency_grading_enabled(false);
+        api::set_is_cm_comptency_grading_enabled(false);
         try {
             api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'coursemodule', 'DESC');
             $this->fail('Must fail because grading competency in course module is disabled');
@@ -494,7 +494,7 @@ class api_cm_test extends \advanced_testcase {
             $this->assertStringContainsString('Grading competency in course module is disabled', $ex->getMessage());
         }
         // Enable grading competency in course module.
-        apitest::set_is_cm_comptency_grading_enabled(true);
+        api::set_is_cm_comptency_grading_enabled(true);
     }
 
     /**
@@ -526,9 +526,9 @@ class api_cm_test extends \advanced_testcase {
         $dg->enrol_user($this->user3->id, $course1->id);
 
         // Assign the letter boundaries we want for these courses.
-        $context = \context_course::instance($course1->id);
+        $context = context_course::instance($course1->id);
         $this->assign_good_letter_boundary($context->id);
-        $context = \context_course::instance($course2->id);
+        $context = context_course::instance($course2->id);
         $this->assign_good_letter_boundary($context->id);
 
         // Insert student grades for the activities.
@@ -685,7 +685,7 @@ class api_cm_test extends \advanced_testcase {
         $this->assertCount(0, $result->cms);
 
         // Test get_competency_detail when grading competency in course module is disabled.
-        apitest::set_is_cm_comptency_grading_enabled(false);
+        api::set_is_cm_comptency_grading_enabled(false);
 
         // Test for user2 for comp1.
         $result = api::get_competency_detail($this->user2->id, $this->comp1->get('id'), $planuser2->get('id'));
@@ -694,7 +694,7 @@ class api_cm_test extends \advanced_testcase {
         $result = api::get_competency_detail($this->user1->id, $this->comp1->get('id'), $planuser1->get('id'));
         $this->assertCount(0, $result->cms);
         // Enable grading competency in course module.
-        apitest::set_is_cm_comptency_grading_enabled(true);
+        api::set_is_cm_comptency_grading_enabled(true);
 
     }
 
@@ -736,7 +736,7 @@ class api_cm_test extends \advanced_testcase {
         $scaleconfig[] = array('id' => 3, 'name' => 'C',  'color' => '#CCCCC');
         $scaleconfig[] = array('id' => 4, 'name' => 'D',  'color' => '#DDDDD');
 
-        $record = new \stdclass();
+        $record = new stdclass();
         $record->competencyframeworkid = $framework->get('id');
         $record->scaleid = $framework->get('scaleid');
         $record->scaleconfiguration = json_encode($scaleconfig);
@@ -815,7 +815,7 @@ class api_cm_test extends \advanced_testcase {
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class apitest extends nontestable_api {
+class api extends nontestable_api {
     /**
      * Change value for the iscmcompetencygradingenabled variable.
      *
