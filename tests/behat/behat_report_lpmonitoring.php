@@ -174,7 +174,7 @@ class behat_report_lpmonitoring extends behat_base {
      * @param string $item
      */
     public function i_should_see_item_in_the_autocomplete_list($item) {
-        $xpathtarget = "//ul[@class='form-autocomplete-suggestions']//li//span//span[contains(.,'" . $item . "')]";
+        $xpathtarget = "//ul[@class='form-autocomplete-suggestions']//li//span[contains(.,'" . $item . "')]";
 
         $this->execute('behat_general::should_exist', [$xpathtarget, 'xpath_element']);
     }

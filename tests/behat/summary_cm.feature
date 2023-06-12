@@ -9,7 +9,7 @@ Feature: Display learning plan summary
     And I log in as "appreciator"
     And I am on course index
     When I follow "Medicine"
-    And I select "Reports" from secondary navigation
+    And I select "Competency reports" from secondary navigation
     Then I should see "Monitoring of learning plans"
 
   Scenario: View the competency summary in courses, activities or both
@@ -73,7 +73,6 @@ Feature: Display learning plan summary
   Scenario: View the competency summary for a plan with only level 1 competency
     Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
     And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])[last()]" to "Pablo"
-    And I click on "Pablo Menendez" item in the autocomplete list
     And I set the field "studentPlansSelectorReport" to "Pablo plan level 1 only"
     When I press "Apply"
     And I click on "//ul/li/a[contains(@href, '#summary-content')]" "xpath_element"
@@ -90,7 +89,7 @@ Feature: Display learning plan summary
 
   Scenario: View the competency summary for a plan with competencies of level 1 and 2 both assessed
     Given I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'student')]" "xpath_element"
-    And I open the autocomplete suggestions list
+    Given I click on "//div[contains(@class, 'studentfilter')]//span[contains(@class, 'form-autocomplete-downarrow')]" "xpath_element"
     And I click on "Pablo Menendez" item in the autocomplete list
     And I set the field "studentPlansSelectorReport" to "Pablo plan level 1 and 2"
     When I press "Apply"

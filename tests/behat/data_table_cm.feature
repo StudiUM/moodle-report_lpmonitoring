@@ -10,7 +10,7 @@ Feature: Display learning plan ratings details
     And I log in as "appreciator"
     And I am on course index
     When I follow "Medicine"
-    And I select "Reports" from secondary navigation
+    And I select "Competency reports" from secondary navigation
     Then I should see "Monitoring of learning plans"
 
   Scenario: Filter user learning plan by scales values in activities
@@ -22,10 +22,10 @@ Feature: Display learning plan ratings details
     And I click on "//ul/li/a[contains(@href, '#report-content')]" "xpath_element"
     And I click on "//td[contains(@class, 'searchable')]/a[contains(., 'Competency A')]" "xpath_element"
     And "User competency summary" "dialogue" should be visible
-    And I should see "Competency A" in the "User competency summary" "dialogue"  
+    And I should see "Competency A" in the "User competency summary" "dialogue"
     And I click on "Close" "button" in the "User competency summary" "dialogue"
 
-    # Genetic Activity G1 in both (course and course activity). 
+    # Genetic Activity G1 in both (course and course activity).
     And I click on "//tr[contains(@class, 'odd')]/td[contains(@class, 'searchable')][2]//a[contains(@class, 'listevidence')]" "xpath_element"
     And "List of evidence" "dialogue" should be visible
     And I click on "Close" "button" in the "List of evidence" "dialogue"
@@ -51,7 +51,7 @@ Feature: Display learning plan ratings details
     And I should see "not good" in the "//tr[contains(@class, 'odd')]/td[contains(@class, 'course-cell')][2]//a" "xpath_element"
     And I should see "not qualified" in the "//tr[contains(@class, 'even')]/td[contains(@class, 'course-cell')][2]//a" "xpath_element"
     And I should not see "Activity G1" in the "//tr[contains(@role, 'row')]/th[contains(@class, 'cm-cell')][1]/a[contains(@class, 'nowrapcm')]" "xpath_element"
-    
+
     # Genetic Activity G1 in course activity.
     And I click on "//label[text()='In the course activity']" "xpath_element"
     And I should see "Competency A" in the "//td[contains(@class, 'searchable')]/a[contains(., 'Competency A')]" "xpath_element"

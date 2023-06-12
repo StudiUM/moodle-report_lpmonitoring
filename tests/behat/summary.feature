@@ -9,7 +9,7 @@ Feature: Display learning plan summary
     And I log in as "appreciator"
     And I am on course index
     When I follow "Medicine"
-    And I select "Reports" from secondary navigation
+    And I select "Competency reports" from secondary navigation
     Then I should see "Monitoring of learning plans"
 
   Scenario: View the competency summary in courses
@@ -28,7 +28,7 @@ Feature: Display learning plan summary
     And I should not see "not qualified"
     And I click on "//div[contains(@id, 'summary-content')]//td//a[contains(., 'Competency A')]" "xpath_element"
     And "User competency summary" "dialogue" should be visible
-    And I should see "Competency A" in the "User competency summary" "dialogue"  
+    And I should see "Competency A" in the "User competency summary" "dialogue"
     And I click on "Close" "button" in the "User competency summary" "dialogue"
     And I should see "5" in "Parent Competency" row "not good" column of "summary-table" table
     And I should see "2" in "Parent Competency" row "good" column of "summary-table" table

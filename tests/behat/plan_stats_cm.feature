@@ -10,7 +10,7 @@ Feature: Display learning plan template statistics in course modules
     And I log in as "appreciator"
     And I am on course index
     When I follow "Medicine"
-    And I select "Reports" from secondary navigation
+    And I select "Competency reports" from secondary navigation
     Then the "jump" select box should contain "Statistics for learning plans"
     And I select "Statistics for learning plans" from the "jump" singleselect
 

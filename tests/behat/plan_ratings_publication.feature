@@ -57,7 +57,7 @@ Feature: Manage publication of ratings in learning plans
     # Login as learning plan admin
     And I log in as "lpmanager"
     And I am on the "Medicine" "Category" page
-    And I click on "//div[contains(@id, 'region-main-settings-menu')]//a[contains(@class, 'dropdown-toggle')]" "xpath_element"
+    And I select "More" from secondary navigation
     And I should see "Learning plan templates"
     And I follow "Learning plan templates"
     And I click on "Display ratings for this template" of edit menu in the "Medicine Year 1" row

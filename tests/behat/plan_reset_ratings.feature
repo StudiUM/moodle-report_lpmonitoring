@@ -9,7 +9,7 @@ Feature: Reset ratings for user competencies
     And I log in as "appreciator"
     And I am on course index
     When I follow "Medicine"
-    And I select "Reports" from secondary navigation
+    And I select "Competency reports" from secondary navigation
     Then I should see "Monitoring of learning plans"
 
   Scenario: Reset rating for one competency
