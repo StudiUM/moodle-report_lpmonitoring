@@ -79,21 +79,21 @@ define(['jquery',
             $('.competencyreport').on('change',
                 '.scalesortordercontainer input[name="optionscalesortorder"]',
                 this.changeScaleSortorderHandler.bind(this)).change();
-            $('.competencyreport').on('change','.scalefiltervalues' ,this.changeScaleHandler.bind(this)).change();
+            $('.competencyreport').on('change', '.scalefiltervalues', this.changeScaleHandler.bind(this)).change();
             $('.competencyreport input[name=optionfilter]').prop("disabled", false);
             $('.competencyreport input[name=optionscalesortorder]').prop("disabled", false);
             // Display rating in user plan.
             $(".competencyreport").on("change", ".displayratings input[type=checkbox]",
                 this.changeDisplayRating.bind(this)).change();
             // Only plans with comments filter.
-            $('.competencyreport').on('change','#filter-comment' ,this.changeWithcommentsHandler.bind(this)).change();
+            $('.competencyreport').on('change', '#filter-comment', this.changeWithcommentsHandler.bind(this)).change();
             // Only students with at least two plans.
-            $('.competencyreport').on('change','#filter-plan' ,this.changeWithplansHandler.bind(this)).change();
+            $('.competencyreport').on('change', '#filter-plan', this.changeWithplansHandler.bind(this)).change();
             // When the tags are modified we reload the tags filter.
             $(".competencyreport").on('DOMSubtreeModified', ".tags-stats", this.reloadTagsIfNeeded.bind(this));
             // When the comments is checked we modify the tags filter.
             // Only plans with comments filter and tags.
-            $('.competencyreport').on('change','#filter-comments',this.reloadTagsIfNeeded.bind(this));
+            $('.competencyreport').on('change', '#filter-comments', this.reloadTagsIfNeeded.bind(this));
 
         };
 
@@ -175,10 +175,12 @@ define(['jquery',
                     $('.competencyreport .advanced').show();
                 }
                 self.loadScalesFromTemplate(self.templateId);
+                self.disableUserTemplateSelector(false);
             } else {
                 $('.competencyreport .moreless-actions').addClass('hidden');
                 $('.competencyreport .advanced').hide();
                 $('.competencyreport #scale').empty();
+                self.disableUserTemplateSelector(true);
             }
             self.checkDataFormReady();
         };
@@ -192,7 +194,7 @@ define(['jquery',
          */
         LearningplanReport.prototype.loadTags = function() {
             var self = this;
-            if(self.tagsAreLoading === false) {
+            if (self.tagsAreLoading === false) {
                 self.tagsAreLoading = true;
                 $(self.tagSelector + ' option').remove();
 
@@ -214,7 +216,7 @@ define(['jquery',
 
                             // Select the option that was selected before.
                             var optionExists = ( $(self.tagSelector + " option[value=" + self.tagId + "]").length > 0 );
-                            if(optionExists === true) {
+                            if (optionExists === true) {
                                 $(self.tagSelector).val(self.tagId);
                             } else {
                                 self.tagId = null;
@@ -293,7 +295,7 @@ define(['jquery',
                             // Select the option that was selected before.
                             var selectorOption = self.learningplanTagSelector + " option[value=" + oldTagLearningplanId + "]";
                             var optionExists = ( $(selectorOption).length > 0 );
-                            if(optionExists === true) {
+                            if (optionExists === true) {
                                 $(self.learningplanTagSelector).val(oldTagLearningplanId);
                                 self.tagLearningplanId = oldTagLearningplanId;
                             } else {
@@ -450,6 +452,25 @@ define(['jquery',
         };
 
         /**
+         * Method to enable or disable the user selector linked to the template filter
+         * @name toggleUserSelector
+         * @param {boolean} state true to disable false to enable
+         * @return {void}
+         */
+        LearningplanReport.prototype.disableUserTemplateSelector = function(state = true) {
+            var userAutocomplete = $('.competencyreport .templatefilter .for-autocomplete .fautocomplete .position-relative'),
+            inputSelector = userAutocomplete.find(':text'),
+            arrowSelector = userAutocomplete.find('.form-autocomplete-downarrow');
+
+            if (inputSelector.length > 0) {
+                inputSelector.prop("disabled", state);
+            }
+            if (arrowSelector.length > 0) {
+                arrowSelector.toggleClass('disabled-option', state);
+            }
+        };
+
+        /**
          * Load scales from template.
          *
          * @name   loadScalesFromTemplate
@@ -541,7 +562,7 @@ define(['jquery',
         LearningplanReport.prototype.studentChangeHandler = function(e) {
             var self = this;
             self.userId = $(e.target).val();
-            if (self.userId !== null) {
+            if (self.userId) {
                 var promise = ajax.call([{
                     methodname: 'core_competency_list_user_plans',
                     args: {
@@ -923,7 +944,7 @@ define(['jquery',
                     userid: userid,
                     planid: planid
                 }
-            },{
+            }, {
                 methodname: 'report_lpmonitoring_read_plan',
                 args: {
                     scalevalues: "",
@@ -1080,7 +1101,7 @@ define(['jquery',
         LearningplanReport.prototype.changeScaleHandler = function() {
             var self = this;
             var scalefiltervalues = [];
-            $('.competencyreport .scalefiltervalues').each(function () {
+            $('.competencyreport .scalefiltervalues').each(function() {
                 if ($(this).is(":checked")) {
                     scalefiltervalues.push({scalevalue : $(this).data("scalevalue"), scaleid : $(this).data("scaleid")});
                 }
@@ -1288,7 +1309,7 @@ define(['jquery',
         LearningplanReport.prototype.displayPlan = function(planid, templateid, tagid) {
             var elementloading = null,
                     self = this;
-            if($('#plan-user-info').length) {
+            if ($('#plan-user-info').length) {
                 elementloading = $('#plan-user-info');
             } else {
                 elementloading = $("#reportFilter button");
@@ -1498,7 +1519,7 @@ define(['jquery',
                 { key: 'selectuser', component: 'report_lpmonitoring' },
                 { key: 'nouserselected', component: 'report_lpmonitoring' }]
             ).done(
-                function (strings) {
+                function(strings) {
                     // Autocomplete users in templates.
                     autocomplete.enhance(
                         self.learningplanSelector,
@@ -1507,7 +1528,8 @@ define(['jquery',
                         strings[0],
                         false,
                         true,
-                        strings[1]);
+                        strings[1])
+                        .then(()=> self.disableUserTemplateSelector());
                     // Autocomplete users.
                     autocomplete.enhance(
                         self.studentSelector,
@@ -1716,7 +1738,7 @@ define(['jquery',
                 { key: 'collapseall'},
                 { key: 'expandall'}]
             ).done(
-                function (strings) {
+                function(strings) {
                     var collapseall = strings[0];
                     var expandall = strings[1];
                     $(".competencyreport").on('click', '.collapsible-actions a', function(event) {
