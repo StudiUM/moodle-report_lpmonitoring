@@ -138,14 +138,12 @@ Feature: Display learning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[contains(., 'Final rating')]" "xpath_element"
-    And I set the field with xpath "(//div[contains(@class, 'templatefilter')]//input[contains(@id, 'form_autocomplete_input')])" to "S"
     And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
     Then I should see "(1) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Frederic Simson" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(2) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I should see "Robert Smith" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I click on "//label[contains(., 'Sort in descending order')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "S"
     And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
     And I should see "(2) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Robert Smith" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
@@ -155,9 +153,9 @@ Feature: Display learning plan ratings details
     And I should see "Robert Smith" in the ".currentplan" "css_element"
     And I should see "Frederic Simson" in the ".nexplan" "css_element"
     And I click on "//label[contains(., 'Sort in ascending order')]" "xpath_element"
-    #And I press "Apply"
-    #And I should see "Frederic Simson" in the ".currentplan" "css_element"
-    #And I should see "Robert Smith" in the ".nexplan" "css_element"
+    And I press "Apply"
+    And I should see "Frederic Simson" in the ".currentplan" "css_element"
+    And I should see "Robert Smith" in the ".nexplan" "css_element"
 
   Scenario: Filter and sort user learning plan with scales values in course
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
@@ -165,14 +163,12 @@ Feature: Display learning plan ratings details
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
     And I click on "//label[text()='Rating in course']" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
     And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
     Then I should see "(3) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Donald Fletcher" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "(8) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I should see "Pablo Menendez" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I click on "//label[contains(., 'Sort in descending order')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "a"
     And I click on ".templatefilter .form-autocomplete-downarrow" "css_element"
     And I should see "(8) rating" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Pablo Menendez" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
@@ -182,9 +178,9 @@ Feature: Display learning plan ratings details
     And I should see "Pablo Menendez" in the ".currentplan" "css_element"
     And I should see "Donald Fletcher" in the ".nexplan" "css_element"
     And I click on "//label[contains(., 'Sort in ascending order')]" "xpath_element"
-    #And I press "Apply"
-    #And I should see "Donald Fletcher" in the ".currentplan" "css_element"
-    #And I should see "Pablo Menendez" in the ".nexplan" "css_element"
+    And I press "Apply"
+    And I should see "Donald Fletcher" in the ".currentplan" "css_element"
+    And I should see "Pablo Menendez" in the ".nexplan" "css_element"
 
   Scenario: Filter user learning plan with comments
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
@@ -207,9 +203,9 @@ Feature: Display learning plan ratings details
     And I should see "(1) comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I should not see "Cynthia Reyes" item in the autocomplete list
     And I should not see "Pablo Menendez" item in the autocomplete list
-    #And I press "Apply"
-    #And I should see "Rebecca Armenta" in the ".currentplan" "css_element"
-    #And I should see "Stepanie Grant" in the ".nexplan" "css_element"
+    And I press "Apply"
+    And I should see "Rebecca Armenta" in the ".currentplan" "css_element"
+    And I should see "Stepanie Grant" in the ".nexplan" "css_element"
 
   Scenario: Read user learning plan by navigating between users
     Given I set the field "templateSelectorReport" to "Medicine Year 1"
