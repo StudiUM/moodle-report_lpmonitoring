@@ -97,3 +97,7 @@ Feature: Bulk rating
     And I click on ".prevplan" "css_element"
     And I toggle the "Competency A" detail
     And I should see "good" in "finalrate" of the competency "Competency A"
+
+  Scenario: Bulk rate students, check the second navigation always display
+    Given I set the field "templateSelector" to "Medicine Year 1"
+    Then "//div[contains(@class, 'tertiary-navigation')][1]//select/option[text()='Bulk rating for all students for all competencies']" "xpath_element" should exist
