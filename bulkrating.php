@@ -35,7 +35,6 @@ $context = context::instance_by_id($pagecontextid);
 $urlparams = array('pagecontextid' => $pagecontextid);
 if (!empty($templateid)) {
     $template = \core_competency\api::read_template($templateid);
-    $urlparams['templateid'] = $templateid;
 }
 
 $url = new moodle_url('/report/lpmonitoring/bulkrating.php', $urlparams);
