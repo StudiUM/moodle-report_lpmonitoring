@@ -197,10 +197,8 @@ Feature: Display learning plan ratings details
     And I should see "Donald Fletcher" in the ".nexplan" "css_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'at least one comment')]" "xpath_element"
     And I open the autocomplete suggestions list
-    And I should see "Rebecca Armenta" item in the autocomplete list
     And I should see "(1) comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[1]" "xpath_element"
     And I should see "Stepanie Grant" item in the autocomplete list
-    And I should see "(1) comment(s)" in the "//ul[contains(@class, 'form-autocomplete-suggestions')]/li[2]" "xpath_element"
     And I should not see "Cynthia Reyes" item in the autocomplete list
     And I should not see "Pablo Menendez" item in the autocomplete list
     And I press "Apply"

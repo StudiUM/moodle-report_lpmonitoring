@@ -26,12 +26,6 @@ namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
-use core_competency\plan;
-use report_lpmonitoring\api;
-use core_competency\api as core_competency_api;
-use tool_cohortroles\api as tool_cohortroles_api;
-use report_lpmonitoring\report_competency_config;
-use core\invalid_persistent_exception;
 
 /**
  * Tags tests.

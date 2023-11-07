@@ -48,7 +48,7 @@ class apcexport {
     /** @var array of options */
     protected $params = array();
 
-    /** @var progress_trace trace */
+    /** @var array trace */
     protected $formatteddata = array();
 
     /** @var progress_trace trace */

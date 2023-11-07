@@ -27,7 +27,6 @@ namespace report_lpmonitoring\external;
 use core\external\exporter;
 use renderer_base;
 use core_tag_tag;
-use core_competency\external\plan_exporter;
 use core_comment\external\comment_area_exporter;
 
 /**

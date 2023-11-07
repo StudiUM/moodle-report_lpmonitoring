@@ -45,7 +45,6 @@ use core_tag_area;
 use core_tag_tag;
 use report_lpmonitoring\report_competency_config;
 use report_lpmonitoring\event\user_competency_resetted;
-use report_lpmonitoring\external;
 use stdClass;
 use Exception;
 use required_capability_exception;

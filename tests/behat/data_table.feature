@@ -11,9 +11,8 @@ Feature: Display learning plan ratings details
     When I am on "Medicine" lpmonitoring page
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "Pablo"
-    And I open the autocomplete suggestions list
-    Then I should see "Pablo Menendez" item in the autocomplete list
-    And I click on "Pablo Menendez" item in the autocomplete list
+    Then ".userplan-fullname span" "css_element" should exist
+    Then I should see "Pablo Menendez"
     And I press "Apply"
 
   Scenario: View the competency report in courses

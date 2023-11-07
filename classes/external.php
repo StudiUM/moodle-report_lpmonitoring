@@ -41,13 +41,10 @@ use core_competency\url;
 use core_competency\external as core_competency_external;
 use core_competency\api as core_competency_api;
 use core_user\external\user_summary_exporter;
-use core_competency\course_competency;
 use core_competency\user_competency;
 use core_competency\external\competency_exporter;
-use core_competency\external\plan_exporter;
 use core_competency\external\template_exporter;
 use core_competency\external\user_competency_exporter;
-use core_competency\external\user_competency_course_exporter;
 use core_competency\external\user_competency_plan_exporter;
 use core_comment\external\comment_area_exporter;
 use core_tag_tag;
@@ -144,7 +141,7 @@ class external extends external_api {
      * @param boolean $withcomments Only plans with comments.
      * @param boolean $withplans Only with at least 2 plans.
      *
-     * @return boolean
+     * @return array
      */
     public static function search_users_by_templateid($templateid, $query, $scalevalues, $scalefilterin, $scalesortorder,
             $withcomments, $withplans) {
@@ -178,7 +175,7 @@ class external extends external_api {
     /**
      * Returns description of search_users_by_templateid() result value.
      *
-     * @return \external_description
+     * @return external_multiple_structure
      */
     public static function search_users_by_templateid_returns() {
         return new external_multiple_structure(

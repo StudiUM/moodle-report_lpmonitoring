@@ -30,8 +30,6 @@ use core_competency\plan;
 use report_lpmonitoring\api as nontestable_api;
 use core_competency\api as core_competency_api;
 use tool_cohortroles\api as tool_cohortroles_api;
-use report_lpmonitoring\report_competency_config;
-use core\invalid_persistent_exception;
 
 /**
  * API for course module tests.
@@ -42,7 +40,7 @@ use core\invalid_persistent_exception;
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class report_lpmonitoring_api_cm_testcase extends advanced_testcase {
+class report_lpmonitoring_api_cm_test extends advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
