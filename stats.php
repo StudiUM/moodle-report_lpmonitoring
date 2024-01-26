@@ -35,7 +35,7 @@ if (!\core_competency\template::can_read_context($context)) {
     throw new required_capability_exception($context, 'moodle/competency:templateview', 'nopermissions', '');
 }
 
-$urlparams = array('pagecontextid' => $pagecontextid);
+$urlparams = ['pagecontextid' => $pagecontextid];
 
 $url = new moodle_url('/report/lpmonitoring/stats.php', $urlparams);
 $title = get_string('statslearningplan', 'report_lpmonitoring');

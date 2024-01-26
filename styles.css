@@ -891,6 +891,14 @@
     border-bottom: 1px solid #cfd1d5;
     margin-top: 1.5em;
 }
+.competencyreport .scalefiltercontainer .checkbox.checkbox-primary input,
+.competencyreport .scaleitem .checkbox.checkbox-primary input,
+.competencyreport .advanced .checkbox.checkbox-primary input,
+.competencyreport .scalesortordercontainer .checkbox.checkbox-primary input,
+.competencyreport .scalesortordercontainer .fradio.radio .radiocontainer input,
+.competencyreport .scalefiltercontainer .fradio.radio .radiocontainer input {
+    margin-right: 1rem;
+}
 .lpmonitoringdialogue .stats-rated-column {
     min-width: 20%;
 }
@@ -909,7 +917,7 @@
 .lpmonitoringdialogue div.dataTables_paginate a.first:not(.page-item):before,
 .lpmonitoringdialogue div.dataTables_paginate a.previous:not(.page-item):before {
     display: block;
-    font-family: FontAwesome;
+    font-family: var(--fa-style-family-classic);
     font-size: 1.5em;
     left: 10px;
     position: absolute;
@@ -919,7 +927,7 @@
 .lpmonitoringdialogue div.dataTables_paginate a.next:not(.page-item):after,
 .lpmonitoringdialogue div.dataTables_paginate a.last:not(.page-item):after {
     display: block;
-    font-family: FontAwesome;
+    font-family: var(--fa-style-family-classic);
     font-size: 1.5em;
     position: absolute;
     right: 10px;
@@ -969,7 +977,7 @@
     top: 10px;
     right: 8px;
     display: block;
-    font-family: FontAwesome;
+    font-family: var(--fa-style-family-classic);
 }
 
 .lpmonitoringdialogue table.dataTable thead th.sorting:after {
@@ -994,6 +1002,14 @@
 .lpmonitoringdialogue table.dataTable thead .sorting_desc,
 .lpmonitoringdialogue table.dataTable thead .sorting {
     cursor: pointer;
+}
+.lpmonitoringdialogue table.dataTable tr.odd td.sorting_1,
+.lpmonitoringdialogue table.dataTable tr.odd td.sorting_2,
+.lpmonitoringdialogue table.dataTable tr.odd td.sorting_3,
+.lpmonitoringdialogue table.dataTable tr.even td.sorting_1,
+.lpmonitoringdialogue table.dataTable tr.even td.sorting_2,
+.lpmonitoringdialogue table.dataTable tr.even td.sorting_3 {
+    background-color: unset;
 }
 .lpmonitoringdialogue .dataTables_paginate {
     text-align: center;
@@ -1085,7 +1101,7 @@
 .lpmonitoringdialogue div.dataTables_paginate a.first:before,
 .lpmonitoringdialogue div.dataTables_paginate a.previous:before {
     display: block;
-    font-family: FontAwesome;
+    font-family: var(--fa-style-family-classic);
     font-size: 1.5em;
     left: 10px;
     position: absolute;
@@ -1094,7 +1110,7 @@
 .lpmonitoringdialogue div.dataTables_paginate a.next:after,
 .lpmonitoringdialogue div.dataTables_paginate a.last:after {
     display: block;
-    font-family: FontAwesome;
+    font-family: var(--fa-style-family-classic);
     font-size: 1.5em;
     position: absolute;
     right: 10px;
@@ -1140,7 +1156,7 @@
     top: 10px;
     right: 8px;
     display: block;
-    font-family: FontAwesome;
+    font-family: var(--fa-style-family-classic);
 }
 
 .lpmonitoringdialogue table.dataTable thead th.sorting:after {
@@ -1197,14 +1213,6 @@
 .lpmonitoringdialogue .dataTables_paginate {
     text-align: center;
 }
-.competencyreport .form-inline .radio
-{
-    margin-bottom: 8px;
-}
-.competencyreport .radio input {
-    display: inline;
-    width: 1%;
-}
 .competencyreport:not(.boost) .input-group-addon {
     background-color: #eceeef;
     border: 1px solid rgba(0, 0, 0, 0.15);
@@ -1221,11 +1229,6 @@
     white-space: nowrap;
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
-}
-.competencyreport:not(.boost) .form-inline .input-group {
-    display: inline-table;
-    vertical-align: middle;
-    width: auto;
 }
 .competencyreport:not(.boost) .input-group {
     border-collapse: separate;
@@ -1603,12 +1606,6 @@ ul.detail-comp-tab li a::first-letter {
 #table-search-columns {
     width: 245px;
 }
-
-/* button radio */
-#reportFilter #id_displayinfo .fcontainer .fitem_fradio .form-inline{
-    display: block !important;
-}
-
 /* round sahpe image */
 #plan-user-info .profile_img {
     border-radius: 50% !important;

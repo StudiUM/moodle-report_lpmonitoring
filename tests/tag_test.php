@@ -47,16 +47,16 @@ class tag_test extends \advanced_testcase {
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
 
-        $user1 = $dg->create_user(array('lastname' => 'Austin', 'firstname' => 'Sharon'));
-        $user2 = $dg->create_user(array('lastname' => 'Cortez', 'firstname' => 'Jonathan'));
-        $user3 = $dg->create_user(array('lastname' => 'Underwood', 'firstname' => 'Alicia'));
+        $user1 = $dg->create_user(['lastname' => 'Austin', 'firstname' => 'Sharon']);
+        $user2 = $dg->create_user(['lastname' => 'Cortez', 'firstname' => 'Jonathan']);
+        $user3 = $dg->create_user(['lastname' => 'Underwood', 'firstname' => 'Alicia']);
         $user1context = \context_user::instance($user1->id);
         $user2context = \context_user::instance($user2->id);
         $user3context = \context_user::instance($user3->id);
 
-        $plan1 = $lpg->create_plan(array('userid' => $user1->id));
-        $plan2 = $lpg->create_plan(array('userid' => $user2->id));
-        $plan3 = $lpg->create_plan(array('userid' => $user3->id));
+        $plan1 = $lpg->create_plan(['userid' => $user1->id]);
+        $plan2 = $lpg->create_plan(['userid' => $user2->id]);
+        $plan3 = $lpg->create_plan(['userid' => $user3->id]);
         // Test add tags.
         \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plan1->get('id'), $user1context, 'Tag plan 1 and 2');
         \core_tag_tag::add_item_tag('report_lpmonitoring', 'competency_plan', $plan2->get('id'), $user2context, 'Tag plan 1 and 2');
