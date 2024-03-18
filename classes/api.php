@@ -282,7 +282,7 @@ class api {
         $fields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
         $extrasearchfields = $userfieldsapi->get_required_fields([\core_user\fields::PURPOSE_IDENTITY]);
 
-        list($wheresql, $whereparams) = users_search_sql($query, 'u', true, $extrasearchfields);
+        list($wheresql, $whereparams) = users_search_sql($query, 'u', USER_SEARCH_STARTS_WITH, $extrasearchfields);
         list($sortsql, $sortparams) = users_order_by_sql('u', $query, $context);
 
         // Group scales values by scaleid.
