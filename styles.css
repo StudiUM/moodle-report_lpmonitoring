@@ -817,6 +817,9 @@
     text-align: center;
     margin-bottom: 0.5em;
 }
+.competencyreport .report-stats-competencies .switcher-container label.switch {
+    text-align: left;
+}
 .competencyreport .report-stats-competencies .space-block-stats {
     padding-bottom: 0.5em;
     flex: 1 0 auto;
@@ -839,10 +842,16 @@
     line-height: 47px;
 }
 .competencyreport .plan-info-report > div.report-stats-competencies {
-    width: 165px;
+    width: 13%;
+}
+.competencyreport .plan-info-report > div.report-stats-competencies.displayratings {
+    width: 22%;
 }
 .competencyreport .plan-info-report .report-stats-competencies .empty-value {
     color: #cfd1d5;
+}
+.competencyreport .plan-info-report .report-stats-competencies .custom-switch .custom-control-label {
+   font-size: 12px;
 }
 .competencyreport .reset-grade a, .competencyreport .reset-grade-all a {
     font-size: 12px;
@@ -1244,7 +1253,7 @@
 .competencyreport:not(.boost) .row {
     margin-left: 0;
 }
-.button-dispayratinghelp, .button-resethelp {
+.button-displayratinghelp, .button-resethelp {
     background: transparent;
     background-color: transparent;
     border: none;
@@ -1427,9 +1436,6 @@
 .plan-info-container .table-list-users span.nav-small {
     font-size: 0.7em;
     display: inline;
-}
-.plan-info-container .table-list-users span.nav-small.badge {
-    display: inline-block;
 }
 .plan-info-container .table-list-users .nav-list-users-displayinfo {
     display: inline-block;

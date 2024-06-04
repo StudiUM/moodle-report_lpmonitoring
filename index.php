@@ -48,8 +48,6 @@ if ($context->contextlevel == CONTEXT_SYSTEM) {
     throw new coding_exception('Unexpected context!');
 }
 
-// Set css.
-$PAGE->requires->css('/report/lpmonitoring/style/checkbox.css');
 $PAGE->set_context($context);
 $PAGE->set_url($url);
 $PAGE->set_title($title);

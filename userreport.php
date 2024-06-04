@@ -48,8 +48,6 @@ if (!$iscurrentuser) {
     $PAGE->navigation->set_userid_for_parent_checks($user->id);
 }
 
-// Set css.
-$PAGE->requires->css('/report/lpmonitoring/style/checkbox.css');
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('report');
 $PAGE->set_url($url);
