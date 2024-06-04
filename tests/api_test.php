@@ -178,7 +178,7 @@ class api_test extends \advanced_testcase {
         );
         $this->user2 = $dg->create_user(
             [
-                'firstname' => 'Donald',
+                'firstname' => 'Roberto',
                 'lastname' => 'Fletcher',
                 'email' => 'user12test@nomail.com',
                 'phone1' => 1111111111,
@@ -932,7 +932,7 @@ class api_test extends \advanced_testcase {
         $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Re');
         $this->assertCount(1, $users);
 
-        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 't');
+        $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'R');
         $this->assertCount(2, $users);
     }
 
