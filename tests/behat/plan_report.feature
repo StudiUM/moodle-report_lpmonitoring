@@ -327,14 +327,14 @@ Feature: Display learning plan ratings details
     And I click on "//a[contains(@class, 'moreless-toggler')]" "xpath_element"
     When I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I click on "//div[contains(@class, 'fradio')]/span/label[contains(@for, 'scalefilterplan')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "m"
+    And I click on "//div[contains(@class, 'radio')]/span/label[contains(@for, 'scalefilterplan')]" "xpath_element"
+    And I open the autocomplete suggestions list
     Then I should not see "William Presley" item in the autocomplete list
     And I should see "Robert Smith" item in the autocomplete list
     And I should see "Frederic Simson" item in the autocomplete list
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not good')]" "xpath_element"
     And I click on "//div[contains(@class, 'checkbox')]/label[contains(., 'not qualified')]" "xpath_element"
-    And I set the field with xpath "(//input[contains(@id, 'form_autocomplete_input')])" to "m"
+    And I open the autocomplete suggestions list
     And I should see "Robert Smith" item in the autocomplete list
     And I should see "William Presley" item in the autocomplete list
     And I should see "Frederic Simson" item in the autocomplete list
