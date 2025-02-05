@@ -48,7 +48,7 @@ use core_external\external_api;
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class external_test extends \externallib_advanced_testcase {
+final class external_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -69,7 +69,7 @@ class external_test extends \externallib_advanced_testcase {
     protected $contextcreator = null;
 
     protected function setUp(): void {
-
+        parent::setUp();
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -254,7 +254,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test we can read a report competency configuration.
      */
-    public function test_read_scale_configuration() {
+    public function test_read_scale_configuration(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -279,7 +279,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test missing capability to create configuration for a framework and a scale.
      */
-    public function test_no_capability_to_create_scale_configuration() {
+    public function test_no_capability_to_create_scale_configuration(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -318,7 +318,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test we can read a report competency configuration.
      */
-    public function test_create_scale_configuration() {
+    public function test_create_scale_configuration(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -365,7 +365,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * est missing capability to update configuration for a framework and a scale.
      */
-    public function test_no_capability_to_update_scale_configuration() {
+    public function test_no_capability_to_update_scale_configuration(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -437,7 +437,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test we can update a report competency configuration.
      */
-    public function test_update_scale_configuration() {
+    public function test_update_scale_configuration(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -521,7 +521,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test we can read plan.
      */
-    public function test_read_plan() {
+    public function test_read_plan(): void {
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
 
@@ -768,7 +768,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test get competency detail for lpmonitoring report.
      */
-    public function test_get_competency_detail() {
+    public function test_get_competency_detail(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -1034,7 +1034,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test list plan competencies for lpmonitoring report.
      */
-    public function test_list_plan_competencies() {
+    public function test_list_plan_competencies(): void {
         $this->setUser($this->creator);
 
         $dg = $this->getDataGenerator();
@@ -1260,7 +1260,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test get competency statistics for lpmonitoring report.
      */
-    public function test_get_lp_monitoring_competency_statistics() {
+    public function test_get_lp_monitoring_competency_statistics(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -1455,7 +1455,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test get competency statistics in course for lpmonitoring report.
      */
-    public function test_get_lp_monitoring_competency_statistics_incourse() {
+    public function test_get_lp_monitoring_competency_statistics_incourse(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
@@ -1616,7 +1616,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Search templates.
      */
-    public function test_search_templates() {
+    public function test_search_templates(): void {
         $user = $this->getDataGenerator()->create_user();
         $category = $this->getDataGenerator()->create_category();
         $syscontextid = \context_system::instance()->id;
@@ -1688,7 +1688,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test get plans for specific scales values in plans.
      */
-    public function test_get_plans_for_scale_values_in_plans() {
+    public function test_get_plans_for_scale_values_in_plans(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -1819,7 +1819,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test get plans for specific scales values in courses.
      */
-    public function test_get_plans_for_scale_values_in_courses() {
+    public function test_get_plans_for_scale_values_in_courses(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -1982,7 +1982,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test get comment area for a specific learning plan.
      */
-    public function test_get_comment_area_for_plan() {
+    public function test_get_comment_area_for_plan(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
@@ -2096,7 +2096,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test the "Only plans with comments" filter of get learning plans from templateid
      */
-    public function test_search_users_by_templateid_and_withcomments() {
+    public function test_search_users_by_templateid_and_withcomments(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
@@ -2184,7 +2184,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test the "At least two plans" filter of get students with learning plans.
      */
-    public function test_search_users_by_templateid_and_withplans() {
+    public function test_search_users_by_templateid_and_withplans(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
@@ -2314,7 +2314,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test list plan competencies and evaluations for lpmonitoring report.
      */
-    public function test_list_plan_competencies_report() {
+    public function test_list_plan_competencies_report(): void {
         global $DB;
         $this->setUser($this->creator);
 
@@ -2761,7 +2761,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test reset grading of all user competencies in a learning plan.
      */
-    public function test_reset_grading_one() {
+    public function test_reset_grading_one(): void {
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
         $cpg = $dg->get_plugin_generator('core_competency');
@@ -2789,7 +2789,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test reset grading of a single user competency.
      */
-    public function test_reset_grading_all() {
+    public function test_reset_grading_all(): void {
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
         $cpg = $dg->get_plugin_generator('core_competency');
@@ -2817,7 +2817,7 @@ class external_test extends \externallib_advanced_testcase {
     /**
      * Test list plan competencies and evaluations for lpmonitoring summary.
      */
-    public function test_list_plan_competencies_summary() {
+    public function test_list_plan_competencies_summary(): void {
         global $DB;
         $this->setUser($this->creator);
 

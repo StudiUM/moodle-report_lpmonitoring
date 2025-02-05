@@ -1,5 +1,5 @@
 @report @javascript @report_lpmonitoring
-Feature: Display learning plan ratings details
+Feature: Display learning plan report course module details
   As a learning plan appreciator
   In order to rate competencies on learning plan
   I need to view course modules competencies ratings

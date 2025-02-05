@@ -46,7 +46,7 @@ use core_external\external_api;
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class external_cm_test extends \externallib_advanced_testcase {
+final class external_cm_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -97,6 +97,7 @@ class external_cm_test extends \externallib_advanced_testcase {
     protected $scale = null;
 
     protected function setUp(): void {
+        parent::setUp();
         if (!api::is_cm_comptency_grading_enabled()) {
             $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
         }
@@ -284,7 +285,7 @@ class external_cm_test extends \externallib_advanced_testcase {
     /**
      * Test the scale filter values in course module.
      */
-    public function test_search_users_by_templateid_and_filterscale_incoursemodule() {
+    public function test_search_users_by_templateid_and_filterscale_incoursemodule(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
@@ -330,7 +331,7 @@ class external_cm_test extends \externallib_advanced_testcase {
     /**
      * Test get competency detail for lpmonitoring report (grading in course module).
      */
-    public function test_get_competency_detail() {
+    public function test_get_competency_detail(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -502,7 +503,7 @@ class external_cm_test extends \externallib_advanced_testcase {
     /**
      * Test get competency statistics in course modules for lpmonitoring report.
      */
-    public function test_get_lp_monitoring_competency_statistics_incoursemodules() {
+    public function test_get_lp_monitoring_competency_statistics_incoursemodules(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
@@ -580,7 +581,7 @@ class external_cm_test extends \externallib_advanced_testcase {
     /**
      * Test get data for the user competency summary in course.
      */
-    public function test_data_for_user_competency_summary_in_course() {
+    public function test_data_for_user_competency_summary_in_course(): void {
         $this->setUser($this->creator);
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');

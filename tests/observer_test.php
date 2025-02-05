@@ -38,7 +38,7 @@ use report_lpmonitoring\report_competency_config;
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class observer_test extends \advanced_testcase {
+final class observer_test extends \advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -59,7 +59,7 @@ class observer_test extends \advanced_testcase {
     protected $contextcreator = null;
 
     protected function setUp(): void {
-
+        parent::setUp();
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -88,7 +88,7 @@ class observer_test extends \advanced_testcase {
     /**
      * Test all color configurations associated to a framework are removed when framework is deleted.
      */
-    public function test_framework_deleted() {
+    public function test_framework_deleted(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -168,7 +168,7 @@ class observer_test extends \advanced_testcase {
      * Test color configuration associated to 2 competencies in framework is kept
      * when scale is changed in one of the competencies.
      */
-    public function test_color_config_used_by_other_competency() {
+    public function test_color_config_used_by_other_competency(): void {
         global $DB;
 
         $this->resetAfterTest(true);

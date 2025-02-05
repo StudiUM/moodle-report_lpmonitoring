@@ -59,7 +59,7 @@ use moodle_exception;
  */
 class api {
 
-    /** @var boolean iscmcompetencygradingenabled  **/
+    /** @var bool iscmcompetencygradingenabled  **/
     static protected $iscmcompetencygradingenabled;
 
     /**

@@ -42,7 +42,7 @@ use tool_cohortroles\api as tool_cohortroles_api;
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class api_cm_test extends \externallib_advanced_testcase {
+final class api_cm_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -90,6 +90,7 @@ class api_cm_test extends \externallib_advanced_testcase {
     protected $comp2 = null;
 
     protected function setUp(): void {
+        parent::setUp();
         if (!api::is_cm_comptency_grading_enabled()) {
             $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
         }
@@ -289,7 +290,7 @@ class api_cm_test extends \externallib_advanced_testcase {
     /**
      * Test get learning plans from templateid with scale filter in course module.
      */
-    public function test_search_users_by_templateid_and_scalefilter() {
+    public function test_search_users_by_templateid_and_scalefilter(): void {
         global $DB;
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -515,7 +516,7 @@ class api_cm_test extends \externallib_advanced_testcase {
     /**
      * Test get competency detail for lpmonitoring report (grading in course module).
      */
-    public function test_get_competency_detail() {
+    public function test_get_competency_detail(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
@@ -716,7 +717,7 @@ class api_cm_test extends \externallib_advanced_testcase {
     /**
      * Test get competency detail for lpmonitoring report with modules.
      */
-    public function test_get_lp_monitoring_competency_detail() {
+    public function test_get_lp_monitoring_competency_detail(): void {
         $this->setAdminUser();
 
         $this->resetAfterTest(true);

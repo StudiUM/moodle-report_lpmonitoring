@@ -1,5 +1,5 @@
 @report @javascript @report_lpmonitoring
-Feature: Display learning plan ratings details
+Feature: Display learning plan report details
   As a learning plan admin
   In order to display competencies ratings on learning plan
   I need to rate a competency in a learning plan
@@ -102,6 +102,7 @@ Feature: Display learning plan ratings details
     And I should see "0" in the ".notproficient-stats" "css_element"
     And I should see "1" in the ".notrated-stats" "css_element"
     And I toggle the "Competency A" detail
+    And I wait "1" seconds
     And I click on "rate-competency" of the competency "Competency A"
     And "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "not good"
@@ -294,6 +295,7 @@ Feature: Display learning plan ratings details
     And I should see "Competency A"
     And I should see "Competency B"
     And I toggle the "Competency B" detail
+    And I wait "1" seconds
     When I click on "rate-competency" of the competency "Competency B"
     Then "Rate" "dialogue" should be visible
     And I set the field with xpath "//select[@name='rating']" to "not qualified"

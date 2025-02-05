@@ -19,7 +19,7 @@ Feature: Display learning plan ratings details
     Given I click on "//ul/li/a[contains(@href, '#report-content')]" "xpath_element"
     When I click on "//td[contains(@class, 'searchable')]/a[contains(., 'Competency A')]" "xpath_element"
     Then "User competency summary" "dialogue" should be visible
-    And I should see "Competency A" in the "User competency summary" "dialogue"  
+    And I should see "Competency A" in the "User competency summary" "dialogue"
     And I click on "Close" "button" in the "User competency summary" "dialogue"
 
     # First verification of the evidences or else it raises an exception.

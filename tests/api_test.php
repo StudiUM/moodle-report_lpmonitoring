@@ -41,7 +41,7 @@ use core\invalid_persistent_exception;
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class api_test extends \advanced_testcase {
+final class api_test extends \advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
@@ -89,7 +89,7 @@ class api_test extends \advanced_testcase {
     protected $comp2 = null;
 
     protected function setUp(): void {
-
+        parent::setUp();
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -248,7 +248,7 @@ class api_test extends \advanced_testcase {
      *
      * @param int $contextid Context id
      */
-    private function assign_good_letter_boundary($contextid) {
+    private function assign_good_letter_boundary($contextid): void {
         global $DB;
         $newlettersscale = [
                 ['contextid' => $contextid, 'lowerboundary' => 90.00000, 'letter' => 'A'],
@@ -272,7 +272,7 @@ class api_test extends \advanced_testcase {
     }
 
 
-    public function test_get_scales_from_competencyframework() {
+    public function test_get_scales_from_competencyframework(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $lpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -355,7 +355,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test that default color is assigned to each scale value when scale configuration does not exist.
      */
-    public function test_missing_scale_configuration() {
+    public function test_missing_scale_configuration(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -375,7 +375,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test missing capability to create configuration for a framework and a scale.
      */
-    public function test_no_capability_to_create_scale_configuration() {
+    public function test_no_capability_to_create_scale_configuration(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -403,7 +403,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test create configuration for a framework and a scale.
      */
-    public function test_create_config_normal() {
+    public function test_create_config_normal(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -436,7 +436,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test create configuration for a framework and a scale with missing color.
      */
-    public function test_create_config_missing_color() {
+    public function test_create_config_missing_color(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -465,7 +465,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test create configuration for a framework and a scale with unknown scale id.
      */
-    public function test_create_config_unknown_scale() {
+    public function test_create_config_unknown_scale(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -495,7 +495,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test create configuration for a framework and a scale with unknown framework id.
      */
-    public function test_create_config_unknown_framework() {
+    public function test_create_config_unknown_framework(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -525,7 +525,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test missing capability to update configuration for a framework and a scale.
      */
-    public function test_no_capability_to_update_config() {
+    public function test_no_capability_to_update_config(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -566,7 +566,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test update configuration for a framework and a scale.
      */
-    public function test_update_config() {
+    public function test_update_config(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -615,7 +615,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test update configuration that does not exist.
      */
-    public function test_update_none_existing_config() {
+    public function test_update_none_existing_config(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -655,7 +655,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test create configuration thta already exist.
      */
-    public function test_create_existing_config() {
+    public function test_create_existing_config(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -694,7 +694,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test missing capability to delete configuration for a framework and a scale.
      */
-    public function test_no_capability_to_delete_config() {
+    public function test_no_capability_to_delete_config(): void {
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -726,7 +726,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test delete all scales configuration associated to framework.
      */
-    public function test_delete_config_framework() {
+    public function test_delete_config_framework(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -773,7 +773,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test delete scale configuration associated to a framework and a scale.
      */
-    public function test_delete_config_scale() {
+    public function test_delete_config_scale(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -821,7 +821,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test we can read plan with no permissions.
      */
-    public function test_read_plan_with_nopermissions() {
+    public function test_read_plan_with_nopermissions(): void {
         $this->setUser($this->appreciatorforcategory);
         // Test we can read the first plan for the template (Rebecca).
         $result = api::read_plan(0, $this->templateincategory->get('id'));
@@ -838,7 +838,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test read current plan and get previous and next user plans.
      */
-    public function test_get_plans() {
+    public function test_get_plans(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
@@ -927,7 +927,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test get learning plans from templateid.
      */
-    public function test_search_users_by_templateid() {
+    public function test_search_users_by_templateid(): void {
         $this->setUser($this->appreciatorforcategory);
         $users = api::search_users_by_templateid($this->templateincategory->get('id'), 'Re');
         $this->assertCount(1, $users);
@@ -939,7 +939,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test we can search users with identity informations.
      */
-    public function test_search_users_by_templateid_withidentityuser() {
+    public function test_search_users_by_templateid_withidentityuser(): void {
         $this->setUser($this->appreciatorforcategory);
 
         // Test with show user identity disabled.
@@ -1006,7 +1006,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test get learning plans from templateid with scale filter.
      */
-    public function test_search_users_by_templateid_and_scalefilter() {
+    public function test_search_users_by_templateid_and_scalefilter(): void {
         global $DB;
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1270,7 +1270,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test the "Only plans with comments" filter of get learning plans from templateid.
      */
-    public function test_search_users_by_templateid_and_withcomments() {
+    public function test_search_users_by_templateid_and_withcomments(): void {
         $this->setUser($this->appreciatorforcategory);
 
         $plans = api::read_plan(0, $this->templateincategory->get('id'));
@@ -1312,7 +1312,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test the "Only user with at least two learning plans" filter of get learning plans from templateid.
      */
-    public function test_search_users_by_templateid_and_withplans() {
+    public function test_search_users_by_templateid_and_withplans(): void {
         $this->setAdminUser();
 
         $plans = api::read_plan(0, $this->templateincategory->get('id'));
@@ -1370,7 +1370,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test get competency detail for lpmonitoring report when scale is defined in framework.
      */
-    public function test_get_lp_monitoring_competency_detail_framework_scale() {
+    public function test_get_lp_monitoring_competency_detail_framework_scale(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -1595,7 +1595,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test get competency detail for lpmonitoring report when scale is defined in competency.
      */
-    public function test_get_lp_monitoring_competency_detail_competency_scale() {
+    public function test_get_lp_monitoring_competency_detail_competency_scale(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -1832,7 +1832,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test get competency statistics for lpmonitoring report when scale is defined in framework.
      */
-    public function test_get_lp_monitoring_competency_stat_framework_scale() {
+    public function test_get_lp_monitoring_competency_stat_framework_scale(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -1984,7 +1984,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test get competency statistics for lpmonitoring report when no permissions.
      */
-    public function test_get_lp_monitoring_competency_stat_permissions() {
+    public function test_get_lp_monitoring_competency_stat_permissions(): void {
         $this->setAdminUser();
 
         // Create plan from template for Stephanie.
@@ -2004,7 +2004,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test get competency statistics for lpmonitoring report when scale is defined in competency.
      */
-    public function test_get_lp_monitoring_competency_stat_specific_scale() {
+    public function test_get_lp_monitoring_competency_stat_specific_scale(): void {
         global $DB;
 
         $this->resetAfterTest(true);
@@ -2170,7 +2170,7 @@ class api_test extends \advanced_testcase {
     /**
      * Search templates.
      */
-    public function test_search_templates() {
+    public function test_search_templates(): void {
         $user = $this->getDataGenerator()->create_user();
         $category = $this->getDataGenerator()->create_category();
         $syscontext = \context_system::instance();
@@ -2250,7 +2250,7 @@ class api_test extends \advanced_testcase {
     /**
      * Search templates.
      */
-    public function test_search_tags_for_accessible_plans() {
+    public function test_search_tags_for_accessible_plans(): void {
         // 1st category, cohort, users and appreciator are created in setup.
 
         // Creation of 2nd category, users, cohort and appreciator.
@@ -2380,7 +2380,7 @@ class api_test extends \advanced_testcase {
     /**
      * Search plans with a specific tag.
      */
-    public function test_search_plans_with_tag() {
+    public function test_search_plans_with_tag(): void {
         // 1st category, cohort, users and appreciator are created in setup.
 
         // Creation of 2nd category, users, cohort and appreciator.
@@ -2512,7 +2512,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test reset grading of a single user competency.
      */
-    public function test_reset_grading_one() {
+    public function test_reset_grading_one(): void {
         $this->setUser($this->appreciatorforcategory);
         $plans = api::read_plan(0, $this->templateincategory->get('id'));
         $plan1 = $plans->current;
@@ -2580,7 +2580,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test reset grading of all user competencies in a learning plan.
      */
-    public function test_reset_grading_all() {
+    public function test_reset_grading_all(): void {
         $this->setUser($this->appreciatorforcategory);
         $plans = api::read_plan(0, $this->templateincategory->get('id'));
         $plan1 = $plans->current;
@@ -2675,7 +2675,7 @@ class api_test extends \advanced_testcase {
     /*
      * Test add_rating_task.
      */
-    public function test_add_rating_task() {
+    public function test_add_rating_task(): void {
         global $DB;
         // Test read template permission for apreciator.
         // Create templates in category.
@@ -2745,7 +2745,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test the user competency viewed event in course, even when the course is hidden.
      */
-    public function test_user_competency_viewed_in_course() {
+    public function test_user_competency_viewed_in_course(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $dg = $this->getDataGenerator();

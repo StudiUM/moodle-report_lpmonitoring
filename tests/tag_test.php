@@ -36,12 +36,12 @@ global $CFG;
  * @copyright  2018 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tag_test extends \advanced_testcase {
+final class tag_test extends \advanced_testcase {
 
     /**
      * manage tags.
      */
-    public function test_plan_tags() {
+    public function test_plan_tags(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
         $dg = $this->getDataGenerator();

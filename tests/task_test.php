@@ -40,7 +40,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright 2019 Université de Montréal
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class task_test extends \externallib_advanced_testcase {
+final class task_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in category context. */
     protected $appreciatorforcategory = null;
@@ -67,7 +67,7 @@ class task_test extends \externallib_advanced_testcase {
     protected $comp2 = null;
 
     protected function setUp(): void {
-
+        parent::setUp();
         $this->resetAfterTest(true);
         $dg = $this->getDataGenerator();
         $cpg = $this->getDataGenerator()->get_plugin_generator('core_competency');
@@ -188,7 +188,7 @@ class task_test extends \externallib_advanced_testcase {
     /*
      * Test execute_rate_users_in_template_task.
      */
-    public function test_execute_rate_users_in_template_task() {
+    public function test_execute_rate_users_in_template_task(): void {
         $datascales = [];
         $datascales = [['compid' => $this->comp1->get('id'), 'value' => 1], ['compid' => $this->comp2->get('id'), 'value' => 2]];
         $datascales = json_encode($datascales);
