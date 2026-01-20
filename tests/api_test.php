@@ -35,12 +35,13 @@ use core\invalid_persistent_exception;
 
 /**
  * API tests.
- * @covers     \report_lpmonitoring\api
+ *
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\api::class)]
 final class api_test extends \advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */

@@ -34,12 +34,12 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 /**
  * Template competency report Task tests.
  *
- * @covers    \report_lpmonitoring\task
  * @package   report_lpmonitoring
  * @author    Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright 2019 Université de Montréal
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\task\rate_users_in_templates::class)]
 final class task_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in category context. */

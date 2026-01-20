@@ -42,12 +42,12 @@ use core_external\external_api;
 /**
  * External testcase.
  *
- * @covers     \report_lpmonitoring\api
  * @package    report_lpmonitoring
  * @author     Serge Gauthier <serge.gauthier.2@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\api::class)]
 final class external_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */

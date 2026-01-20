@@ -36,12 +36,12 @@ use tool_cohortroles\api as tool_cohortroles_api;
 /**
  * API for course module tests.
  *
- * @covers     \report_lpmonitoring\api
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\api::class)]
 final class api_cm_test extends \externallib_advanced_testcase {
 
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
