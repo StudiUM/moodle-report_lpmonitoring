@@ -26,8 +26,8 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Gherkin\Node\TableNode as TableNode;
-use Behat\Behat\Tester\Exception\PendingException as PendingException;
+use Behat\Gherkin\Node\TableNode;
+use Behat\Behat\Tester\Exception\PendingException;
 use report_lpmonitoring\api;
 use core_competency\api as core_competency_api;
 use tool_cohortroles\api as tool_cohortroles_api;
@@ -43,7 +43,6 @@ use tool_cohortroles\api as tool_cohortroles_api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_report_lpmonitoring_data_generators extends behat_base {
-
     /**
      * Creates the specified element. More info about available elements in http://docs.moodle.org/dev/Acceptance_testing#Fixtures.
      *
@@ -55,7 +54,7 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
     public function the_lpmonitoring_fixtures_exist() {
 
         // Now that we need them require the data generators.
-        require_once(__DIR__.'/../../../../lib/phpunit/classes/util.php');
+        require_once(__DIR__ . '/../../../../lib/phpunit/classes/util.php');
 
         $datagenerator = testing_util::get_data_generator();
         $cpg = $datagenerator->get_plugin_generator('core_competency');
@@ -102,12 +101,12 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $scale1 = $datagenerator->create_scale(["name" => "Scale default", "scale" => "not good, good"]);
         $scale2 = $datagenerator->create_scale(["name" => "Scale specific", "scale" => "not qualified, qualified"]);
 
-        $scaleconfiguration1 = '[{"scaleid":"'.$scale1->id.'"},' .
-                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
-                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
-        $scaleconfiguration2 = '[{"scaleid":"'.$scale2->id.'"},' .
-                '{"name":"not qualified","id":1,"scaledefault":1,"proficient":0},' .
-                '{"name":"qualified","id":2,"scaledefault":0,"proficient":1}]';
+        $scaleconfiguration1 = '[{"scaleid":"' . $scale1->id . '"},' .
+            '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+        $scaleconfiguration2 = '[{"scaleid":"' . $scale2->id . '"},' .
+            '{"name":"not qualified","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"qualified","id":2,"scaledefault":0,"proficient":1}]';
 
         // Create the framework competency.
         $framework = [
@@ -371,12 +370,12 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
         $datagenerator->enrol_user($user5->id, $course6->id);
 
         $appreciator = $datagenerator->create_user(
-                [
-                    'firstname' => 'Appreciator',
-                    'lastname' => 'Test',
-                    'username' => 'appreciator',
-                    'password' => 'appreciator',
-                ]
+            [
+                'firstname' => 'Appreciator',
+                'lastname' => 'Test',
+                'username' => 'appreciator',
+                'password' => 'appreciator',
+            ]
         );
 
         $cohort = $datagenerator->create_cohort(['contextid' => $cat1ctx->id]);
@@ -415,12 +414,12 @@ class behat_report_lpmonitoring_data_generators extends behat_base {
 
         // Create role for managing the learning plan templates.
         $manager = $datagenerator->create_user(
-                [
-                    'firstname' => 'LP templates manager',
-                    'lastname' => 'Test',
-                    'username' => 'lpmanager',
-                    'password' => 'lpmanager',
-                ]
+            [
+                'firstname' => 'LP templates manager',
+                'lastname' => 'Test',
+                'username' => 'lpmanager',
+                'password' => 'lpmanager',
+            ]
         );
         $role2id = create_role('LP templates manager role', 'rolelpmanager', 'learning plan templates manager role description');
         assign_capability('moodle/competency:competencymanage', CAP_ALLOW, $role2id, $cat1ctx->id);

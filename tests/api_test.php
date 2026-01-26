@@ -35,14 +35,14 @@ use core\invalid_persistent_exception;
 
 /**
  * API tests.
- * @covers     \report_lpmonitoring\api
+ *
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\api::class)]
 final class api_test extends \advanced_testcase {
-
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
 
@@ -128,9 +128,9 @@ final class api_test extends \advanced_testcase {
         // Create scales.
         $scale = $dg->create_scale(["name" => "Scale default", "scale" => "not good, good"]);
 
-        $scaleconfiguration = '[{"scaleid":"'.$scale->id.'"},' .
-                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
-                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+        $scaleconfiguration = '[{"scaleid":"' . $scale->id . '"},' .
+            '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
 
         // Create the framework competency.
         $framework = [
@@ -200,12 +200,12 @@ final class api_test extends \advanced_testcase {
         );
 
         $appreciatorforcategory = $dg->create_user(
-                [
-                    'firstname' => 'Appreciator',
-                    'lastname' => 'Test',
-                    'username' => 'appreciator',
-                    'password' => 'appreciator',
-                ]
+            [
+                'firstname' => 'Appreciator',
+                'lastname' => 'Test',
+                'username' => 'appreciator',
+                'password' => 'appreciator',
+            ]
         );
 
         $cohort = $dg->create_cohort(['contextid' => $cat1ctx->id]);
@@ -349,7 +349,6 @@ final class api_test extends \advanced_testcase {
             $scale2->id => ['id' => $scale2->id, 'name' => $scale2->name],
             $scale4->id => ['id' => $scale4->id, 'name' => $scale4->name],
         ], $scales);
-
     }
 
     /**
@@ -1128,8 +1127,10 @@ final class api_test extends \advanced_testcase {
         $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'course');
         $this->assertCount(3, $users);
         $userinfo = array_values($users);
-        $this->assertEquals([$userinfo[0]['fullname'], $userinfo[1]['fullname'], $userinfo[2]['fullname']],
-                ['User11 Lastname1', 'User3 Lastname3', 'User12 Lastname2']);
+        $this->assertEquals(
+            [$userinfo[0]['fullname'], $userinfo[1]['fullname'], $userinfo[2]['fullname']],
+            ['User11 Lastname1', 'User3 Lastname3', 'User12 Lastname2']
+        );
         $this->assertEquals(1, $userinfo[0]['nbrating']);
         $this->assertEquals('User11 Lastname1', $userinfo[0]['fullname']);
         $this->assertEquals(1, $userinfo[1]['nbrating']);
@@ -1175,8 +1176,10 @@ final class api_test extends \advanced_testcase {
         $users = api::search_users_by_templateid($template->get('id'), '', $scalevalues, 'course');
         $this->assertCount(3, $users);
         $userinfo = array_values($users);
-        $this->assertEquals([$userinfo[0]['fullname'], $userinfo[1]['fullname'], $userinfo[2]['fullname']],
-                ['User11 Lastname1', 'User12 Lastname2', 'User3 Lastname3']);
+        $this->assertEquals(
+            [$userinfo[0]['fullname'], $userinfo[1]['fullname'], $userinfo[2]['fullname']],
+            ['User11 Lastname1', 'User12 Lastname2', 'User3 Lastname3']
+        );
 
         // Test with not found scale value.
         $scalevalues = [
@@ -1264,7 +1267,6 @@ final class api_test extends \advanced_testcase {
         $this->setUser($appreciator);
         $users = api::search_users_by_templateid($template->get('id'), 'User12', $scalevalues, 'course', 'DESC');
         $this->assertCount(0, $users);
-
     }
 
     /**
@@ -1410,10 +1412,10 @@ final class api_test extends \advanced_testcase {
         $lpg->create_course_competency(['competencyid' => $comp4->get('id'), 'courseid' => $c4->id]);
 
         // Create scale report configuration.
-        $scaleconfig[] = ['id' => 1, 'name' => 'A',  'color' => '#AAAAA'];
-        $scaleconfig[] = ['id' => 2, 'name' => 'B',  'color' => '#BBBBB'];
-        $scaleconfig[] = ['id' => 3, 'name' => 'C',  'color' => '#CCCCC'];
-        $scaleconfig[] = ['id' => 4, 'name' => 'D',  'color' => '#DDDDD'];
+        $scaleconfig[] = ['id' => 1, 'name' => 'A', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'B', 'color' => '#BBBBB'];
+        $scaleconfig[] = ['id' => 3, 'name' => 'C', 'color' => '#CCCCC'];
+        $scaleconfig[] = ['id' => 4, 'name' => 'D', 'color' => '#DDDDD'];
 
         $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
@@ -1644,10 +1646,10 @@ final class api_test extends \advanced_testcase {
 
         // Create scale report configuration for the scale of framework.
         $scaleconfig = [];
-        $scaleconfig[] = ['id' => 1, 'name' => 'A',  'color' => '#AAAAA'];
-        $scaleconfig[] = ['id' => 2, 'name' => 'B',  'color' => '#BBBBB'];
-        $scaleconfig[] = ['id' => 3, 'name' => 'C',  'color' => '#CCCCC'];
-        $scaleconfig[] = ['id' => 4, 'name' => 'D',  'color' => '#DDDDD'];
+        $scaleconfig[] = ['id' => 1, 'name' => 'A', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'B', 'color' => '#BBBBB'];
+        $scaleconfig[] = ['id' => 3, 'name' => 'C', 'color' => '#CCCCC'];
+        $scaleconfig[] = ['id' => 4, 'name' => 'D', 'color' => '#DDDDD'];
 
         $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
@@ -1657,10 +1659,10 @@ final class api_test extends \advanced_testcase {
 
         // Create scale report configuration for the scale of the competency.
         $scaleconfig = [];
-        $scaleconfig[] = ['id' => 1, 'name' => 'W',  'color' => '#WWWWW'];
-        $scaleconfig[] = ['id' => 2, 'name' => 'X',  'color' => '#XXXXX'];
-        $scaleconfig[] = ['id' => 3, 'name' => 'Y',  'color' => '#YYYYY'];
-        $scaleconfig[] = ['id' => 4, 'name' => 'Z',  'color' => '#ZZZZZ'];
+        $scaleconfig[] = ['id' => 1, 'name' => 'W', 'color' => '#WWWWW'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'X', 'color' => '#XXXXX'];
+        $scaleconfig[] = ['id' => 3, 'name' => 'Y', 'color' => '#YYYYY'];
+        $scaleconfig[] = ['id' => 4, 'name' => 'Z', 'color' => '#ZZZZZ'];
 
         $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
@@ -1695,7 +1697,7 @@ final class api_test extends \advanced_testcase {
         $record2->grade = 4;
         $record2->timecreated = 10;
         $record2->timemodified = 10;
-        $record2->usermodified = $u1->id;;
+        $record2->usermodified = $u1->id;
         $DB->insert_records('competency_usercompcourse', [$record1, $record2]);
 
         // Create user competency and add an evidence.
@@ -1884,10 +1886,10 @@ final class api_test extends \advanced_testcase {
 
         // Create scale report configuration.
         $scaleconfig = [];
-        $scaleconfig[] = ['id' => 1, 'name' => 'A',  'color' => '#AAAAA'];
-        $scaleconfig[] = ['id' => 2, 'name' => 'B',  'color' => '#BBBBB'];
-        $scaleconfig[] = ['id' => 3, 'name' => 'C',  'color' => '#CCCCC'];
-        $scaleconfig[] = ['id' => 4, 'name' => 'D',  'color' => '#DDDDD'];
+        $scaleconfig[] = ['id' => 1, 'name' => 'A', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'B', 'color' => '#BBBBB'];
+        $scaleconfig[] = ['id' => 3, 'name' => 'C', 'color' => '#CCCCC'];
+        $scaleconfig[] = ['id' => 4, 'name' => 'D', 'color' => '#DDDDD'];
 
         $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
@@ -1973,7 +1975,6 @@ final class api_test extends \advanced_testcase {
             } else {
                 if ($user->userinfo->id == $u2->id) {
                     $this->assertEquals(3, $user->usercompetency->get('grade'));
-
                 } else {
                     $this->assertEquals(2, $user->usercompetency->get('grade'));
                 }
@@ -2062,10 +2063,10 @@ final class api_test extends \advanced_testcase {
 
         // Create scale report configuration.
         $scaleconfig = [];
-        $scaleconfig[] = ['id' => 1, 'name' => 'A',  'color' => '#AAAAA'];
-        $scaleconfig[] = ['id' => 2, 'name' => 'B',  'color' => '#BBBBB'];
-        $scaleconfig[] = ['id' => 3, 'name' => 'C',  'color' => '#CCCCC'];
-        $scaleconfig[] = ['id' => 4, 'name' => 'D',  'color' => '#DDDDD'];
+        $scaleconfig[] = ['id' => 1, 'name' => 'A', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'B', 'color' => '#BBBBB'];
+        $scaleconfig[] = ['id' => 3, 'name' => 'C', 'color' => '#CCCCC'];
+        $scaleconfig[] = ['id' => 4, 'name' => 'D', 'color' => '#DDDDD'];
 
         $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
@@ -2075,10 +2076,10 @@ final class api_test extends \advanced_testcase {
 
         // Create second scale report configuration.
         $scaleconfig = [];
-        $scaleconfig[] = ['id' => 1, 'name' => 'W',  'color' => '#WWWWW'];
-        $scaleconfig[] = ['id' => 2, 'name' => 'X',  'color' => '#XXXXX'];
-        $scaleconfig[] = ['id' => 3, 'name' => 'Y',  'color' => '#YYYYY'];
-        $scaleconfig[] = ['id' => 4, 'name' => 'Z',  'color' => '#ZZZZZ'];
+        $scaleconfig[] = ['id' => 1, 'name' => 'W', 'color' => '#WWWWW'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'X', 'color' => '#XXXXX'];
+        $scaleconfig[] = ['id' => 3, 'name' => 'Y', 'color' => '#YYYYY'];
+        $scaleconfig[] = ['id' => 4, 'name' => 'Z', 'color' => '#ZZZZZ'];
 
         $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
@@ -2152,7 +2153,6 @@ final class api_test extends \advanced_testcase {
             } else {
                 if ($user->userinfo->id == $u2->id) {
                     $this->assertEquals(3, $user->usercompetency->get('grade'));
-
                 } else {
                     $this->assertEquals(2, $user->usercompetency->get('grade'));
                 }
@@ -2631,7 +2631,7 @@ final class api_test extends \advanced_testcase {
         $this->assertInstanceOf('\report_lpmonitoring\event\user_competency_resetted', $eventrating1);
         $this->assertEquals($this->user1->id, $eventrating1->relateduserid);
         $this->assertEquals($context->id, $eventrating1->contextid);
-        $this->assertStringContainsString("the user competency with id '".$uc->get('id')."'", $eventrating1->get_description());
+        $this->assertStringContainsString("the user competency with id '" . $uc->get('id') . "'", $eventrating1->get_description());
         $this->assertEventContextNotUsed($eventrating1);
         $this->assertDebuggingNotCalled();
 
@@ -2655,7 +2655,7 @@ final class api_test extends \advanced_testcase {
         $this->assertInstanceOf('\report_lpmonitoring\event\user_competency_resetted', $eventrating2);
         $this->assertEquals($this->user1->id, $eventrating2->relateduserid);
         $this->assertEquals($context->id, $eventrating2->contextid);
-        $this->assertStringContainsString("the user competency with id '".$uc->get('id')."'", $eventrating2->get_description());
+        $this->assertStringContainsString("the user competency with id '" . $uc->get('id') . "'", $eventrating2->get_description());
         $this->assertEventContextNotUsed($eventrating2);
         $this->assertDebuggingNotCalled();
 
@@ -2689,9 +2689,10 @@ final class api_test extends \advanced_testcase {
             api::add_rating_task($template->get('id'), true, "");
             $this->fail('Must fail user does not have permissions to view learning plan templates.');
         } catch (\Exception $ex) {
-            $this->assertStringContainsString('Sorry, but you do not currently have '
-            .'permissions to do that (View learning plan templates)',
-                    $ex->getMessage());
+            $this->assertStringContainsString(
+                'Sorry, but you do not currently have ' . 'permissions to do that (View learning plan templates)',
+                $ex->getMessage()
+            );
         }
 
         $data = [['compid' => $this->comp1->get('id'), 'value' => 1], ['compid' => $this->comp2->get('id'), 'value' => 2]];

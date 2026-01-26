@@ -38,7 +38,6 @@ use report_lpmonitoring\external\competency_stats_user_exporter;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lpmonitoring_competency_statistics_exporter extends exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *
@@ -90,8 +89,10 @@ class lpmonitoring_competency_statistics_exporter extends exporter {
             $scaleinfo->name = $scalename;
             $scaleinfo->color = $data->reportscaleconfig[$id - 1]->color;
 
-            $scalecompetencyitemexporter = new scale_competency_item_statistics_exporter($scaleinfo,
-                    ['users' => $data->listusers]);
+            $scalecompetencyitemexporter = new scale_competency_item_statistics_exporter(
+                $scaleinfo,
+                ['users' => $data->listusers]
+            );
             $scalecompetencyitem = $scalecompetencyitemexporter->export($output);
             $result->nbuserrated += $scalecompetencyitem->nbusers;
             $result->scalecompetencyitems[] = $scalecompetencyitem;
@@ -113,5 +114,4 @@ class lpmonitoring_competency_statistics_exporter extends exporter {
         }
         return (array) $result;
     }
-
 }

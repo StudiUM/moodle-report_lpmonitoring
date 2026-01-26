@@ -38,18 +38,16 @@ use core_competency\url;
 use tool_cohortroles\api as tool_cohortroles_api;
 use core_external\external_api;
 
-
 /**
  * External testcase.
  *
- * @covers     \report_lpmonitoring\api
  * @package    report_lpmonitoring
  * @author     Serge Gauthier <serge.gauthier.2@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\api::class)]
 final class external_test extends \externallib_advanced_testcase {
-
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
 
@@ -273,7 +271,6 @@ final class external_test extends \externallib_advanced_testcase {
         $this->assertEquals($scaleconfig[1]['color'], report_competency_config::DEFAULT_COLOR);
         $this->assertEquals($scaleconfig[2]['color'], report_competency_config::DEFAULT_COLOR);
         $this->assertEquals($scaleconfig[3]['color'], report_competency_config::DEFAULT_COLOR);
-
     }
 
     /**
@@ -359,7 +356,6 @@ final class external_test extends \externallib_advanced_testcase {
         $this->assertEquals($scaleconfig[1]['color'], '#BBBBB');
         $this->assertEquals($scaleconfig[2]['color'], '#CCCCC');
         $this->assertEquals($scaleconfig[3]['color'], '#DDDDD');
-
     }
 
     /**
@@ -398,10 +394,11 @@ final class external_test extends \externallib_advanced_testcase {
 
         $reportconfig = $lpg->create_report_competency_config(
             [
-        'competencyframeworkid' => $framework->get('id'),
+                'competencyframeworkid' => $framework->get('id'),
                 'scaleid'               => $scale->id,
                 'scaleconfiguration'    => $scaleconfig,
-            ]);
+            ]
+        );
 
         // Change de colors for scale.
         $record = [];
@@ -430,8 +427,7 @@ final class external_test extends \externallib_advanced_testcase {
         $this->setUser($this->appreciator);
         $msgexception = 'Sorry, but you do not currently have permissions to do that (Manage competency frameworks).';
         $this->expectExceptionMessage($msgexception);
-        external::update_report_competency_config($framework->get('id'), $scale->id,
-            json_encode($scaleconfig));
+        external::update_report_competency_config($framework->get('id'), $scale->id, json_encode($scaleconfig));
     }
 
     /**
@@ -470,10 +466,11 @@ final class external_test extends \externallib_advanced_testcase {
 
         $reportconfig = $lpg->create_report_competency_config(
             [
-        'competencyframeworkid' => $framework->get('id'),
+                'competencyframeworkid' => $framework->get('id'),
                 'scaleid'               => $scale->id,
                 'scaleconfiguration'    => $scaleconfig,
-            ]);
+            ]
+        );
 
         // Change de colors for scale.
         $record = [];
@@ -499,8 +496,7 @@ final class external_test extends \externallib_advanced_testcase {
         ];
         $record['scaleconfiguration'] = json_encode($scaleconfig);
 
-        $result = external::update_report_competency_config($framework->get('id'), $scale->id,
-                json_encode($scaleconfig));
+        $result = external::update_report_competency_config($framework->get('id'), $scale->id, json_encode($scaleconfig));
         $result = external_api::clean_returnvalue(external::update_report_competency_config_returns(), $result);
 
         $this->assertTrue($result);
@@ -542,42 +538,47 @@ final class external_test extends \externallib_advanced_testcase {
         $plan1 = $lpg->create_plan(['userid' => $user1->id, 'templateid' => $tpl->get('id')]);
         $plan2 = $lpg->create_plan(
             [
-        'userid'     => $user2->id,
-        'templateid' => $tpl->get('id'),
+                'userid'     => $user2->id,
+                'templateid' => $tpl->get('id'),
                 'status'     => plan::STATUS_ACTIVE,
-            ]);
+            ]
+        );
         $plan3 = $lpg->create_plan(
             [
-        'userid'     => $user3->id,
-        'templateid' => $tpl->get('id'),
+                'userid'     => $user3->id,
+                'templateid' => $tpl->get('id'),
                 'status'     => plan::STATUS_ACTIVE,
-            ]);
+            ]
+        );
         $plan4 = $lpg->create_plan(['userid' => $user1->id, 'status' => plan::STATUS_COMPLETE]);
 
         // Some ratings for user2.
         $lpg->create_user_competency(
             [
-        'userid'       => $user2->id,
-        'competencyid' => $c1a->get('id'),
-            'grade'        => 1,
-        'proficiency'  => 0,
-            ]);
+                'userid'       => $user2->id,
+                'competencyid' => $c1a->get('id'),
+                'grade'        => 1,
+                'proficiency'  => 0,
+            ]
+        );
         $lpg->create_user_competency(
             [
-        'userid'       => $user2->id,
-        'competencyid' => $c1c->get('id'),
-            'grade'        => 2,
-        'proficiency'  => 1,
-            ]);
+                'userid'       => $user2->id,
+                'competencyid' => $c1c->get('id'),
+                'grade'        => 2,
+                'proficiency'  => 1,
+            ]
+        );
 
         // Some ratings for user3.
         $lpg->create_user_competency(
             [
-        'userid'       => $user3->id,
-        'competencyid' => $c1a->get('id'),
-            'grade'        => 2,
-        'proficiency'  => 1,
-            ]);
+                'userid'       => $user3->id,
+                'competencyid' => $c1a->get('id'),
+                'grade'        => 2,
+                'proficiency'  => 1,
+            ]
+        );
 
         // Get plans urls.
         $plan1url = url::plan($plan1->get('id'))->out(false);
@@ -762,7 +763,6 @@ final class external_test extends \externallib_advanced_testcase {
             $this->assertEquals(2, $result['plan']['stats']['nbcompetenciesnotrated']);
             $this->assertEquals(0, $result['plan']['stats']['nbcompetenciesrated']);
         }
-
     }
 
     /**
@@ -788,9 +788,10 @@ final class external_test extends \externallib_advanced_testcase {
         $comp0 = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
         $comp1 = $lpg->create_competency(
             [
-        'competencyframeworkid' => $framework->get('id'),
-            'parentid'              => $comp0->get('id'),
-            ]);   // In C1, and C2.
+                'competencyframeworkid' => $framework->get('id'),
+                'parentid'              => $comp0->get('id'),
+            ]
+        );   // In C1, and C2.
         $comp2 = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);   // In C2.
         $comp3 = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);   // In None.
         $comp4 = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);   // In C4.
@@ -861,7 +862,7 @@ final class external_test extends \externallib_advanced_testcase {
         $record2->grade = 2;
         $record2->timecreated = 10;
         $record2->timemodified = 10;
-        $record2->usermodified = $u1->id;;
+        $record2->usermodified = $u1->id;
         $DB->insert_records('competency_usercompcourse', [$record1, $record2]);
 
         // Create user competency and add an evidence.
@@ -880,11 +881,12 @@ final class external_test extends \externallib_advanced_testcase {
         // Insert student grades for the activity.
         $gi = \grade_item::fetch(
             [
-        'itemtype'     => 'mod',
-            'itemmodule'   => 'data',
-            'iteminstance' => $data->id,
-            'courseid'     => $c1->id,
-            ]);
+                'itemtype'     => 'mod',
+                'itemmodule'   => 'data',
+                'iteminstance' => $data->id,
+                'courseid'     => $c1->id,
+            ]
+        );
         $datagrade = 50;
         $gradegrade = new \grade_grade();
         $gradegrade->itemid = $gi->id;
@@ -900,22 +902,25 @@ final class external_test extends \externallib_advanced_testcase {
         // Create an evidence for the user prior learning evidence.
         $e1 = $lpg->create_evidence(
             [
-        'usercompetencyid' => $uc->get('id'),
-            'contextid'        => \context_user::instance($u1->id)->id,
-            ]);
+                'usercompetencyid' => $uc->get('id'),
+                'contextid'        => \context_user::instance($u1->id)->id,
+            ]
+        );
 
         // Add evidences for courses C1, C2.
         $lpg->create_evidence(
             [
-        'usercompetencyid' => $uc->get('id'),
-        'note'             => 'Note text',
-            'contextid'        => \context_course::instance($c1->id)->id,
-            ]);
+                'usercompetencyid' => $uc->get('id'),
+                'note'             => 'Note text',
+                'contextid'        => \context_course::instance($c1->id)->id,
+            ]
+        );
         $lpg->create_evidence(
             [
-        'usercompetencyid' => $uc->get('id'),
-            'contextid'        => \context_course::instance($c2->id)->id,
-            ]);
+                'usercompetencyid' => $uc->get('id'),
+                'contextid'        => \context_course::instance($c2->id)->id,
+            ]
+        );
 
         // Assign final grade for the course C1.
         $courseitem = \grade_item::fetch_course_item($c1->id);
@@ -955,11 +960,14 @@ final class external_test extends \externallib_advanced_testcase {
         $c3->id,
         ];
         foreach ($result->listtotalcourses as $course) {
-            $errormsg = self::validate_url($course['url'], $urlpage,
-                ['userid' => $urluseridids, 'competencyid' => $urlcompetencyids, 'courseid' => $urlcourseids]);
+            $errormsg = self::validate_url(
+                $course['url'],
+                $urlpage,
+                ['userid' => $urluseridids, 'competencyid' => $urlcompetencyids, 'courseid' => $urlcourseids]
+            );
             $this->assertEmpty($errormsg, $errormsg);
 
-            $courseid = self::get_url_param_value ($course['url'], 'courseid');
+            $courseid = self::get_url_param_value($course['url'], 'courseid');
             if ($courseid == $c1->id) {
                 $this->assertTrue($course['rated']);
                 $this->assertEquals($course['coursename'], $c1->shortname);
@@ -986,7 +994,7 @@ final class external_test extends \externallib_advanced_testcase {
         $urluseridids = [$u1->id];
 
         foreach ($result->scalecompetencyitems as $scalecompetencyitem) {
-            $this->assertTrue(in_array($scalecompetencyitem['value'], $listscaleid ));
+            $this->assertTrue(in_array($scalecompetencyitem['value'], $listscaleid));
             if ($scalecompetencyitem['value'] == '1') {
                 $this->assertEquals($scalecompetencyitem['name'], 'A');
                 $this->assertEquals($scalecompetencyitem['color'], '#AAAAA');
@@ -997,8 +1005,11 @@ final class external_test extends \externallib_advanced_testcase {
                 $this->assertEquals($scalecompetencyitem['listcourses'][0]['shortname'], $c1->shortname);
                 $this->assertEquals($scalecompetencyitem['listcourses'][0]['grade'], 'C+');
                 $this->assertEquals($scalecompetencyitem['listcourses'][0]['nbnotes'], 1);
-                $errormsg = self::validate_url($scalecompetencyitem['listcourses'][0]['url'], $urlpage,
-                    ['userid' => $urluseridids, 'competencyid' => $urlcompetencyids, 'courseid' => [$c1->id]]);
+                $errormsg = self::validate_url(
+                    $scalecompetencyitem['listcourses'][0]['url'],
+                    $urlpage,
+                    ['userid' => $urluseridids, 'competencyid' => $urlcompetencyids, 'courseid' => [$c1->id]]
+                );
                 $this->assertEmpty($errormsg, $errormsg);
             } else if ($scalecompetencyitem['value'] == '2') {
                     $this->assertEquals($scalecompetencyitem['name'], 'B');
@@ -1010,8 +1021,11 @@ final class external_test extends \externallib_advanced_testcase {
                     $this->assertEquals($scalecompetencyitem['listcourses'][0]['shortname'], $c2->shortname);
                     $this->assertEquals($scalecompetencyitem['listcourses'][0]['grade'], 'A-');
                     $this->assertEquals($scalecompetencyitem['listcourses'][0]['nbnotes'], 0);
-                    $errormsg = self::validate_url($scalecompetencyitem['listcourses'][0]['url'], $urlpage,
-                        ['userid' => $urluseridids, 'competencyid' => $urlcompetencyids, 'courseid' => [$c2->id]]);
+                    $errormsg = self::validate_url(
+                        $scalecompetencyitem['listcourses'][0]['url'],
+                        $urlpage,
+                        ['userid' => $urluseridids, 'competencyid' => $urlcompetencyids, 'courseid' => [$c2->id]]
+                    );
                     $this->assertEmpty($errormsg, $errormsg);
             } else if ($scalecompetencyitem['value'] == '3') {
                     $this->assertEquals($scalecompetencyitem['name'], 'C');
@@ -1057,31 +1071,36 @@ final class external_test extends \externallib_advanced_testcase {
 
         $plan = $lpg->create_plan(
             [
-        'userid'     => $user->id,
-        'templateid' => $tpl->get('id'),
+                'userid'     => $user->id,
+                'templateid' => $tpl->get('id'),
                 'status'     => plan::STATUS_ACTIVE,
-            ]);
+            ]
+        );
 
-        $uc1a = $lpg->create_user_competency([
-        'userid'       => $user->id,
-        'competencyid' => $c1a->get('id'),
-            'status'       => user_competency::STATUS_IN_REVIEW,
-        'reviewerid'   => $this->creator->id,
-        ]);
+        $uc1a = $lpg->create_user_competency(
+            [
+                'userid'       => $user->id,
+                'competencyid' => $c1a->get('id'),
+                'status'       => user_competency::STATUS_IN_REVIEW,
+                'reviewerid'   => $this->creator->id,
+            ]
+        );
         $uc1c = $lpg->create_user_competency(
             [
-        'userid'       => $user->id,
-        'competencyid' => $c1c->get('id'),
-            'grade'        => 1,
-        'proficiency'  => 0,
-            ]);
+                'userid'       => $user->id,
+                'competencyid' => $c1c->get('id'),
+                'grade'        => 1,
+                'proficiency'  => 0,
+            ]
+        );
         $uc2b = $lpg->create_user_competency(
             [
-        'userid'       => $user->id,
-        'competencyid' => $c2b->get('id'),
-            'grade'        => 2,
-        'proficiency'  => 1,
-            ]);
+                'userid'       => $user->id,
+                'competencyid' => $c2b->get('id'),
+                'grade'        => 2,
+                'proficiency'  => 1,
+            ]
+        );
 
         $result = external::list_plan_competencies($plan->get('id'));
         $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
@@ -1111,31 +1130,35 @@ final class external_test extends \externallib_advanced_testcase {
         // Check the return values when the plan status is complete.
         $completedplan = $lpg->create_plan(
             [
-        'userid'     => $user->id,
-        'templateid' => $tpl->get('id'),
+                'userid'     => $user->id,
+                'templateid' => $tpl->get('id'),
                 'status'     => plan::STATUS_COMPLETE,
-            ]);
+            ]
+        );
 
         $uc1a = $lpg->create_user_competency_plan(
             [
-        'userid'       => $user->id,
-        'competencyid' => $c1a->get('id'),
+                'userid'       => $user->id,
+                'competencyid' => $c1a->get('id'),
                 'planid'       => $completedplan->get('id'),
-            ]);
+            ]
+        );
         $uc1b = $lpg->create_user_competency_plan(
             [
-        'userid'       => $user->id,
-        'competencyid' => $c1c->get('id'),
+                'userid'       => $user->id,
+                'competencyid' => $c1c->get('id'),
                 'planid'       => $completedplan->get('id'),
-            ]);
+            ]
+        );
         $uc2b = $lpg->create_user_competency_plan(
             [
-        'userid'       => $user->id,
+                'userid'       => $user->id,
                 'competencyid' => $c2b->get('id'),
                 'planid'       => $completedplan->get('id'),
                 'grade'        => 2,
-        'proficiency'  => 1,
-            ]);
+                'proficiency'  => 1,
+            ]
+        );
 
         $result = external::list_plan_competencies($completedplan->get('id'));
         $result = external::clean_returnvalue(external::list_plan_competencies_returns(), $result);
@@ -1296,10 +1319,11 @@ final class external_test extends \externallib_advanced_testcase {
         $comp0 = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
         $comp1 = $lpg->create_competency(
             [
-        'competencyframeworkid' => $framework->get('id'),
+                'competencyframeworkid' => $framework->get('id'),
                 'parentid'              => $comp0->get('id'),
-                'path'                  => '0/'. $comp0->get('id'),
-            ]);
+                'path'                  => '0/' . $comp0->get('id'),
+            ]
+        );
         $comp2 = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
         $comp3 = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
         $comp4 = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
@@ -1308,24 +1332,28 @@ final class external_test extends \externallib_advanced_testcase {
         $template = $lpg->create_template();
         $tempcomp0 = $lpg->create_template_competency(
             [
-        'templateid'   => $template->get('id'),
-            'competencyid' => $comp0->get('id'),
-            ]);
+                'templateid'   => $template->get('id'),
+                'competencyid' => $comp0->get('id'),
+            ]
+        );
         $tempcomp1 = $lpg->create_template_competency(
             [
-        'templateid'   => $template->get('id'),
-            'competencyid' => $comp1->get('id'),
-            ]);
+                'templateid'   => $template->get('id'),
+                'competencyid' => $comp1->get('id'),
+            ]
+        );
         $tempcomp2 = $lpg->create_template_competency(
             [
-        'templateid'   => $template->get('id'),
-            'competencyid' => $comp2->get('id'),
-            ]);
+                'templateid'   => $template->get('id'),
+                'competencyid' => $comp2->get('id'),
+            ]
+        );
         $tempcomp3 = $lpg->create_template_competency(
             [
-        'templateid'   => $template->get('id'),
-            'competencyid' => $comp3->get('id'),
-            ]);
+                'templateid'   => $template->get('id'),
+                'competencyid' => $comp3->get('id'),
+            ]
+        );
 
         // Create scale report configuration.
         $scaleconfigcomp = [['scaleid' => $scale->id]];
@@ -1360,51 +1388,58 @@ final class external_test extends \externallib_advanced_testcase {
         // Create plan from template for all users.
         $plan = $lpg->create_plan(
             [
-        'userid'     => $u1->id,
-        'templateid' => $template->get('id'),
-            'status'     => plan::STATUS_ACTIVE,
-            ]);
+                'userid'     => $u1->id,
+                'templateid' => $template->get('id'),
+                'status'     => plan::STATUS_ACTIVE,
+            ]
+        );
         $plan = $lpg->create_plan(
             [
-        'userid'     => $u2->id,
-        'templateid' => $template->get('id'),
-            'status'     => plan::STATUS_ACTIVE,
-            ]);
+                'userid'     => $u2->id,
+                'templateid' => $template->get('id'),
+                'status'     => plan::STATUS_ACTIVE,
+            ]
+        );
         $plan = $lpg->create_plan(
             [
-        'userid'     => $u3->id,
-        'templateid' => $template->get('id'),
-            'status'     => plan::STATUS_ACTIVE,
-            ]);
+                'userid'     => $u3->id,
+                'templateid' => $template->get('id'),
+                'status'     => plan::STATUS_ACTIVE,
+            ]
+        );
         $plan = $lpg->create_plan(
             [
-        'userid'     => $u4->id,
-        'templateid' => $template->get('id'),
-            'status'     => plan::STATUS_ACTIVE,
-            ]);
+                'userid'     => $u4->id,
+                'templateid' => $template->get('id'),
+                'status'     => plan::STATUS_ACTIVE,
+            ]
+        );
 
         // Rate user competency1 for all users 1 to 3.
         $uc = $lpg->create_user_competency(
             [
-        'userid'       => $u1->id,
-        'competencyid' => $comp1->get('id'),
-            'proficiency'  => true,
-        'grade'        => 1,
-            ]);
+                'userid'       => $u1->id,
+                'competencyid' => $comp1->get('id'),
+                'proficiency'  => true,
+                'grade'        => 1,
+            ]
+        );
         $uc = $lpg->create_user_competency(
             [
-        'userid'       => $u2->id,
-        'competencyid' => $comp1->get('id'),
-            'proficiency'  => false,
-        'grade'        => 3,
-            ]);
+                'userid'       => $u2->id,
+                'competencyid' => $comp1->get('id'),
+                'proficiency'  => false,
+                'grade'        => 3,
+            ]
+        );
         $uc = $lpg->create_user_competency(
             [
-        'userid'       => $u3->id,
-        'competencyid' => $comp1->get('id'),
-            'proficiency'  => true,
-        'grade'        => 2,
-            ]);
+                'userid'       => $u3->id,
+                'competencyid' => $comp1->get('id'),
+                'proficiency'  => true,
+                'grade'        => 2,
+            ]
+        );
 
         $result = external::get_competency_statistics($comp1->get('id'), $template->get('id'));
         $result = external::clean_returnvalue(external::get_competency_statistics_returns(), $result);
@@ -1495,14 +1530,16 @@ final class external_test extends \externallib_advanced_testcase {
         $template = $lpg->create_template();
         $lpg->create_template_competency(
             [
-        'templateid'   => $template->get('id'),
-            'competencyid' => $comp1->get('id'),
-            ]);
+                'templateid'   => $template->get('id'),
+                'competencyid' => $comp1->get('id'),
+            ]
+        );
         $lpg->create_template_competency(
             [
-        'templateid'   => $template->get('id'),
-            'competencyid' => $comp2->get('id'),
-            ]);
+                'templateid'   => $template->get('id'),
+                'competencyid' => $comp2->get('id'),
+            ]
+        );
 
         // Create plan from template for all users.
         $lpg->create_plan(['userid' => $u1->id, 'templateid' => $template->get('id'), 'status' => plan::STATUS_ACTIVE]);
@@ -1533,61 +1570,68 @@ final class external_test extends \externallib_advanced_testcase {
         // Some ratings in courses for user1 and user2.
         $lpg->create_user_competency_course(
             [
-        'userid'       => $u1->id,
-        'competencyid' => $comp1->get('id'),
-            'grade'        => 1,
-        'courseid'     => $course1->id,
-        'proficiency'  => 1,
-            ]);
+                'userid'       => $u1->id,
+                'competencyid' => $comp1->get('id'),
+                'grade'        => 1,
+                'courseid'     => $course1->id,
+                'proficiency'  => 1,
+            ]
+        );
         $lpg->create_user_competency_course(
             [
-        'userid'       => $u1->id,
-        'competencyid' => $comp1->get('id'),
-            'grade'        => 1,
-        'courseid'     => $course2->id,
-        'proficiency'  => 1,
-            ]);
+                'userid'       => $u1->id,
+                'competencyid' => $comp1->get('id'),
+                'grade'        => 1,
+                'courseid'     => $course2->id,
+                'proficiency'  => 1,
+            ]
+        );
         $lpg->create_user_competency_course(
             [
-        'userid'       => $u1->id,
-        'competencyid' => $comp1->get('id'),
-            'grade'        => 1,
-        'courseid'     => $course3->id,
-        'proficiency'  => 1,
-            ]);
+                'userid'       => $u1->id,
+                'competencyid' => $comp1->get('id'),
+                'grade'        => 1,
+                'courseid'     => $course3->id,
+                'proficiency'  => 1,
+            ]
+        );
         $lpg->create_user_competency_course(
             [
-        'userid'       => $u1->id,
-        'competencyid' => $comp1->get('id'),
-            'grade'        => 2,
-        'courseid'     => $course4->id,
-        'proficiency'  => 1,
-            ]);
+                'userid'       => $u1->id,
+                'competencyid' => $comp1->get('id'),
+                'grade'        => 2,
+                'courseid'     => $course4->id,
+                'proficiency'  => 1,
+            ]
+        );
         // User2.
         $lpg->create_user_competency_course(
             [
-        'userid'       => $u2->id,
-            'competencyid' => $comp1->get('id'),
-            'grade'        => 1,
-            'courseid'     => $course1->id,
-            'proficiency'  => 1,
-            ]);
+                'userid'       => $u2->id,
+                'competencyid' => $comp1->get('id'),
+                'grade'        => 1,
+                'courseid'     => $course1->id,
+                'proficiency'  => 1,
+            ]
+        );
         $lpg->create_user_competency_course(
             [
-        'userid'       => $u2->id,
-            'competencyid' => $comp1->get('id'),
-            'grade'        => 1,
-            'courseid'     => $course2->id,
-            'proficiency'  => 1,
-            ]);
+                'userid'       => $u2->id,
+                'competencyid' => $comp1->get('id'),
+                'grade'        => 1,
+                'courseid'     => $course2->id,
+                'proficiency'  => 1,
+            ]
+        );
         $lpg->create_user_competency_course(
             [
-        'userid'       => $u2->id,
-            'competencyid' => $comp1->get('id'),
-            'grade'        => 2,
-            'courseid'     => $course3->id,
-            'proficiency'  => 1,
-            ]);
+                'userid'       => $u2->id,
+                'competencyid' => $comp1->get('id'),
+                'grade'        => 2,
+                'courseid'     => $course3->id,
+                'proficiency'  => 1,
+            ]
+        );
 
         $result = external::get_competency_statistics_incourse($comp1->get('id'), $template->get('id'));
         $result = external::clean_returnvalue(external::get_competency_statistics_incourse_returns(), $result);
@@ -1714,66 +1758,72 @@ final class external_test extends \externallib_advanced_testcase {
 
         $plan1 = $lpg->create_plan(
             [
-        'userid'     => $user1->id,
-            'templateid' => $tpl->get('id'),
-            'status'     => plan::STATUS_ACTIVE,
-            ]);
+                'userid'     => $user1->id,
+                'templateid' => $tpl->get('id'),
+                'status'     => plan::STATUS_ACTIVE,
+            ]
+        );
         $plan2 = $lpg->create_plan(
             [
-        'userid'     => $user2->id,
-            'templateid' => $tpl->get('id'),
-            'status'     => plan::STATUS_ACTIVE,
-            ]);
+                'userid'     => $user2->id,
+                'templateid' => $tpl->get('id'),
+                'status'     => plan::STATUS_ACTIVE,
+            ]
+        );
         $plan3 = $lpg->create_plan(
             [
-        'userid'     => $user3->id,
-            'templateid' => $tpl->get('id'),
-            'status'     => plan::STATUS_COMPLETE,
-            ]);
+                'userid'     => $user3->id,
+                'templateid' => $tpl->get('id'),
+                'status'     => plan::STATUS_COMPLETE,
+            ]
+        );
 
         // Some ratings in plan for user1.
         $lpg->create_user_competency(
             [
-        'userid'       => $user1->id,
-            'competencyid' => $comp1->get('id'),
-            'grade'        => 1,
-            'proficiency'  => 0,
-            ]);
+                'userid'       => $user1->id,
+                'competencyid' => $comp1->get('id'),
+                'grade'        => 1,
+                'proficiency'  => 0,
+            ]
+        );
         $lpg->create_user_competency(
             [
-        'userid'       => $user1->id,
-            'competencyid' => $comp2->get('id'),
-            'grade'        => 2,
-        'proficiency'  => 1,
-            ]);
-
+                'userid'       => $user1->id,
+                'competencyid' => $comp2->get('id'),
+                'grade'        => 2,
+                'proficiency'  => 1,
+            ]
+        );
         // Some ratings for user2.
         $lpg->create_user_competency(
             [
-        'userid'       => $user2->id,
-            'competencyid' => $comp3->get('id'),
-            'grade'        => 2,
-            'proficiency'  => 0,
-            ]);
-
+                'userid'       => $user2->id,
+                'competencyid' => $comp3->get('id'),
+                'grade'        => 2,
+                'proficiency'  => 0,
+            ]
+        );
         // Some ratings for user3.
         $lpg->create_user_competency_plan(
             [
-        'userid'       => $user3->id,
-            'competencyid' => $comp2->get('id'),
-            'planid'       => $plan3->get('id'),
-            'grade'        => 3,
-            'proficiency'  => 1,
-            ]);
+                'userid'       => $user3->id,
+                'competencyid' => $comp2->get('id'),
+                'planid'       => $plan3->get('id'),
+                'grade'        => 3,
+                'proficiency'  => 1,
+            ]
+        );
         // Some ratings for user3.
         $lpg->create_user_competency_plan(
             [
-        'userid'       => $user3->id,
-            'competencyid' => $comp3->get('id'),
-            'planid'       => $plan3->get('id'),
-            'grade'        => 3,
-            'proficiency'  => 1,
-            ]);
+                'userid'       => $user3->id,
+                'competencyid' => $comp3->get('id'),
+                'planid'       => $plan3->get('id'),
+                'grade'        => 3,
+                'proficiency'  => 1,
+            ]
+        );
 
         // Specify one scale value as filter.
         $scalevalues = '[{"scalevalue" : 2, "scaleid" :' . $framework->get('scaleid') . '}]';
@@ -1800,7 +1850,7 @@ final class external_test extends \externallib_advanced_testcase {
 
         // Specify 2 scale values as filter.
         $scalevalues = '[{"scalevalue" : 1, "scaleid" :' . $framework->get('scaleid') . '}, '
-                . '{"scalevalue" : 3, "scaleid" :' . $framework->get('scaleid') .'}]';
+            . '{"scalevalue" : 3, "scaleid" :' . $framework->get('scaleid') . '}]';
         $scalefilterin = '';
         $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterin);
 
@@ -1813,7 +1863,6 @@ final class external_test extends \externallib_advanced_testcase {
         // Check next plan selected is user 3.
         $this->assertEquals($result->navnext['userid'], $user3->id);
         $this->assertEquals($result->navnext['planid'], $plan3->get('id'));
-
     }
 
     /**
@@ -1850,22 +1899,25 @@ final class external_test extends \externallib_advanced_testcase {
 
         $plan1 = $lpg->create_plan(
             [
-        'userid'     => $user1->id,
+                'userid'     => $user1->id,
                 'templateid' => $tpl->get('id'),
                 'status'     => plan::STATUS_ACTIVE,
-            ]);
+            ]
+        );
         $plan2 = $lpg->create_plan(
             [
-        'userid'     => $user2->id,
+                'userid'     => $user2->id,
                 'templateid' => $tpl->get('id'),
                 'status'     => plan::STATUS_ACTIVE,
-            ]);
+            ]
+        );
         $plan3 = $lpg->create_plan(
             [
-        'userid'     => $user3->id,
+                'userid'     => $user3->id,
                 'templateid' => $tpl->get('id'),
                 'status'     => plan::STATUS_COMPLETE,
-            ]);
+            ]
+        );
 
         // Associated competencies to courses.
         $lpg->create_course_competency(['competencyid' => $comp1->get('id'), 'courseid' => $course1->id]);
@@ -1906,7 +1958,7 @@ final class external_test extends \externallib_advanced_testcase {
         $record2->grade = 2;
         $record2->timecreated = 10;
         $record2->timemodified = 10;
-        $record2->usermodified = $user1->id;;
+        $record2->usermodified = $user1->id;
         $DB->insert_records('competency_usercompcourse', [$record1, $record2]);
 
         // Assigne rates for user 2 to comptencies in course 4.
@@ -1964,7 +2016,7 @@ final class external_test extends \externallib_advanced_testcase {
 
         // Specify 2 scale values as filter.
         $scalevalues = '[{"scalevalue" : 1, "scaleid" :' . $framework->get('scaleid') . '}, '
-                . '{"scalevalue" : 3, "scaleid" :' . $framework->get('scaleid') .'}]';
+            . '{"scalevalue" : 3, "scaleid" :' . $framework->get('scaleid') . '}]';
         $scalefilterincourse = 'course';
         $result = external::read_plan(0, $tpl->get('id'), $scalevalues, $scalefilterincourse);
 
@@ -1976,7 +2028,6 @@ final class external_test extends \externallib_advanced_testcase {
 
         // Check that there is no next plan because comp 2 is not associated to course 3.
         $this->assertFalse(isset($result->navnext));
-
     }
 
     /**
@@ -2308,7 +2359,6 @@ final class external_test extends \externallib_advanced_testcase {
         $this->assertCount(1, $resultd);
         $this->assertEquals(4, reset($resultd)['nbplans']);
         $this->assertEquals(3, reset($resultd)['nbcomments']);
-
     }
 
     /**

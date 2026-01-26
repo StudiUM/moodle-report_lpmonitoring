@@ -41,7 +41,6 @@ use report_lpmonitoring\external as report_lpmonitoring_external;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class apcexport {
-
     /** @var array errors when processing export */
     protected $errors = [];
 
@@ -138,12 +137,12 @@ class apcexport {
             $this->errors[] = "Missing template id";
         } else {
             if (!$DB->get_record('competency_template', ['id' => $params['templateid']])) {
-                $this->errors[] = "Template with id '". $params['templateid']. "' does not exist. \n";
+                $this->errors[] = "Template with id '" . $params['templateid'] . "' does not exist. \n";
             }
         }
 
         if (!empty($params['userid']) && !$DB->get_record('user', ['id' => $params['userid']])) {
-            $this->errors[] = "User with id '". $params['userid']. "' does not exist. \n";
+            $this->errors[] = "User with id '" . $params['userid'] . "' does not exist. \n";
         }
 
         if (!isset($params['filepath']) || empty($params['filepath'])) {
@@ -151,14 +150,14 @@ class apcexport {
         } else {
             // Validate the file path.
             if (file_exists($params['filepath']) && is_file($params['filepath'])) {
-                $this->errors[] = "The file '" . $params['filepath'] ."' already exits.";
+                $this->errors[] = "The file '" . $params['filepath'] . "' already exits.";
             } else {
                 try {
                     if (!$fp = fopen($params['filepath'], 'w')) {
-                        $this->errors[] = "The file '" . $params['filepath'] ."' is invalid.";
+                        $this->errors[] = "The file '" . $params['filepath'] . "' is invalid.";
                     }
                 } catch (\Exception $e) {
-                    $this->errors[] = "The file '" . $params['filepath'] ."' is invalid.";
+                    $this->errors[] = "The file '" . $params['filepath'] . "' is invalid.";
                 }
             }
         }
@@ -178,7 +177,6 @@ class apcexport {
         } else {
             $this->emplid = $userinfofield->id;
         }
-
     }
 
     /**
@@ -210,13 +208,16 @@ class apcexport {
 
         $plans = $DB->get_recordset_sql($sql, $params);
         foreach ($plans as $plan) {
-            $message = "Learning plan " . $plan->name . ' for student ' . $plan->firstname . ' ' .$plan->lastname;
+            $message = "Learning plan " . $plan->name . ' for student ' . $plan->firstname . ' ' . $plan->lastname;
             $this->trace->output($message);
 
             $competencies = report_lpmonitoring_external::list_plan_competencies($plan->id);
             foreach ($competencies as $competency) {
-                $competencydetail = report_lpmonitoring_external::get_competency_detail($plan->userid, $competency->competency->id,
-                        $plan->id);
+                $competencydetail = report_lpmonitoring_external::get_competency_detail(
+                    $plan->userid,
+                    $competency->competency->id,
+                    $plan->id
+                );
 
                 $row = [];
                 $row[] = $plan->name;
@@ -259,7 +260,7 @@ class apcexport {
 
                     // Add evaluation done in each course.
                     foreach ($listcourses as $course => $value) {
-                        $this->formatteddata[] = array_merge($row, [$course] , $value);
+                        $this->formatteddata[] = array_merge($row, [$course], $value);
                     }
                 }
             }
@@ -271,7 +272,6 @@ class apcexport {
      *
      */
     public function create_file() {
-
         $fp = fopen($this->params['filepath'], 'w');
         foreach ($this->formatteddata as $data) {
             $row = [];

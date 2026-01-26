@@ -40,7 +40,6 @@ global $CFG;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_lpmonitoring_generator extends component_generator_base {
-
     /**
      * Create a new report_competency_config.
      *
@@ -56,8 +55,10 @@ class report_lpmonitoring_generator extends component_generator_base {
         if (!isset($record->scaleid)) {
             throw new coding_exception('The scaleid value is required.');
         }
-        if (isset($record->scaleconfiguration)
-                && (is_array($record->scaleconfiguration) || is_object($record->scaleconfiguration))) {
+        if (
+            isset($record->scaleconfiguration) &&
+            (is_array($record->scaleconfiguration) || is_object($record->scaleconfiguration))
+        ) {
             // Conveniently encode the config.
             $record->scaleconfiguration = json_encode($record->scaleconfiguration);
         }

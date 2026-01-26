@@ -250,4 +250,3 @@ $functions = [
         'ajax' => true,
     ],
 ];
-

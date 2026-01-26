@@ -37,7 +37,6 @@ use core_competency\user_competency;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_competency_resetted extends base {
-
     /**
      * Convenience method to instantiate the event.
      *
@@ -117,5 +116,4 @@ class user_competency_resetted extends base {
             throw new \coding_exception('The \'relateduserid\' value must be set.');
         }
     }
-
 }

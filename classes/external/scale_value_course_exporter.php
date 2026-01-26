@@ -35,7 +35,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scale_value_course_exporter extends \core\external\exporter {
-
     /**
      * Returns a list of objects that are related to this persistent.
      *

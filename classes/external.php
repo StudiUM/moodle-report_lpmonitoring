@@ -140,8 +140,15 @@ class external extends external_api {
      *
      * @return array
      */
-    public static function search_users_by_templateid($templateid, $query, $scalevalues, $scalefilterin, $scalesortorder,
-            $withcomments, $withplans) {
+    public static function search_users_by_templateid(
+        $templateid,
+        $query,
+        $scalevalues,
+        $scalefilterin,
+        $scalesortorder,
+        $withcomments,
+        $withplans
+    ) {
         global $PAGE;
         $params = self::validate_parameters(self::search_users_by_templateid_parameters(), [
             'templateid' => $templateid,
@@ -156,9 +163,15 @@ class external extends external_api {
         $context = context_system::instance();
         self::validate_context($context);
 
-        $records = api::search_users_by_templateid($params['templateid'], $params['query'],
-                json_decode($params['scalevalues'], true), $params['scalefilterin'], $params['scalesortorder'],
-                $params['withcomments'], $params['withplans']);
+        $records = api::search_users_by_templateid(
+            $params['templateid'],
+            $params['query'],
+            json_decode($params['scalevalues'], true),
+            $params['scalefilterin'],
+            $params['scalesortorder'],
+            $params['withcomments'],
+            $params['withplans']
+        );
 
         foreach ($records as $key => $record) {
             $profileimage = $record['profileimage'];
@@ -262,7 +275,7 @@ class external extends external_api {
      * @param bool $onlyvisible If should search only in visible templates
      * @return boolean
      */
-    public static function search_templates($contextid, $query, $skip, $limit, $includes, $onlyvisible ) {
+    public static function search_templates($contextid, $query, $skip, $limit, $includes, $onlyvisible) {
         global $PAGE;
         $params = self::validate_parameters(self::search_templates_parameters(), [
             'contextid' => $contextid,
@@ -277,12 +290,14 @@ class external extends external_api {
         self::validate_context($context);
         $output = $PAGE->get_renderer('core');
 
-        $results = api::search_templates($context,
-                $params['query'],
-                $params['skip'],
-                $params['limit'],
-                $params['includes'],
-                $params['onlyvisible']);
+        $results = api::search_templates(
+            $context,
+            $params['query'],
+            $params['skip'],
+            $params['limit'],
+            $params['includes'],
+            $params['onlyvisible']
+        );
 
         $records = [];
         foreach ($results as $result) {
@@ -358,14 +373,12 @@ class external extends external_api {
                 'competencyframeworkid' => new external_value(PARAM_INT, 'The option value'),
                 'scaleid' => new external_value(PARAM_INT, 'The option value'),
                 'scaleconfiguration' => new external_multiple_structure(
-                    new external_single_structure(
-                        [
-                            'id' => new external_value(PARAM_INT, 'The option value'),
-                            'name' => new external_value(PARAM_TEXT, 'The option value'),
-                            'color' => new external_value(PARAM_TEXT, 'The option value'),
-                            'proficient' => new external_value(PARAM_BOOL, 'The proficient indicator'),
-                        ]
-                    )
+                    new external_single_structure([
+                        'id' => new external_value(PARAM_INT, 'The option value'),
+                        'name' => new external_value(PARAM_TEXT, 'The option value'),
+                        'color' => new external_value(PARAM_TEXT, 'The option value'),
+                        'proficient' => new external_value(PARAM_BOOL, 'The proficient indicator'),
+                    ])
                 ),
             ])
         );
@@ -412,11 +425,11 @@ class external extends external_api {
      */
     public static function get_scales_from_framework_returns() {
         return new external_multiple_structure(
-                    new external_single_structure([
-                        'id' => new external_value(PARAM_INT, 'The option value'),
-                        'name' => new external_value(PARAM_TEXT, 'The name of the scale'),
-                    ])
-            );
+            new external_single_structure([
+                'id' => new external_value(PARAM_INT, 'The option value'),
+                'name' => new external_value(PARAM_TEXT, 'The name of the scale'),
+            ])
+        );
     }
 
     /**
@@ -681,26 +694,41 @@ class external extends external_api {
      * @param boolean $withplans True to return only students'plans with at leat two plans
      * @return array
      */
-    public static function read_plan($planid, $templateid, $scalevalues = '', $scalefilterin = '',
-            $scalesortorder= 'ASC', $tagid = null, $withcomments = false, $withplans = false) {
+    public static function read_plan(
+        $planid,
+        $templateid,
+        $scalevalues = '',
+        $scalefilterin = '',
+        $scalesortorder = 'ASC',
+        $tagid = null,
+        $withcomments = false,
+        $withplans = false
+    ) {
         global $PAGE;
         $context = context_system::instance();
         self::validate_context($context);
 
         $params = self::validate_parameters(self::read_plan_parameters(), [
-                    'planid' => $planid,
-                    'templateid' => $templateid,
-                    'scalevalues' => $scalevalues,
-                    'scalefilterin' => $scalefilterin,
-                    'scalesortorder' => $scalesortorder,
-                    'tagid' => $tagid,
-                    'withcomments' => $withcomments,
-                    'withplans' => $withplans,
-                ]);
+            'planid' => $planid,
+            'templateid' => $templateid,
+            'scalevalues' => $scalevalues,
+            'scalefilterin' => $scalefilterin,
+            'scalesortorder' => $scalesortorder,
+            'tagid' => $tagid,
+            'withcomments' => $withcomments,
+            'withplans' => $withplans,
+        ]);
 
-        $plans = api::read_plan($params['planid'], $params['templateid'],
-                json_decode($params['scalevalues'], true), $params['scalefilterin'],
-                $params['scalesortorder'], $params['tagid'], $params['withcomments'], $params['withplans']);
+        $plans = api::read_plan(
+            $params['planid'],
+            $params['templateid'],
+            json_decode($params['scalevalues'], true),
+            $params['scalefilterin'],
+            $params['scalesortorder'],
+            $params['tagid'],
+            $params['withcomments'],
+            $params['withplans']
+        );
         self::validate_context($plans->current->get_context());
 
         $output = $PAGE->get_renderer('report_lpmonitoring');
@@ -962,8 +990,10 @@ class external extends external_api {
                     if (!in_array($parent->id, array_keys($competencieswithparents))) {
                         $newcompdetail = new \stdClass();
                         $newcompdetail->competency = $parent;
-                        $newcompdetail->usercompetency = \core_competency\user_competency::get_multiple($plan->get('userid'),
-                                [$parent->id]);
+                        $newcompdetail->usercompetency = \core_competency\user_competency::get_multiple(
+                            $plan->get('userid'),
+                            [$parent->id]
+                        );
                         $newcompdetail->isparent = true;
                         $newcompdetail->isnotrated = false;
                         $newcompdetail->isproficient = false;
@@ -1247,8 +1277,13 @@ class external extends external_api {
      */
     public static function submit_manage_tags_form($contextid, $jsonformdata) {
         // We always must pass webservice params through validate_parameters.
-        $params = self::validate_parameters(self::submit_manage_tags_form_parameters(),
-                                            ['contextid' => $contextid, 'jsonformdata' => $jsonformdata]);
+        $params = self::validate_parameters(
+            self::submit_manage_tags_form_parameters(),
+            [
+                'contextid' => $contextid,
+                'jsonformdata' => $jsonformdata,
+            ]
+        );
 
         $context = context::instance_by_id($params['contextid'], MUST_EXIST);
         self::validate_context($context);
@@ -1265,8 +1300,13 @@ class external extends external_api {
 
         if ($validateddata) {
             // Save the tags.
-            core_tag_tag::set_item_tags('report_lpmonitoring', 'competency_plan',
-                                        $validateddata->planid, $context, $validateddata->tags);
+            core_tag_tag::set_item_tags(
+                'report_lpmonitoring',
+                'competency_plan',
+                $validateddata->planid,
+                $context,
+                $validateddata->tags
+            );
         } else {
             // Generate a warning.
             throw new moodle_exception('errormanagetags', 'report_lpmonitoring');
@@ -1719,8 +1759,11 @@ class external extends external_api {
         self::validate_context($context);
         $output = $PAGE->get_renderer('tool_lp');
 
-        $renderable = new lpmonitoring_user_competency_summary_in_course($params['userid'], $params['competencyid'],
-            $params['courseid']);
+        $renderable = new lpmonitoring_user_competency_summary_in_course(
+            $params['userid'],
+            $params['competencyid'],
+            $params['courseid']
+        );
         return $renderable->export_for_template($output);
     }
 
@@ -1738,24 +1781,26 @@ class external extends external_api {
      * @return external_function_parameters
      */
     public static function get_user_pdfs_parameters() {
-        return new external_function_parameters(
-            [
-                'users' => new external_multiple_structure(
-                    new external_single_structure(
-                        [
-                            'user' => new external_value(PARAM_RAW, 'User identifier. Currently configured to use ' .
-                                    \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
-                                    'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more ' .
-                                    'details.'),
-
-                            'cohort' => new external_value(PARAM_RAW, 'idnumber of cohort (optional). If set, will only include ' .
-                                    'plans in the PDF that are associated with the given cohort (in the ' .
-                                    'competency_templatecohort table).', VALUE_OPTIONAL),
-                        ]
-                    )
-                ),
-            ]
-        );
+        return new external_function_parameters([
+            'users' => new external_multiple_structure(
+                new external_single_structure([
+                    'user' => new external_value(
+                        PARAM_RAW,
+                        'User identifier. Currently configured to use ' .
+                        \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
+                        'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more ' .
+                        'details.'
+                    ),
+                    'cohort' => new external_value(
+                        PARAM_RAW,
+                        'idnumber of cohort (optional). If set, will only include ' .
+                        'plans in the PDF that are associated with the given cohort (in the ' .
+                        'competency_templatecohort table).',
+                        VALUE_OPTIONAL
+                    ),
+                ])
+            ),
+        ]);
     }
 
     /**
@@ -1763,22 +1808,24 @@ class external extends external_api {
      * @return external_single_parameters
      */
     public static function get_user_pdf_parameters() {
-        return new external_function_parameters(
-            [
-                'params' => new external_single_structure(
-                    [
-                        'user' => new external_value(PARAM_RAW, 'User identifier. Currently configured to use ' .
-                                \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
-                                'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more ' .
-                                'details.'),
-
-                        'cohort' => new external_value(PARAM_RAW, 'idnumber of cohort (optional). If set, will only include ' .
-                                'plans in the PDF that are associated with the given cohort (in the ' .
-                                'competency_templatecohort table).', VALUE_OPTIONAL),
-                    ]
+        return new external_function_parameters([
+            'params' => new external_single_structure([
+                'user' => new external_value(
+                    PARAM_RAW,
+                    'User identifier. Currently configured to use ' .
+                    \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
+                    'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more ' .
+                    'details.'
                 ),
-            ]
-        );
+                'cohort' => new external_value(
+                    PARAM_RAW,
+                    'idnumber of cohort (optional). If set, will only include ' .
+                    'plans in the PDF that are associated with the given cohort (in the ' .
+                    'competency_templatecohort table).',
+                    VALUE_OPTIONAL
+                ),
+            ]),
+        ]);
     }
 
     /**
@@ -1787,21 +1834,23 @@ class external extends external_api {
      */
     public static function get_user_pdfs_returns() {
         return new external_multiple_structure(
-            new external_single_structure(
-                [
-                    'user' => new external_value(PARAM_RAW, 'User identifier. Currently configured to use ' .
-                            \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
-                            'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more details.'),
-
-                    'timecreated' => new external_value(PARAM_INT, 'Unix timestamp of the date / time the PDF was created.'),
-
-                    'pdf' => new external_value(PARAM_RAW, 'Base 64 encoded string of the PDF file that was generated.'),
-
-                    'cohort' => new external_value(PARAM_RAW, 'idnumber of cohort (optional). If set, will only include plans ' .
-                            'in the PDF that are associated with the given cohort (in the competency_templatecohort table).',
-                            VALUE_OPTIONAL),
-                ]
-            )
+            new external_single_structure([
+                'user' => new external_value(
+                    PARAM_RAW,
+                    'User identifier. Currently configured to use ' .
+                    \get_config('report_lpmonitoring', 'studentidmapping') .
+                    ' (the config variable used is ' .
+                    'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more details.'
+                ),
+                'timecreated' => new external_value(PARAM_INT, 'Unix timestamp of the date / time the PDF was created.'),
+                'pdf' => new external_value(PARAM_RAW, 'Base 64 encoded string of the PDF file that was generated.'),
+                'cohort' => new external_value(
+                    PARAM_RAW,
+                    'idnumber of cohort (optional). If set, will only include plans ' .
+                    'in the PDF that are associated with the given cohort (in the competency_templatecohort table).',
+                    VALUE_OPTIONAL
+                ),
+            ])
         );
     }
 
@@ -1810,21 +1859,22 @@ class external extends external_api {
      * @return external_single_structure
      */
     public static function get_user_pdf_returns() {
-        return new external_single_structure(
-            [
-                'user' => new external_value(PARAM_RAW, 'User identifier. Currently configured to use ' .
-                        \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
-                        'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more details.'),
-
-                'timecreated' => new external_value(PARAM_INT, 'Unix timestamp of the date / time the PDF was created.'),
-
-                'pdf' => new external_value(PARAM_RAW, 'Base 64 encoded string of the PDF file that was generated.'),
-
-                'cohort' => new external_value(PARAM_RAW, 'idnumber of cohort (optional). If set, will only include plans ' .
-                        'in the PDF that are associated with the given cohort (in the competency_templatecohort table).',
-                        VALUE_OPTIONAL),
-            ]
-        );
+        return new external_single_structure([
+            'user' => new external_value(
+                PARAM_RAW,
+                'User identifier. Currently configured to use ' .
+                \get_config('report_lpmonitoring', 'studentidmapping') . ' (the config variable used is ' .
+                'report_lpmonitoring | studentidmapping). Speak to your Moodle administrator for more details.'
+            ),
+            'timecreated' => new external_value(PARAM_INT, 'Unix timestamp of the date / time the PDF was created.'),
+            'pdf' => new external_value(PARAM_RAW, 'Base 64 encoded string of the PDF file that was generated.'),
+            'cohort' => new external_value(
+                PARAM_RAW,
+                'idnumber of cohort (optional). If set, will only include plans ' .
+                'in the PDF that are associated with the given cohort (in the competency_templatecohort table).',
+                VALUE_OPTIONAL
+            ),
+        ]);
     }
 
     /**
@@ -1850,7 +1900,6 @@ class external extends external_api {
         require_capability('moodle/competency:planview', $context);
 
         foreach ($params['users'] as $user) {
-
             $user = (object)$user;
 
             if (isset($user->cohort)) {

@@ -35,7 +35,6 @@ use renderer_base;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scale_competency_incoursemodule_statistics_exporter extends exporter {
-
     /**
      * Returns a list of objects that are related to this persistent.
      *

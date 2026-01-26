@@ -26,18 +26,16 @@ namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
-
 /**
  * Tags tests.
  *
- * @covers     \report_lpmonitoring
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2018 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 final class tag_test extends \advanced_testcase {
-
     /**
      * manage tags.
      */

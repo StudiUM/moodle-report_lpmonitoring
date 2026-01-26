@@ -36,7 +36,6 @@ use core_competency\url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_user_evidence_summary_exporter extends user_evidence_summary_exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *
@@ -60,5 +59,4 @@ class report_user_evidence_summary_exporter extends user_evidence_summary_export
         $othervalues['userevidenceurl'] = url::user_evidence($id)->out(false);
         return $othervalues;
     }
-
 }

@@ -47,34 +47,42 @@ function report_lpmonitoring_extend_navigation_category_settings($navigation, $c
         $name = get_string('pluginname', 'report_lpmonitoring');
         $namestats = get_string('statslearningplan', 'report_lpmonitoring');
         $namebulkratingnode = get_string('bulkdefaultrating', 'report_lpmonitoring');
-        $settingsnodestats = navigation_node::create($namestats,
-                                                $urlstats,
-                                                navigation_node::TYPE_SETTING,
-                                                null,
-                                                null,
-                                                new pix_icon('i/report', ''));
-        $settingsnode = navigation_node::create($name,
-                                                $url,
-                                                navigation_node::TYPE_SETTING,
-                                                null,
-                                                null,
-                                                new pix_icon('i/report', ''));
-        $bulkratingnode = navigation_node::create($namebulkratingnode,
-                                                $urlbulkrating,
-                                                navigation_node::TYPE_SETTING,
-                                                null,
-                                                null,
-                                                new pix_icon('i/grades', ''));
+        $settingsnodestats = navigation_node::create(
+            $namestats,
+            $urlstats,
+            navigation_node::TYPE_SETTING,
+            null,
+            null,
+            new pix_icon('i/report', '')
+        );
+        $settingsnode = navigation_node::create(
+            $name,
+            $url,
+            navigation_node::TYPE_SETTING,
+            null,
+            null,
+            new pix_icon('i/report', '')
+        );
+        $bulkratingnode = navigation_node::create(
+            $namebulkratingnode,
+            $urlbulkrating,
+            navigation_node::TYPE_SETTING,
+            null,
+            null,
+            new pix_icon('i/grades', '')
+        );
         if ($bulkratingnode->check_if_active(URL_MATCH_BASE)) {
             $bulkratingnode->make_active();
         }
 
-        $reportsnode = navigation_node::create(get_string('competencyreports', 'report_lpmonitoring'),
-                                               null,
-                                               navigation_node::TYPE_CATEGORY,
-                                               null,
-                                               'categoryreports',
-                                               new pix_icon('i/stats', ''));
+        $reportsnode = navigation_node::create(
+            get_string('competencyreports', 'report_lpmonitoring'),
+            null,
+            navigation_node::TYPE_CATEGORY,
+            null,
+            'categoryreports',
+            new pix_icon('i/stats', '')
+        );
 
         if (isset($settingsnode) && isset($reportsnode)) {
             $reportnode = $navigation->add_node($reportsnode);
@@ -86,15 +94,16 @@ function report_lpmonitoring_extend_navigation_category_settings($navigation, $c
 
     // Set navigation for scales colors setting page.
     if ($canmanagecompetency) {
-        $url = new moodle_url('/report/lpmonitoring/scalecolorconfiguration.php',
-                ['pagecontextid' => $categorycontext->id]);
+        $url = new moodle_url('/report/lpmonitoring/scalecolorconfiguration.php', ['pagecontextid' => $categorycontext->id]);
         $name = get_string('colorconfiguration', 'report_lpmonitoring');
-        $settingsnode = navigation_node::create($name,
-                                                $url,
-                                                navigation_node::TYPE_SETTING,
-                                                null,
-                                                null,
-                                                new pix_icon('i/competencies', ''));
+        $settingsnode = navigation_node::create(
+            $name,
+            $url,
+            navigation_node::TYPE_SETTING,
+            null,
+            null,
+            new pix_icon('i/competencies', '')
+        );
         if (isset($settingsnode)) {
             $navigation->add_node($settingsnode);
         }
@@ -119,8 +128,13 @@ function report_lpmonitoring_myprofile_navigation(core_user\output\myprofile\tre
     }
 
     $url = new moodle_url('/report/lpmonitoring/userreport.php', ['userid' => $user->id]);
-    $node = new core_user\output\myprofile\node('reports', 'lpmonitoringreport',
-            get_string('pluginname', 'report_lpmonitoring'), null, $url);
+    $node = new core_user\output\myprofile\node(
+        'reports',
+        'lpmonitoringreport',
+        get_string('pluginname', 'report_lpmonitoring'),
+        null,
+        $url
+    );
     $tree->add_node($node);
 
     return true;
@@ -135,7 +149,7 @@ function report_lpmonitoring_myprofile_navigation(core_user\output\myprofile\tre
 function report_lpmonitoring_output_fragment_tags($args) {
     global $CFG, $DB;
 
-    require_once($CFG->libdir.'/formslib.php');
+    require_once($CFG->libdir . '/formslib.php');
     require_once($CFG->dirroot . '/report/lpmonitoring/classes/form/tags.php');
     $args = (object) $args;
 
@@ -144,7 +158,6 @@ function report_lpmonitoring_output_fragment_tags($args) {
     $plan = new \core_competency\plan($planid);
     $cangrade = \core_competency\user_competency::can_grade_user($plan->get('userid'));
     if ($cangrade) {
-
         $mform = new \report_lpmonitoring\form\tags(null, ['planid' => $planid]);
         // Used to set the planid.
         $data = $DB->get_record('competency_plan', ['id' => $planid]);

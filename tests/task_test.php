@@ -34,14 +34,13 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 /**
  * Template competency report Task tests.
  *
- * @covers    \report_lpmonitoring\task
  * @package   report_lpmonitoring
  * @author    Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright 2019 Université de Montréal
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\task\rate_users_in_templates::class)]
 final class task_test extends \externallib_advanced_testcase {
-
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in category context. */
     protected $appreciatorforcategory = null;
 
@@ -83,9 +82,9 @@ final class task_test extends \externallib_advanced_testcase {
         // Create scales.
         $scale = $dg->create_scale(["name" => "Scale default", "scale" => "not good, good"]);
 
-        $scaleconfiguration = '[{"scaleid":"'.$scale->id.'"},' .
-                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
-                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+        $scaleconfiguration = '[{"scaleid":"' . $scale->id . '"},' .
+            '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
 
         // Create the framework competency.
         $framework = [
@@ -144,12 +143,12 @@ final class task_test extends \externallib_advanced_testcase {
         );
 
         $appreciatorforcategory = $dg->create_user(
-                [
-                    'firstname' => 'Appreciator',
-                    'lastname' => 'Test',
-                    'username' => 'appreciator',
-                    'password' => 'appreciator',
-                ]
+            [
+                'firstname' => 'Appreciator',
+                'lastname' => 'Test',
+                'username' => 'appreciator',
+                'password' => 'appreciator',
+            ]
         );
 
         $cohort = $dg->create_cohort(['contextid' => $cat1ctx->id]);

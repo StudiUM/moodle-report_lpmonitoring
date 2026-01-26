@@ -36,7 +36,6 @@ use report_lpmonitoring\api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class list_plan_competency_report_exporter extends exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *
@@ -97,7 +96,7 @@ class list_plan_competency_report_exporter extends exporter {
             $r->tmpevalinmodule = []; // Save the evaluation in modules information the further usage.
             foreach ($r->competencydetail->courses as $courseinfo) {
                 // Add course to list of all courses.
-                if (!isset ($allcourses[$courseinfo->course->id]) ) {
+                if (!isset($allcourses[$courseinfo->course->id])) {
                     $allcourses[$courseinfo->course->id]['courseinfo'] = $courseinfo;
                     $allcourses[$courseinfo->course->id]['modulesinfo'] = [];
                 }

@@ -36,7 +36,6 @@ namespace report_lpmonitoring\external;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_pdf {
-
     /** @var stdClass Stores basic user information (name, student ID). */
     private $user = null;
 
@@ -110,7 +109,6 @@ class user_pdf {
         $firstpage = true;
 
         foreach ($plans as $planid => $plan) {
-
             if (!is_null($forceplans) && !in_array($planid, $forceplans)) {
                 unset($plans[$planid]);
                 continue;
@@ -144,7 +142,6 @@ class user_pdf {
             $curline = 0; // Track what line number we're on.
 
             foreach ($competencies as $comp) {
-
                 $compid = $comp->competency->id;
 
                 $tmpcomp = new \stdClass();
@@ -321,11 +318,13 @@ class user_pdf {
     public static function get_userid_from_profile_field($fieldname, $value) {
         global $DB;
 
-        $results = $DB->get_records_sql("SELECT u.id FROM {user} u
-                                            INNER JOIN {user_info_data} d ON d.userid = u.id
-                                            INNER JOIN {user_info_field} f ON f.id = d.fieldid
-                                            WHERE f.shortname = ? AND d.data = ?",
-                                            [$fieldname, $value]);
+        $results = $DB->get_records_sql(
+            "SELECT u.id FROM {user} u
+            INNER JOIN {user_info_data} d ON d.userid = u.id
+            INNER JOIN {user_info_field} f ON f.id = d.fieldid
+            WHERE f.shortname = ? AND d.data = ?",
+            [$fieldname, $value]
+        );
         if (count($results) !== 1) {
             throw new \Exception(get_string("profilefieldnotuniqueerror", "report_lpmonitoring", count($results)));
         } else {
@@ -352,11 +351,13 @@ class user_pdf {
             return $this->cohort_match_override($planid, $userid, $cohort);
         }
 
-        $cohortmatch = $DB->get_records_sql("SELECT p.id FROM {competency_plan} p
-                                INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.templateid
-                                INNER JOIN {cohort} c ON c.id = tc.cohortid
-                                WHERE p.id = :planid AND c.idnumber = :cohort AND p.userid = :userid" ,
-                                ['planid' => $planid, 'cohort' => $cohort, 'userid' => $userid]);
+        $cohortmatch = $DB->get_records_sql(
+            "SELECT p.id FROM {competency_plan} p
+            INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.templateid
+            INNER JOIN {cohort} c ON c.id = tc.cohortid
+            WHERE p.id = :planid AND c.idnumber = :cohort AND p.userid = :userid",
+            ['planid' => $planid, 'cohort' => $cohort, 'userid' => $userid]
+        );
 
         if (count($cohortmatch) == 0) {
             return false;
@@ -379,33 +380,38 @@ class user_pdf {
     private function cohort_match_override($planid, $userid, $progno) {
         global $DB;
 
-        $cohortmatch = $DB->get_records_sql("SELECT p.id FROM {competency_plan} p
-                            INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.templateid
-                            INNER JOIN {cohort} c ON c.id = tc.cohortid
-                            WHERE " . $DB->sql_like('c.idnumber', ':progno') . "
-                            AND p.id = :planid AND p.userid = :userid" ,
-                            ['planid' => $planid, 'progno' => $DB->sql_like_escape($progno) . '-%', 'userid' => $userid]);
-
+        $cohortmatch = $DB->get_records_sql(
+            "SELECT p.id FROM {competency_plan} p
+            INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.templateid
+            INNER JOIN {cohort} c ON c.id = tc.cohortid
+            WHERE " . $DB->sql_like('c.idnumber', ':progno') . "
+            AND p.id = :planid AND p.userid = :userid",
+            ['planid' => $planid, 'progno' => $DB->sql_like_escape($progno) . '-%', 'userid' => $userid]
+        );
         // Nothing found. Try with origtemplateid before giving up.
         if (count($cohortmatch) == 0) {
-            $cohortmatch = $DB->get_records_sql("SELECT p.id FROM {competency_plan} p
-                                INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.origtemplateid
-                                INNER JOIN {cohort} c ON c.id = tc.cohortid
-                                WHERE " . $DB->sql_like('c.idnumber', ':progno') . "
-                                AND p.id = :planid AND p.userid = :userid" ,
-                                ['planid' => $planid, 'progno' => $DB->sql_like_escape($progno) . '-%', 'userid' => $userid]);
+            $cohortmatch = $DB->get_records_sql(
+                "SELECT p.id FROM {competency_plan} p
+                INNER JOIN {competency_templatecohort} tc ON tc.templateid = p.origtemplateid
+                INNER JOIN {cohort} c ON c.id = tc.cohortid
+                WHERE " . $DB->sql_like('c.idnumber', ':progno') . "
+                AND p.id = :planid AND p.userid = :userid",
+                ['planid' => $planid, 'progno' => $DB->sql_like_escape($progno) . '-%', 'userid' => $userid]
+            );
         }
 
         if (count($cohortmatch) == 0) {
             // Save plan IDs that have no cohort association into $this->forceplans.
             // If the constructor doesn't come up with any plans related to the cohort, we'll
             // recall the constructor with whatever IDs we have in $this->forceplans as a failover.
-            $pid = $DB->get_field_sql("SELECT p.id FROM {competency_plan} p
-                                WHERE p.templateid NOT IN
-                                (SELECT tc.templateid FROM {competency_templatecohort} tc
-                                 WHERE tc.templateid = p.templateid OR tc.templateid = p.origtemplateid)
-                                AND p.id = :planid AND p.userid = :userid",
-                                ['planid' => $planid, 'userid' => $userid]);
+            $pid = $DB->get_field_sql(
+                "SELECT p.id FROM {competency_plan} p
+                WHERE p.templateid NOT IN
+                (SELECT tc.templateid FROM {competency_templatecohort} tc
+                    WHERE tc.templateid = p.templateid OR tc.templateid = p.origtemplateid)
+                AND p.id = :planid AND p.userid = :userid",
+                ['planid' => $planid, 'userid' => $userid]
+            );
             if ($pid) {
                 if (is_null($this->forceplans)) {
                     $this->forceplans = [];

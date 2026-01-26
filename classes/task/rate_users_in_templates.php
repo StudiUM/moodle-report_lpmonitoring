@@ -35,7 +35,6 @@ use report_lpmonitoring\api;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class rate_users_in_templates extends \core\task\adhoc_task {
-
     /**
      * Run the rating task.
      */

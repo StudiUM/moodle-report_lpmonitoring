@@ -39,7 +39,6 @@ use core_competency\api as core_competency_api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class template_selector implements renderable, templatable {
-
     /** @var context The context in which everything is happening. */
     protected $pagecontext;
 
@@ -55,8 +54,15 @@ class template_selector implements renderable, templatable {
     public function __construct($pagecontext, $templateid) {
         $this->templateid = $templateid;
         $this->pagecontext = $pagecontext;
-        $this->learningplantemplates = core_competency_api::list_templates('shortname', 'ASC', 0, 0, $this->pagecontext,
-                'children', true);
+        $this->learningplantemplates = core_competency_api::list_templates(
+            'shortname',
+            'ASC',
+            0,
+            0,
+            $this->pagecontext,
+            'children',
+            true
+        );
     }
 
     /**
