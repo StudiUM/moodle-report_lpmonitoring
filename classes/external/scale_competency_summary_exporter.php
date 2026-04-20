@@ -36,7 +36,6 @@ use report_lpmonitoring\api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scale_competency_summary_exporter extends exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *

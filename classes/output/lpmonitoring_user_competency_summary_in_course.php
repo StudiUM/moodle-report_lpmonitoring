@@ -38,7 +38,6 @@ use report_lpmonitoring\external\lpmonitoring_user_competency_summary_in_course_
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lpmonitoring_user_competency_summary_in_course extends user_competency_summary_in_course {
-
     /**
      * This function redefines the parent function by calling lpmonitoring_user_competency_summary_in_course_exporter
      * instead of user_competency_summary_in_course_exporter from tool_lp.

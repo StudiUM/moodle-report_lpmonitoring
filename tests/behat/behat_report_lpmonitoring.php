@@ -13,9 +13,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
+ 
 /**
- * Step definition to generate database fixtures for learning plan report.
+ * Step definitions for learning plan report.
  *
  * @package    report_lpmonitoring
  * @category   test
@@ -26,21 +26,11 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Mink\Exception\ElementNotFoundException as ElementNotFoundException;
-use Behat\Mink\Exception\ExpectationException as ExpectationException;
+use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Exception\ExpectationException;
 use report_lpmonitoring\api;
 
-/**
- * Step definition for learning plan report.
- *
- * @package    report_lpmonitoring
- * @category   test
- * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
- * @copyright  2016 Université de Montréal
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class behat_report_lpmonitoring extends behat_base {
-
     /**
      * Checks, that the specified element contains the specified text in the competency detail rating.
      *
@@ -53,13 +43,19 @@ class behat_report_lpmonitoring extends behat_base {
      * @param string $competencyname
      * @param string $type data-type value, for example 'incourse', 'incm'
      */
-    public function i_see_nbrating_of_the_scalevalue_in_the_competency($numberrating, $scalevalue, $rownumber, $competencyname,
-            $type) {
+    public function i_see_nbrating_of_the_scalevalue_in_the_competency(
+        $numberrating,
+        $scalevalue,
+        $rownumber,
+        $competencyname,
+        $type
+    ) {
         // Building xpath.
         $xpath = "//table[contains(@class, 'tile_info') and contains(@data-type, '$type') and "
                 . "ancestor-or-self::div[contains(., '$competencyname')]]/"
                 . "tbody/tr[$rownumber]/td[contains(., '$scalevalue')]/following-sibling::td[1]";
-        $this->execute("behat_general::assert_element_contains_text",
+        $this->execute(
+            "behat_general::assert_element_contains_text",
             [$numberrating, $xpath, "xpath_element"]
         );
     }
@@ -100,7 +96,8 @@ class behat_report_lpmonitoring extends behat_base {
                 break;
         }
 
-        $this->execute("behat_general::assert_element_contains_text",
+        $this->execute(
+            "behat_general::assert_element_contains_text",
             [$texttoverify, $xpath, "xpath_element"]
         );
     }
@@ -142,8 +139,13 @@ class behat_report_lpmonitoring extends behat_base {
      * @param string $competencyname
      * @param string $type data-type value, for example 'incourse', 'incm'
      */
-    public function i_click_on_rating_of_the_scalevalue_in_the_competency($numberrating, $scalevalue, $rownumber,
-            $competencyname, $type) {
+    public function i_click_on_rating_of_the_scalevalue_in_the_competency(
+        $numberrating,
+        $scalevalue,
+        $rownumber,
+        $competencyname,
+        $type
+    ) {
         // Building xpath.
         $xpath = "//table[contains(@class, 'tile_info') and contains(@data-type, '$type') and "
                 . "ancestor-or-self::div[contains(., '$competencyname')]]/tbody/"
@@ -204,7 +206,7 @@ class behat_report_lpmonitoring extends behat_base {
      */
     public function i_should_see_in_row_column_of_table($value, $row, $column, $table) {
         // Find the visible table (in case more than one table $table is found).
-        list($selector, $locator) = $this->transform_selector('table', $table);
+        [$selector, $locator] = $this->transform_selector('table', $table);
         $tablenodes = $this->find_all($selector, $locator);
         $visiblenode = null;
         foreach ($tablenodes as $node) {
@@ -236,8 +238,12 @@ class behat_report_lpmonitoring extends behat_base {
             $columnheader = $this->getSession()->getDriver()->find($columnheaderxpath);
             if (empty($columnheader)) {
                 $columnexceptionmsg = $column . '" in table "' . $table . '"';
-                throw new ElementNotFoundException($this->getSession(), "\n$columnheaderxpath\n\n".'Column', null,
-                        $columnexceptionmsg);
+                throw new ElementNotFoundException(
+                    $this->getSession(),
+                    "\n$columnheaderxpath\n\n" . 'Column',
+                    null,
+                    $columnexceptionmsg
+                );
             }
             // Following conditions were considered before finding column count.
             // 1. Table header can be in thead/tr/th or tbody/tr/td[1].
@@ -249,8 +255,8 @@ class behat_report_lpmonitoring extends behat_base {
         // Check if value exists in specific row/column.
         // Get row xpath.
         // GoutteDriver uses DomCrawler\Crawler and it is making XPath relative to the current context, so use descendant.
-        $rowxpath = $tablexpath."/tbody/tr[descendant::th[contains(., " . $rowliteral .
-                    ")] | descendant::td[contains(., " . $rowliteral . ")]]";
+        $rowxpath = $tablexpath . "/tbody/tr[descendant::th[contains(., " . $rowliteral .
+            ")] | descendant::td[contains(., " . $rowliteral . ")]]";
 
         $columnvaluexpath = $rowxpath . $columnpositionxpath . "[contains(normalize-space(.)," . $valueliteral . ")]";
 
@@ -258,8 +264,12 @@ class behat_report_lpmonitoring extends behat_base {
         $columnnode = $this->getSession()->getDriver()->find($columnvaluexpath);
         if (empty($columnnode)) {
             $locatorexceptionmsg = $value . '" in "' . $row . '" row with column "' . $column;
-            throw new ElementNotFoundException($this->getSession(), "\n$columnvaluexpath\n\n".'Column value', null,
-                    $locatorexceptionmsg);
+            throw new ElementNotFoundException(
+                $this->getSession(),
+                "\n$columnvaluexpath\n\n" . 'Column value',
+                null,
+                $locatorexceptionmsg
+            );
         }
     }
 
@@ -285,7 +295,7 @@ class behat_report_lpmonitoring extends behat_base {
      */
     public function course_module_competency_grading_is_enabled() {
         if (!api::is_cm_comptency_grading_enabled()) {
-            throw new \Moodle\BehatExtension\Exception\SkippedException;
+            throw new \Moodle\BehatExtension\Exception\SkippedException();
         }
     }
 
@@ -296,7 +306,7 @@ class behat_report_lpmonitoring extends behat_base {
      */
     public function course_module_competency_grading_is_not_enabled() {
         if (api::is_cm_comptency_grading_enabled()) {
-            throw new \Moodle\BehatExtension\Exception\SkippedException;
+            throw new \Moodle\BehatExtension\Exception\SkippedException();
         }
     }
 
@@ -307,7 +317,7 @@ class behat_report_lpmonitoring extends behat_base {
      */
     public function hide_competency_rating_is_enabled() {
         if (!api::is_display_rating_enabled()) {
-            throw new \Moodle\BehatExtension\Exception\SkippedException;
+            throw new \Moodle\BehatExtension\Exception\SkippedException();
         }
     }
 
@@ -361,6 +371,40 @@ class behat_report_lpmonitoring extends behat_base {
         }
         $url = new moodle_url('/report/lpmonitoring/index.php', ['pagecontextid' => $categorycontext->id]);
         $this->execute('behat_general::i_visit', [$url]);
+    }
+
+    /**
+     * Checks that the specified lpmonitoring checkbox is checked.
+     *
+     * @Then /^the lpmonitoring "(?P<checkbox_string>(?:[^"]|\\")*)" "(?P<element_string>(?:[^"]|\\")*)" checkbox should be checked$/
+     * @throws ExpectationException
+     * @param string $checkbox
+     * @param string $selectortype
+     */
+    public function the_lpmonitoring_checkbox_should_be_checked($checkbox, $selectortype) {
+        $node = $this->get_selected_node($selectortype, $checkbox);
+
+        if (!$node->hasAttribute('checked')) {
+            throw new ExpectationException('The lpmonitoring checkbox "' . $checkbox . '" is not checked',
+                $this->getSession());
+        }
+    }
+
+    /**
+     * Checks that the specified lpmonitoring checkbox is not checked.
+     *
+     * @Then /^the lpmonitoring "(?P<checkbox_string>(?:[^"]|\\")*)" "(?P<element_string>(?:[^"]|\\")*)" checkbox should not be checked$/
+     * @throws ExpectationException
+     * @param string $checkbox
+     * @param string $selectortype
+     */
+    public function the_lpmonitoring_checkbox_should_not_be_checked($checkbox, $selectortype) {
+        $node = $this->get_selected_node($selectortype, $checkbox);
+
+        if ($node->hasAttribute('checked')) {
+            throw new ExpectationException('The lpmonitoring checkbox "' . $checkbox . '" is checked',
+                $this->getSession());
+        }
     }
 
 }

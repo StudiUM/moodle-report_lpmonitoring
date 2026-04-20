@@ -32,7 +32,7 @@ require_once($CFG->libdir . '/clilib.php');
 require_once($CFG->dirroot . '/report/lpmonitoring/classes/apcexport.php');
 
 // Now get cli options.
-list($options, $unrecognized) = cli_get_params(
+[$options, $unrecognized] = cli_get_params(
     [
         'help' => false,
         'templateid' => false,
@@ -50,7 +50,6 @@ list($options, $unrecognized) = cli_get_params(
         'v' => 'verbose',
     ]
 );
-
 
 $help = "Perform APC export.
 

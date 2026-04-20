@@ -36,7 +36,6 @@ use renderer_base;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scale_value_user_exporter extends exporter {
-
     /**
      * Return the list of properties.
      *

@@ -35,7 +35,6 @@ use context_system;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class evaluations_exporter extends \core\external\exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *

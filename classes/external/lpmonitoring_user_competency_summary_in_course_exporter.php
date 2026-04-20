@@ -63,8 +63,10 @@ class lpmonitoring_user_competency_summary_in_course_exporter extends user_compe
         $related['usercompetency'] = null;
         $exporter = new user_competency_summary_exporter(null, $related);
         $result->usercompetencysummary = $exporter->export($output);
-        $result->usercompetencysummary->cangrade = user_competency::can_grade_user_in_course($this->related['user']->id,
-            $this->related['course']->id);
+        $result->usercompetencysummary->cangrade = user_competency::can_grade_user_in_course(
+            $this->related['user']->id,
+            $this->related['course']->id
+        );
 
         $context = context_course::instance($this->related['course']->id);
         $exporter = new course_summary_exporter($this->related['course'], ['context' => $context]);
@@ -72,12 +74,16 @@ class lpmonitoring_user_competency_summary_in_course_exporter extends user_compe
 
         // This is the block different from the parent, to avoid some validations.
         try {
-            $coursemodules = api::list_course_modules_using_competency($this->related['competency']->get('id'),
-                $this->related['course']->id);
+            $coursemodules = api::list_course_modules_using_competency(
+                $this->related['competency']->get('id'),
+                $this->related['course']->id
+            );
         } catch (\Exception $e) {
             // Special case for hidden courses.
-            $coursemodules = course_module_competency::list_course_modules($this->related['competency']->get('id'),
-                $this->related['course']->id);
+            $coursemodules = course_module_competency::list_course_modules(
+                $this->related['competency']->get('id'),
+                $this->related['course']->id
+            );
         }
 
         $fastmodinfo = get_fast_modinfo($this->related['course']->id);

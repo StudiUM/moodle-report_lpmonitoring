@@ -26,7 +26,7 @@ namespace report_lpmonitoring;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/gradelib.php');
-require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 
 use core_user;
 use context;
@@ -58,9 +58,8 @@ use moodle_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class api {
-
     /** @var bool iscmcompetencygradingenabled  **/
-    static protected $iscmcompetencygradingenabled;
+    protected static $iscmcompetencygradingenabled;
 
     /**
      * Get scales from frameworkid.
@@ -164,12 +163,23 @@ class api {
         // Check the permissions before accessing configuration.
         $framework = new competency_framework($record->competencyframeworkid);
         if (!$framework->can_manage()) {
-            throw new required_capability_exception($framework->get_context(), 'moodle/competency:competencymanage',
-                'nopermissions', '');
+            throw new required_capability_exception(
+                $framework->get_context(),
+                'moodle/competency:competencymanage',
+                'nopermissions',
+                ''
+            );
         }
 
-        if ($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $record->competencyframeworkid, 'scaleid' => $record->scaleid])) {
+        if (
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                [
+                    'competencyframeworkid' => $record->competencyframeworkid,
+                    'scaleid' => $record->scaleid,
+                ]
+            )
+        ) {
             throw new exception('Can not create: configuration already exist');
         }
 
@@ -193,13 +203,19 @@ class api {
         // Check the permissions before accessing configuration.
         $framework = new competency_framework($record->competencyframeworkid);
         if (!$framework->can_manage()) {
-            throw new required_capability_exception($framework->get_context(), 'moodle/competency:competencymanage',
-                'nopermissions', '');
+            throw new required_capability_exception(
+                $framework->get_context(),
+                'moodle/competency:competencymanage',
+                'nopermissions',
+                ''
+            );
         }
 
         // Check for existing record.
-        $recordconfig = $DB->get_record(report_competency_config::TABLE,
-                ['competencyframeworkid' => $record->competencyframeworkid, 'scaleid' => $record->scaleid]);
+        $recordconfig = $DB->get_record(
+            report_competency_config::TABLE,
+            ['competencyframeworkid' => $record->competencyframeworkid, 'scaleid' => $record->scaleid]
+        );
 
         if (!$recordconfig) {
             throw new Exception('Can not update: configuration does not exist');
@@ -229,8 +245,12 @@ class api {
         if ($DB->record_exists(competency_framework::TABLE, ['id' => $competencyframeworkid])) {
             $framework = new competency_framework($competencyframeworkid);
             if (!$framework->can_manage()) {
-                throw new required_capability_exception($framework->get_context(), 'moodle/competency:competencymanage',
-                'nopermissions', '');
+                throw new required_capability_exception(
+                    $framework->get_context(),
+                    'moodle/competency:competencymanage',
+                    'nopermissions',
+                    ''
+                );
             }
         }
 
@@ -264,8 +284,15 @@ class api {
      *                      )
      *              )
      */
-    public static function search_users_by_templateid($templateid, $query, $scalesvalues = [], $scalefilterin = '',
-            $scalesortorder = "ASC", $withcomments = false, $withplans = false) {
+    public static function search_users_by_templateid(
+        $templateid,
+        $query,
+        $scalesvalues = [],
+        $scalefilterin = '',
+        $scalesortorder = "ASC",
+        $withcomments = false,
+        $withplans = false
+    ) {
         global $CFG, $DB;
         if (!in_array(strtolower($scalesortorder), ['asc', 'desc'])) {
             throw new \coding_exception('Sort order must be ASC or DESC');
@@ -282,8 +309,8 @@ class api {
         $fields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
         $extrasearchfields = $userfieldsapi->get_required_fields([\core_user\fields::PURPOSE_IDENTITY]);
 
-        list($wheresql, $whereparams) = users_search_sql($query, 'u', USER_SEARCH_STARTS_WITH, $extrasearchfields);
-        list($sortsql, $sortparams) = users_order_by_sql('u', $query, $context);
+        [$wheresql, $whereparams] = users_search_sql($query, 'u', USER_SEARCH_STARTS_WITH, $extrasearchfields);
+        [$sortsql, $sortparams] = users_order_by_sql('u', $query, $context);
 
         // Group scales values by scaleid.
         $scalefilter = [];
@@ -299,10 +326,16 @@ class api {
         $sqlscalefilter = '';
         // Build scale filters SQL and params by final rating or by course rating.
         foreach ($scalefilter as $scaleid => $scalevalues) {
-            list($insqlframework, $params1) = $DB->get_in_or_equal($scalevalues,
-                    SQL_PARAMS_NAMED, 'gradeframework');
-            list($insqlcompetency, $params2) = $DB->get_in_or_equal($scalevalues,
-                    SQL_PARAMS_NAMED, 'gradecompetency');
+            [$insqlframework, $params1] = $DB->get_in_or_equal(
+                $scalevalues,
+                SQL_PARAMS_NAMED,
+                'gradeframework'
+            );
+            [$insqlcompetency, $params2] = $DB->get_in_or_equal(
+                $scalevalues,
+                SQL_PARAMS_NAMED,
+                'gradecompetency'
+            );
             $querykeyname1 = 'scaleid1' . $i;
             $querykeyname2 = 'scaleid2' . $i;
             $or = ($i > 1) ? ' OR ' : '';
@@ -314,10 +347,16 @@ class api {
 
             // If scale values in plan, we should build the "IN" SQL for both usercomp and usercompplan.
             if (!$scalefilterin) {
-                list($insqlframework, $params1) = $DB->get_in_or_equal($scalevalues,
-                    SQL_PARAMS_NAMED, 'gradeframework');
-                list($insqlcompetency, $params2) = $DB->get_in_or_equal($scalevalues,
-                    SQL_PARAMS_NAMED, 'gradecompetency');
+                [$insqlframework, $params1] = $DB->get_in_or_equal(
+                    $scalevalues,
+                    SQL_PARAMS_NAMED,
+                    'gradeframework'
+                );
+                [$insqlcompetency, $params2] = $DB->get_in_or_equal(
+                    $scalevalues,
+                    SQL_PARAMS_NAMED,
+                    'gradecompetency'
+                );
                 $querykeyname3 = 'scaleid3' . $i;
                 $querykeyname4 = 'scaleid4' . $i;
 
@@ -594,8 +633,16 @@ class api {
      *                            'next' => \stdClass
      *                        ))
      */
-    public static function read_plan($planid = null, $templateid = null, $scalesvalues = [], $scalefilterin = '',
-            $sortorder = 'ASC', $tagid = null, $withcomments = false, $withplans = false) {
+    public static function read_plan(
+        $planid = null,
+        $templateid = null,
+        $scalesvalues = [],
+        $scalefilterin = '',
+        $sortorder = 'ASC',
+        $tagid = null,
+        $withcomments = false,
+        $withplans = false
+    ) {
 
         if (empty($planid) && empty($templateid) && empty($tagid)) {
             throw new coding_exception('A plan ID and/or a template ID and/or a tag ID must be specified');
@@ -607,12 +654,21 @@ class api {
         $userplans = [];
         // Get the current plan depending on the values passed in parameter.
         $currentplanid = $planid;
-        if ( !empty($templateid) || !empty($tagid) ) {
+        if (!empty($templateid) || !empty($tagid)) {
             if (!empty($tagid)) {
                 $userplans = self::search_plans_with_tag($tagid, $withcomments);
             } else {
-                $userplans = array_values(self::search_users_by_templateid($templateid , '', $scalesvalues, $scalefilterin,
-                        $sortorder, $withcomments, $withplans));
+                $userplans = array_values(
+                    self::search_users_by_templateid(
+                        $templateid,
+                        '',
+                        $scalesvalues,
+                        $scalefilterin,
+                        $sortorder,
+                        $withcomments,
+                        $withplans
+                    )
+                );
             }
             $currentindex = null;
             // We throw an exception if no plans are found.
@@ -744,14 +800,22 @@ class api {
             $courseinfo->course = $course;
 
             // Find rating in course.
-            $courseinfo->usecompetencyincourse = core_competency_api::get_user_competency_in_course($course->id, $userid,
-                    $competencyid);
+            $courseinfo->usecompetencyincourse = core_competency_api::get_user_competency_in_course(
+                $course->id,
+                $userid,
+                $competencyid
+            );
 
             // Find most recent course evidences.
             $sort = 'timecreated';
             $order = 'DESC';
-            $courseinfo->courseevidences = core_competency_api::list_evidence_in_course($userid, $course->id, $competencyid,
-                    $sort, $order);
+            $courseinfo->courseevidences = core_competency_api::list_evidence_in_course(
+                $userid,
+                $course->id,
+                $competencyid,
+                $sort,
+                $order
+            );
 
             // Find litteral note.
             $gradeitem = \grade_item::fetch_course_item($course->id);
@@ -763,8 +827,11 @@ class api {
                 $modules = course_module_competency::list_course_modules($competencyid, $course->id);
                 $courseinfo->modules = [];
                 foreach ($modules as $cmid) {
-                    $courseinfo->modules[] = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cmid,
-                        $userid, $competencyid);
+                    $courseinfo->modules[] = \tool_cmcompetency\api::get_user_competency_in_coursemodule(
+                        $cmid,
+                        $userid,
+                        $competencyid
+                    );
                 }
             }
             $competencydetails->courses[] = $courseinfo;
@@ -785,14 +852,22 @@ class api {
                 }
 
                 // Find rating in course module.
-                $cminfo->usecompetencyincm = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cmid, $userid,
-                        $competencyid);
+                $cminfo->usecompetencyincm = \tool_cmcompetency\api::get_user_competency_in_coursemodule(
+                    $cmid,
+                    $userid,
+                    $competencyid
+                );
 
                 // Find most recent course module evidences.
                 $sort = 'timecreated';
                 $order = 'DESC';
-                $cminfo->cmevidences = \tool_cmcompetency\api::list_evidence_in_coursemodule($userid, $cmid, $competencyid,
-                        $sort, $order);
+                $cminfo->cmevidences = \tool_cmcompetency\api::list_evidence_in_coursemodule(
+                    $userid,
+                    $cmid,
+                    $competencyid,
+                    $sort,
+                    $order
+                );
 
                 // Calculate grade if exist.
                 $cminfo->cm = $cm;
@@ -841,8 +916,10 @@ class api {
                 $userfullname = fullname($user->userinfo);
                 throw new moodle_exception('nopermissionsusercompetencyview', 'report_lpmonitoring', '', $userfullname);
             }
-            if ($userplan->get('status') == plan::STATUS_COMPLETE &&
-                    !self::has_records_for_competency_user_in_plan($userplan->get('id'), $competencyid)) {
+            if (
+                $userplan->get('status') == plan::STATUS_COMPLETE &&
+                !self::has_records_for_competency_user_in_plan($userplan->get('id'), $competencyid)
+            ) {
                 continue;
             }
 
@@ -995,12 +1072,15 @@ class api {
         global $DB;
 
         // Get all the relevant contexts.
-        $contexts = core_competency_api::get_related_contexts($context, $includes,
-            ['moodle/competency:templateview', 'moodle/competency:templatemanage']);
+        $contexts = core_competency_api::get_related_contexts(
+            $context,
+            $includes,
+            ['moodle/competency:templateview', 'moodle/competency:templatemanage']
+        );
 
         // First we do a permissions check.
         if (empty($contexts)) {
-             throw new required_capability_exception($context, 'moodle/competency:templateview', 'nopermissions', '');
+            throw new required_capability_exception($context, 'moodle/competency:templateview', 'nopermissions', '');
         }
 
         // Make the order by.
@@ -1008,7 +1088,7 @@ class api {
 
         // OK - all set.
         $template = new template();
-        list($insql, $params) = $DB->get_in_or_equal(array_keys($contexts), SQL_PARAMS_NAMED);
+        [$insql, $params] = $DB->get_in_or_equal(array_keys($contexts), SQL_PARAMS_NAMED);
         $select = "contextid $insql";
 
         if ($onlyvisible) {
@@ -1016,7 +1096,7 @@ class api {
             $params['visible'] = 1;
         }
         if ($query) {
-            list($sqlquery, $paramsquery) = self::get_template_query_search($query);
+            [$sqlquery, $paramsquery] = self::get_template_query_search($query);
             $select .= " AND $sqlquery";
             $params += $paramsquery;
         }
@@ -1142,7 +1222,7 @@ class api {
                         $nbcomments = 0;
                     }
 
-                    $users = user_get_users_by_id( [$planinfos->userid] );
+                    $users = user_get_users_by_id([$planinfos->userid]);
                     $user = array_shift($users);
 
                     $profileimage = new \user_picture($user);
@@ -1168,10 +1248,12 @@ class api {
      * Check if course module competency grading is enabled.
      */
     public static function is_cm_comptency_grading_enabled() {
-        if (defined('PHPUNIT_TEST') &&
+        if (
+            defined('PHPUNIT_TEST') &&
             PHPUNIT_TEST &&
             isset(self::$iscmcompetencygradingenabled) &&
-            self::$iscmcompetencygradingenabled !== null) {
+            self::$iscmcompetencygradingenabled !== null
+        ) {
             return self::$iscmcompetencygradingenabled;
         }
         if (\core_component::get_component_directory('tool_cmcompetency')) {
@@ -1208,9 +1290,18 @@ class api {
         // Throws exception if competency not in plan.
         $competency = $uc->get_competency();
         $competencycontext = $competency->get_context();
-        if (!has_any_capability(['moodle/competency:competencyview', 'moodle/competency:competencymanage'],
-                $competencycontext)) {
-            throw new required_capability_exception($competencycontext, 'moodle/competency:competencyview', 'nopermissions', '');
+        if (
+            !has_any_capability(
+                ['moodle/competency:competencyview', 'moodle/competency:competencymanage'],
+                $competencycontext
+            )
+        ) {
+            throw new required_capability_exception(
+                $competencycontext,
+                'moodle/competency:competencyview',
+                'nopermissions',
+                ''
+            );
         }
 
         // If there is actually a grade, we reset it.
@@ -1219,18 +1310,20 @@ class api {
             $action = evidence::ACTION_OVERRIDE;
             $desckey = 'evidence_reset';
 
-            $result = core_competency_api::add_evidence($uc->get('userid'),
-                                      $competency,
-                                      $context->id,
-                                      $action,
-                                      $desckey,
-                                      'report_lpmonitoring',
-                                      $plan->get('name'),
-                                      false,
-                                      null,
-                                      null,
-                                      $USER->id,
-                                      $note);
+            $result = core_competency_api::add_evidence(
+                $uc->get('userid'),
+                $competency,
+                $context->id,
+                $action,
+                $desckey,
+                'report_lpmonitoring',
+                $plan->get('name'),
+                false,
+                null,
+                null,
+                $USER->id,
+                $note
+            );
             if ($result) {
                 $uc->read();
                 $event = user_competency_resetted::create_from_user_competency($uc);
@@ -1356,8 +1449,12 @@ class api {
         }
 
         if (!$ucc || !user_competency::can_read_user_in_course($ucc->get('userid'), $ucc->get('courseid'))) {
-            throw new required_capability_exception($ucc->get_context(), 'moodle/competency:usercompetencyview',
-                'nopermissions', '');
+            throw new required_capability_exception(
+                $ucc->get_context(),
+                'moodle/competency:usercompetencyview',
+                'nopermissions',
+                ''
+            );
         }
 
         \core\event\competency_user_competency_viewed_in_course::create_from_user_competency_viewed_in_course($ucc)->trigger();
@@ -1403,4 +1500,3 @@ class api {
         return true;
     }
 }
-

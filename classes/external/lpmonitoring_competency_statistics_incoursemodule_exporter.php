@@ -38,7 +38,6 @@ use report_lpmonitoring\external\scale_competency_incoursemodule_statistics_expo
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lpmonitoring_competency_statistics_incoursemodule_exporter extends exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *
@@ -85,13 +84,14 @@ class lpmonitoring_competency_statistics_incoursemodule_exporter extends exporte
             $scaleinfo->name = $scalename;
             $scaleinfo->color = $data->reportscaleconfig[$id - 1]->color;
 
-            $scalecompetencyitemexporter = new scale_competency_incoursemodule_statistics_exporter($scaleinfo,
-                    ['ratings' => $data->listratings]);
+            $scalecompetencyitemexporter = new scale_competency_incoursemodule_statistics_exporter(
+                $scaleinfo,
+                ['ratings' => $data->listratings]
+            );
             $scalecompetencyitem = $scalecompetencyitemexporter->export($output);
             $result->nbratings += $scalecompetencyitem->nbratings;
             $result->scalecompetencyitems[] = $scalecompetencyitem;
         }
         return (array) $result;
     }
-
 }

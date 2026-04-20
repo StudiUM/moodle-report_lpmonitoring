@@ -143,17 +143,17 @@
                     <button class="fa fa-question-circle text-info fa-fw button-displayratinghelp"
                             data-container="body"
                             data-trigger="focus"
-                            data-toggle="popover"
+                            data-bs-toggle="popover"
                             data-placement="left"
                             data-content="{{#str}}resetoneplandisplayrating, tool_lp{{/str}}">
                     </button>
                 </div>
             </div>
-            <div class="switcher-container custom-control custom-switch">                
-                <input class="custom-control-input" id="customSwitch1" type="checkbox" role="switch"
+            <div class="switcher-container form-check form-switch">                
+                <input class="form-check-input" id="customSwitch1" type="checkbox" role="switch"
                     data-displayrating-plan="{{plan.id}}"
                     {{#plan.displayrating}}checked{{/plan.displayrating}} />
-                <label class="switch custom-control-label" for="customSwitch1">
+                <label class="switch form-check-label" for="customSwitch1">
                     {{#str}}ratingsdisplay, tool_lp{{/str}}
                 </label>
             </div>

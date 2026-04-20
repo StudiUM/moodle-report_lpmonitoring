@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die('Direct access to this script is forbidden.');
 use moodleform;
 use renderable;
 use MoodleQuickForm;
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Class for managing tags related to user plans.
@@ -37,7 +37,7 @@ require_once($CFG->libdir.'/formslib.php');
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class tags extends moodleform  implements renderable {
+class tags extends moodleform implements renderable {
     /**
      * Tags form definition.
      */
@@ -48,11 +48,18 @@ class tags extends moodleform  implements renderable {
 
         $planid = $this->_customdata['planid'];
 
-        MoodleQuickForm::registerElementType('tagautocomplete',
-                "$CFG->dirroot/report/lpmonitoring/classes/form/tagautocomplete.php", 'tagautocomplete');
+        MoodleQuickForm::registerElementType(
+            'tagautocomplete',
+            "$CFG->dirroot/report/lpmonitoring/classes/form/tagautocomplete.php",
+            'tagautocomplete'
+        );
 
-        $mform->addElement('tagautocomplete', 'tags', get_string('tags', 'report_lpmonitoring'),
-                ['itemtype' => 'competency_plan', 'component' => 'report_lpmonitoring']);
+        $mform->addElement(
+            'tagautocomplete',
+            'tags',
+            get_string('tags', 'report_lpmonitoring'),
+            ['itemtype' => 'competency_plan', 'component' => 'report_lpmonitoring']
+        );
 
         $this->add_action_buttons();
         $mform->addElement('hidden', 'action');

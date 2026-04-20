@@ -38,7 +38,6 @@ require_once($CFG->libdir . '/grade/grade_scale.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_competency_config extends \core\persistent {
-
     /** Table name. */
     const TABLE = 'report_competency_config';
 
@@ -193,5 +192,4 @@ class report_competency_config extends \core\persistent {
         }
         return new report_competency_config(0, $record);
     }
-
 }

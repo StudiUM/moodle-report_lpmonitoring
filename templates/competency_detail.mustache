@@ -74,12 +74,12 @@
         <h5 class="count_top"><i class="fa fa-bar-chart-o"></i> {{#str}}rating, tool_lp{{/str}}</h5>
         {{#cmcompgradingenabled}}
         <ul id="nav-tabs" class="nav nav-tabs detail-comp-tab" role="tablist">
-            <li class="nav-item"><a class="nav-link incourse active" data-toggle="tab" href="#tab-incourses-content-{{competencyid}}" role="tab">{{#str}}incourses, report_lpmonitoring{{/str}}</a></li>
-            <li class="nav-item"><a class="nav-link incm" data-toggle="tab" href="#tab-incms-content-{{competencyid}}" role="tab">{{#str}}incms, report_lpmonitoring{{/str}}</a></li>
+            <li class="nav-item"><a class="nav-link incourse active" data-bs-toggle="tab" href="#tab-incourses-content-{{competencyid}}" role="tab">{{#str}}incourses, report_lpmonitoring{{/str}}</a></li>
+            <li class="nav-item"><a class="nav-link incm" data-bs-toggle="tab" href="#tab-incms-content-{{competencyid}}" role="tab">{{#str}}incms, report_lpmonitoring{{/str}}</a></li>
         </ul>
         {{/cmcompgradingenabled}}
         <div class="tab-content">
-            <div id="tab-incourses-content-{{competencyid}}" class="tab-pane active fade in" role="tabpanel">
+            <div id="tab-incourses-content-{{competencyid}}" class="tab-pane active fade show" role="tabpanel">
                 <table>
                     <tr>
                         <td>
@@ -199,7 +199,7 @@
                         <button class="fa fa-question-circle text-info fa-fw button-resethelp"
                                 data-container="body"
                                 data-trigger="focus"
-                                data-toggle="popover"
+                                data-bs-toggle="popover"
                                 data-placement="left"
                                 data-content="{{#str}}resetonecompetency, report_lpmonitoring{{/str}}">
                         </button>

@@ -29,7 +29,7 @@ global $USER;
 require_login();
 \core_competency\api::require_enabled();
 
-$templateid = optional_param('templateid', null, PARAM_INT);
+$templateid = optional_param('templateid', 0, PARAM_INT);
 $pagecontextid = required_param('pagecontextid', PARAM_INT);
 $context = context::instance_by_id($pagecontextid);
 $urlparams = ['pagecontextid' => $pagecontextid];

@@ -34,7 +34,6 @@ use renderer_base;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class linked_course_and_modules_exporter extends \core\external\exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *

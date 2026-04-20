@@ -59,15 +59,22 @@ if ($hassiteconfig && get_config('core_competency', 'enabled')) {
 
     if ($ADMIN->fulltree) {
         // Border colour setting.
-        $settingspage->add(new admin_setting_configcolourpicker('report_lpmonitoring/bordercolour',
-                get_string('bordercolour', 'report_lpmonitoring'),
-                get_string('bordercolourdesc', 'report_lpmonitoring'),
-                '#000000'));
+        $settingspage->add(new admin_setting_configcolourpicker(
+            'report_lpmonitoring/bordercolour',
+            get_string('bordercolour', 'report_lpmonitoring'),
+            get_string('bordercolourdesc', 'report_lpmonitoring'),
+            '#000000'
+        ));
 
         // Logo file setting.
-        $settingspage->add(new admin_setting_configstoredfile('report_lpmonitoring/userpdflogo',
-                get_string('userpdflogo', 'report_lpmonitoring'), get_string('userpdflogodesc', 'report_lpmonitoring'),
-                'pdflogo', 0, ['maxfiles' => 1, 'accepted_types' => ['.jpg', '.png']]));
+        $settingspage->add(new admin_setting_configstoredfile(
+            'report_lpmonitoring/userpdflogo',
+            get_string('userpdflogo', 'report_lpmonitoring'),
+            get_string('userpdflogodesc', 'report_lpmonitoring'),
+            'pdflogo',
+            0,
+            ['maxfiles' => 1, 'accepted_types' => ['.jpg', '.png']]
+        ));
 
         // Student ID mappping setting.
         $userfields = $DB->get_records('user_info_field');
@@ -80,10 +87,13 @@ if ($hassiteconfig && get_config('core_competency', 'enabled')) {
             }
         }
 
-        $settingspage->add(new admin_setting_configselect('report_lpmonitoring/studentidmapping',
-                get_string('studentidmapping', 'report_lpmonitoring'),
-                get_string('studentidmappingdesc', 'report_lpmonitoring'),
-                'id', $mappingoptions));
+        $settingspage->add(new admin_setting_configselect(
+            'report_lpmonitoring/studentidmapping',
+            get_string('studentidmapping', 'report_lpmonitoring'),
+            get_string('studentidmappingdesc', 'report_lpmonitoring'),
+            'id',
+            $mappingoptions
+        ));
     }
 
     $ADMIN->add('competencies', $settingspage);

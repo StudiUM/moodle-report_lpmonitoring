@@ -23,7 +23,7 @@ Feature: Manage publication of ratings in learning plans
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I press "Apply"
     And I should see "Rebecca Armenta"
-    And the "Ratings display" "checkbox" should not be checked
+    And the lpmonitoring "Ratings display" "checkbox" checkbox should not be checked
     And I toggle the "Competency B" detail
     And I wait "1" seconds
     And I click on "rate-competency" of the competency "Competency B"
@@ -95,7 +95,7 @@ Feature: Manage publication of ratings in learning plans
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I press "Apply"
     And I should see "Rebecca Armenta"
-    And the "Ratings display" "checkbox" should not be checked
+    And the lpmonitoring "Ratings display" "checkbox" checkbox should not be checked
     And I toggle the "Competency B" detail
     And I wait "1" seconds
     And I click on "rate-competency" of the competency "Competency B"
@@ -103,7 +103,7 @@ Feature: Manage publication of ratings in learning plans
     And I click on "//button[contains(@data-action, 'rate')] | //input[contains(@data-action, 'rate')]" "xpath_element"
     And I should see "Not proficient" in "level-proficiency" of the competency "Competency B"
     And I should see "not qualified" in "finalrate" of the competency "Competency B"
-    And the "Ratings display" "checkbox" should not be checked
+    And the lpmonitoring "Ratings display" "checkbox" checkbox should not be checked
     When I click on "Ratings display" "checkbox"
     And I should see "Reset" in the ".displayratings" "css_element"
     And I log out
@@ -138,7 +138,7 @@ Feature: Manage publication of ratings in learning plans
     And I set the field "templateSelectorReport" to "Medicine Year 1"
     And I press "Apply"
     And I should see "Rebecca Armenta"
-    And the "Ratings display" "checkbox" should be checked
+    And the lpmonitoring "Ratings display" "checkbox" checkbox should be checked
     And I toggle the "Competency B" detail
     And I wait "1" seconds
     And I click on "rate-competency" of the competency "Competency B"
@@ -179,7 +179,7 @@ Feature: Manage publication of ratings in learning plans
     And I press "Apply"
     And I should see "Rebecca Armenta"
     And I click on ".stats-display-rating .resetdisplayrating a" "css_element"
-    And the "Ratings display" "checkbox" should not be checked
+    And the lpmonitoring "Ratings display" "checkbox" checkbox should not be checked
     And I should not see "Reset" in the ".displayratings" "css_element"
     And I log out
     # Login as student

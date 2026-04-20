@@ -38,7 +38,6 @@ use report_lpmonitoring\api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class tagautocomplete extends MoodleQuickForm_tags {
-
     /**
      * Constructor.
      *
@@ -64,7 +63,7 @@ class tagautocomplete extends MoodleQuickForm_tags {
         }
 
         // The array must contain the tag as keys AND as values.
-        $tags = array_values( api::search_tags_for_accessible_plans() );
+        $tags = array_values(api::search_tags_for_accessible_plans());
         return array_combine($tags, $tags);
     }
 }
