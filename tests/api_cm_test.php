@@ -36,14 +36,13 @@ use tool_cohortroles\api as tool_cohortroles_api;
 /**
  * API for course module tests.
  *
- * @covers     \report_lpmonitoring\api
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\api::class)]
 final class api_cm_test extends \externallib_advanced_testcase {
-
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
 
@@ -133,9 +132,9 @@ final class api_cm_test extends \externallib_advanced_testcase {
         // Create scales.
         $scale = $dg->create_scale(["name" => "Scale default", "scale" => "not good, good"]);
 
-        $scaleconfiguration = '[{"scaleid":"'.$scale->id.'"},' .
-                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
-                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+        $scaleconfiguration = '[{"scaleid":"' . $scale->id . '"},' .
+            '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
 
         // Create the framework competency.
         $framework = [
@@ -149,8 +148,8 @@ final class api_cm_test extends \externallib_advanced_testcase {
         $this->frameworkincategory = $cpg->create_framework($framework);
 
         // Create scale report configuration.
-        $scaleconfig[] = ['id' => 1, 'name' => 'not good',  'color' => '#AAAAA'];
-        $scaleconfig[] = ['id' => 2, 'name' => 'good',  'color' => '#BBBBB'];
+        $scaleconfig[] = ['id' => 1, 'name' => 'not good', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'good', 'color' => '#BBBBB'];
 
         $record = new \stdclass();
         $record->competencyframeworkid = $this->frameworkincategory->get('id');
@@ -216,12 +215,12 @@ final class api_cm_test extends \externallib_advanced_testcase {
         );
 
         $appreciatorforcategory = $dg->create_user(
-                [
-                    'firstname' => 'Appreciator',
-                    'lastname' => 'Test',
-                    'username' => 'appreciator',
-                    'password' => 'appreciator',
-                ]
+            [
+                'firstname' => 'Appreciator',
+                'lastname' => 'Test',
+                'username' => 'appreciator',
+                'password' => 'appreciator',
+            ]
         );
 
         $cohort = $dg->create_cohort(['contextid' => $cat1ctx->id]);
@@ -412,8 +411,11 @@ final class api_cm_test extends \externallib_advanced_testcase {
         $users = testapi::search_users_by_templateid($template->get('id'), '', $scalevalues, 'coursemodule');
         $this->assertCount(2, $users);
         $userinfo = array_values($users);
-        $this->assertEquals([$userinfo[0]['fullname'], $userinfo[1]['fullname']],
-                ['User11 Lastname1', 'User12 Lastname2']);
+        $this->assertEquals(
+            [$userinfo[0]['fullname'],
+            $userinfo[1]['fullname']],
+            ['User11 Lastname1', 'User12 Lastname2']
+        );
         $this->assertEquals(1, $userinfo[0]['nbrating']);
         $this->assertEquals('User11 Lastname1', $userinfo[0]['fullname']);
         $this->assertEquals(2, $userinfo[1]['nbrating']);
@@ -711,7 +713,6 @@ final class api_cm_test extends \externallib_advanced_testcase {
         $this->assertCount(0, $result->cms);
         // Enable grading competency in course module.
         testapi::set_is_cm_comptency_grading_enabled(true);
-
     }
 
     /**
@@ -747,10 +748,10 @@ final class api_cm_test extends \externallib_advanced_testcase {
 
         // Create scale report configuration for the scale of framework.
         $scaleconfig = [];
-        $scaleconfig[] = ['id' => 1, 'name' => 'A',  'color' => '#AAAAA'];
-        $scaleconfig[] = ['id' => 2, 'name' => 'B',  'color' => '#BBBBB'];
-        $scaleconfig[] = ['id' => 3, 'name' => 'C',  'color' => '#CCCCC'];
-        $scaleconfig[] = ['id' => 4, 'name' => 'D',  'color' => '#DDDDD'];
+        $scaleconfig[] = ['id' => 1, 'name' => 'A', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'B', 'color' => '#BBBBB'];
+        $scaleconfig[] = ['id' => 3, 'name' => 'C', 'color' => '#CCCCC'];
+        $scaleconfig[] = ['id' => 4, 'name' => 'D', 'color' => '#DDDDD'];
 
         $record = new \stdclass();
         $record->competencyframeworkid = $framework->get('id');
@@ -821,7 +822,6 @@ final class api_cm_test extends \externallib_advanced_testcase {
         }
     }
 }
-
 
 /**
  * Test subclass that makes some variables or methods we want to test public.

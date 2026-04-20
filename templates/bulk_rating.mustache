@@ -69,7 +69,7 @@
                 <td>{{name}}</td>
                 <td><input type="radio" name="scale_{{compid}}" data-compid="{{compid}}" value="{{value}}" {{#default}}checked="checked"{{/default}} />
                 {{#proficient}}
-                <span aria-selected="true" class="badge badge-info" >
+                <span aria-selected="true" class="badge text-bg-info" >
                 {{#str}}proficient, tool_lp{{/str}}
                 </span>
                 {{/proficient}}
@@ -84,8 +84,8 @@
     </div>
     {{/datascalecompetencies}}
     </div>
-    <div id="msg-success-cmrating"class="alert alert-success alert-block fade in hidden">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <div id="msg-success-cmrating"class="alert alert-success alert-block fade show hidden">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         {{#str}}successtaskmsg, report_lpmonitoring{{/str}}
     </div>
     <div data-region="scale-buttons" class="m-t-1 pull-xs-right">

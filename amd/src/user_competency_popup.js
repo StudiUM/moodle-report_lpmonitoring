@@ -96,7 +96,7 @@ define(['jquery',
                 return ModalFactory.create({
                     type: ModalFactory.types.DEFAULT,
                     title: title,
-                    body: templates.render('tool_lp/user_competency_summary_in_plan', context),
+                    body: templates.render('report_lpmonitoring/user_competency_summary_in_plan', context),
                     large: true
                 }, trigger).done(function(modal) {
                     // Keep a reference to the modal.

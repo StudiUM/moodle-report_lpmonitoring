@@ -32,14 +32,13 @@ use report_lpmonitoring\report_competency_config;
 /**
  * Observer tests.
  *
- * @covers     \report_lpmonitoring\observer
  * @package    report_lpmonitoring
  * @author     Serge Gauthier <serge.gauthier.2@umontreal.ca>
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\event\observer::class)]
 final class observer_test extends \advanced_testcase {
-
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
 
@@ -149,19 +148,35 @@ final class observer_test extends \advanced_testcase {
                 ]);
 
         // Check we have both colors configuration.
-        $this->assertTrue($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale1->id]));
-        $this->assertTrue($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale2->id]));
+        $this->assertTrue(
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale1->id]
+            )
+        );
+        $this->assertTrue(
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale2->id]
+            )
+        );
 
         $result = core_competency_api::delete_framework($framework->get('id'));
 
         // Check all color configuration associated to the framework is deleted.
         $this->assertTrue($result);
-        $this->assertFalse($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale1->id]));
-         $this->assertFalse($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale2->id]));
+        $this->assertFalse(
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale1->id]
+            )
+        );
+        $this->assertFalse(
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale2->id]
+            )
+        );
     }
 
     /**
@@ -233,10 +248,18 @@ final class observer_test extends \advanced_testcase {
                 ]);
 
         // Check we have both colors configuration.
-        $this->assertTrue($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale1->id]));
-        $this->assertTrue($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale2->id]));
+        $this->assertTrue(
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale1->id]
+            )
+        );
+        $this->assertTrue(
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale2->id]
+            )
+        );
 
         $comp2record = $comp2->to_record();
 
@@ -251,10 +274,17 @@ final class observer_test extends \advanced_testcase {
 
         // Check both color configuration associated to the framework and comp0 still exist.
         $this->assertTrue($result);
-        $this->assertTrue($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale1->id]));
-         $this->assertTrue($DB->record_exists(report_competency_config::TABLE,
-                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale2->id]));
+        $this->assertTrue(
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale1->id]
+            )
+        );
+        $this->assertTrue(
+            $DB->record_exists(
+                report_competency_config::TABLE,
+                ['competencyframeworkid' => $framework->get('id'), 'scaleid' => $scale2->id]
+            )
+        );
     }
-
 }

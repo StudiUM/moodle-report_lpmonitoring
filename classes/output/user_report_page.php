@@ -40,7 +40,6 @@ use core_competency\external\plan_exporter;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_report_page implements renderable, templatable {
-
     /** @var array|\core_competency\plan[] $plans List of plans. */
     protected $plans = [];
 

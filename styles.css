@@ -2,8 +2,8 @@
     font-size: 18px;
     font-weight: 400;
 }
-.competencyreport .form-group {
-    margin-bottom: 10px;
+.competencyreport .mb-3 {
+    margin-bottom: 1rem;
 }
 .competencyreport .scaleitem > label {
     font-weight: bold;
@@ -624,7 +624,7 @@
 .competencyreport .fautocomplete input[type="text"] {
     margin-bottom: 2px;
 }
-.competencyreport .fautocomplete .badge-info span {
+.competencyreport .fautocomplete .text-bg-info span {
     padding: 2px 4px;
 }
 
@@ -850,7 +850,7 @@
 .competencyreport .plan-info-report .report-stats-competencies .empty-value {
     color: #cfd1d5;
 }
-.competencyreport .plan-info-report .report-stats-competencies .custom-switch .custom-control-label {
+.competencyreport .plan-info-report .report-stats-competencies .form-switch .form-check-label {
    font-size: 12px;
 }
 .competencyreport .reset-grade a, .competencyreport .reset-grade-all a {

@@ -41,7 +41,6 @@ use report_lpmonitoring\external\report_user_evidence_summary_exporter;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *
@@ -168,8 +167,10 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
         foreach ($data->userevidences as $userevidence) {
             $userevidencerecord = new user_evidence($userevidence->id);
             $context = $userevidencerecord->get_context();
-            $userevidencesummaryexporter = new report_user_evidence_summary_exporter($userevidencerecord,
-                    ['context' => $context]);
+            $userevidencesummaryexporter = new report_user_evidence_summary_exporter(
+                $userevidencerecord,
+                ['context' => $context]
+            );
             $result->listevidence[] = $userevidencesummaryexporter->export($output);
         }
 
@@ -242,5 +243,4 @@ class lpmonitoring_competency_detail_exporter extends \core\external\exporter {
 
         return (array) $result;
     }
-
 }

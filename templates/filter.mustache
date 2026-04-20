@@ -34,7 +34,7 @@
             <a role="button" title="{{#str}}clicktohideshow{{/str}}" href="#" class="fheader" aria-controls="id_displayinfo" aria-expanded="true">{{#str}}filter, report_lpmonitoring{{/str}}</a>
         </legend>
         <div class="fcontainer clearfix">
-            <div class="fitem_fradio fitem fitem_fradiogroup form-group row">
+            <div class="fitem_fradio fitem fitem_fradiogroup mb-3 row">
                 <div class="fitemtitle col-md-3" id="optionfilter">
                     <label class="col-form-label d-inline">{{#str}}filterby, report_lpmonitoring{{/str}}</label>
                 </div>
@@ -61,12 +61,12 @@
                 </div>
             </div>
             <div class="templatefilter">
-                <div class="fitem form-group row">
+                <div class="fitem mb-3 row">
                     <div class="fitemtitle col-md-3">
                         <label class="col-form-label d-inline" for="templateSelectorReport">{{#str}}template, tool_lp{{/str}}</label>
                     </div>
                     <div class="felement fautocomplete col-md-9">
-                        <select id="templateSelectorReport" class="form-control custom-select">
+                        <select id="templateSelectorReport" class="form-control form-select">
                             <option value="">{{#str}}selectlearningplantemplate, report_lpmonitoring{{/str}}</option>
                             {{#templates}}
                             <option value="{{id}}">{{shortname}}</option>
@@ -74,7 +74,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="fitem for-autocomplete form-group row">
+                <div class="fitem for-autocomplete mb-3 row">
                     <div class="fitemtitle col-md-3">
                         <label class="col-form-label d-inline" for="learningplanSelectorReport">{{#str}}usersfromtemplate, report_lpmonitoring{{/str}}</label>
                     </div>
@@ -84,7 +84,7 @@
                     </div>
                 </div>
                 <div class="advanced" style="display: none">
-                    <div class="fitem form-group row">
+                    <div class="fitem mb-3 row">
                         <div class="fitemtitle col-md-3">
                             <label>{{#str}}comments{{/str}}</label>
                         </div>
@@ -95,7 +95,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="fitem form-group row">
+                    <div class="fitem mb-3 row">
                         <div class="fitemtitle col-md-3">
                             <label>{{#str}}learningplans, tool_lp{{/str}}</label>
                         </div>
@@ -106,7 +106,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="fitem form-group row">
+                    <div class="fitem mb-3 row">
                         <div class="fitemtitle col-md-3">
                             <label>{{#str}}scalesfortemplate, report_lpmonitoring{{/str}}</label>
                         </div>
@@ -114,7 +114,7 @@
                             <div id="scale"></div>
                         </div>
                     </div>
-                    <div class="fitem form-group row">
+                    <div class="fitem mb-3 row">
                         <div class="fitemtitle col-md-3" id="scalefilterapply">
                             <label>{{#str}}scalefilterby, report_lpmonitoring{{/str}}</label>
                         </div>
@@ -122,7 +122,7 @@
                             <div id="scalefilter"></div>
                         </div>
                     </div>
-                    <div class="fitem form-group row">
+                    <div class="fitem mb-3 row">
                         <div class="fitemtitle col-md-3" id="scalesortorderlabel">
                             <label >{{#str}}sort{{/str}}</label>
                         </div>
@@ -132,7 +132,7 @@
                     </div>
                 </div>
                 <div class="moreless-actions hidden">
-                    <div class="fitem form-group row">
+                    <div class="fitem mb-3 row">
                         <div class="fitemtitle col-md-3"></div>
                         <div class="felement col-md-9">
                             <a href="#" title="{{#str}}showmore, form{{/str}}" class="moreless-toggler show-toggler" role="button">{{#str}}showmore, form{{/str}}</a>
@@ -142,7 +142,7 @@
                 </div>
             </div>
             <div class="studentfilter disabled-option">
-                <div class="fitem form-group row">
+                <div class="fitem mb-3 row">
                     <div class="fitemtitle col-md-3">
                         <label for="studentSelectorReport">{{#str}}user{{/str}}</label>
                     </div>
@@ -151,29 +151,29 @@
                         </select>
                     </div>
                 </div>
-                <div class="fitem form-group row">
+                <div class="fitem mb-3 row">
                     <div class="fitemtitle col-md-3">
                         <label for="studentPlansSelectorReport">{{#str}}learningplans, tool_lp{{/str}}</label>
                     </div>
                     <div class="felement col-md-9">
-                        <select id="studentPlansSelectorReport" class="form-control custom-select" disabled="disabled">
+                        <select id="studentPlansSelectorReport" class="form-control form-select" disabled="disabled">
                             <option>{{#str}}nolearningplanavailable, report_lpmonitoring{{/str}}</option>
                         </select>
                     </div>
                 </div>
             </div>
             <div class="tagfilter disabled-option">
-                <div class="fitem form-group row">
+                <div class="fitem mb-3 row">
                     <div class="fitemtitle col-md-3">
                         <label class="col-form-label d-inline" for="tagSelectorReport">{{#str}}tag, report_lpmonitoring{{/str}}</label>
                     </div>
                     <div class="felement fautocomplete col-md-9">
-                        <select id="tagSelectorReport" class="form-control custom-select">
+                        <select id="tagSelectorReport" class="form-control form-select">
                             <option value="">{{#str}}selecttag, report_lpmonitoring{{/str}}</option>
                         </select>
                     </div>
                 </div>
-                <div class="fitem form-group row">
+                <div class="fitem mb-3 row">
                     <div class="fitemtitle col-md-3">
                             <label>{{#str}}comments{{/str}}</label>
                     </div>
@@ -184,18 +184,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="fitem form-group row">
+                <div class="fitem mb-3 row">
                     <div class="fitemtitle col-md-3">
                         <label for="learningplanTagSelectorReport">{{#str}}learningplanswithtag, report_lpmonitoring{{/str}}</label>
                     </div>
                     <div class="felement col-md-9">
-                        <select id="learningplanTagSelectorReport" class="form-control custom-select" disabled="disabled">
+                        <select id="learningplanTagSelectorReport" class="form-control form-select" disabled="disabled">
                             <option>{{#str}}nolearningplanavailable, report_lpmonitoring{{/str}}</option>
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="fitem form-group row">
+            <div class="fitem mb-3 row">
                     <div class="fitemtitle col-md-3"></div>
                     <div class="felement col-md-9">
                         <button id="submitFilterReportButton" type="submit" class="btn btn-primary" disabled>

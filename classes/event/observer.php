@@ -33,7 +33,6 @@ use report_lpmonitoring\api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class observer {
-
     /**
      * Listen to events and queue the submission for processing.
      * @param \core\event\competency_framework_deleted $event
@@ -47,5 +46,4 @@ class observer {
 
         api::delete_report_competency_config($record->id);
     }
-
 }

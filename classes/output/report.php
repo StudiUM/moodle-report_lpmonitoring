@@ -42,7 +42,6 @@ use report_lpmonitoring\api as report_lpmonitoring_api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report implements renderable, templatable {
-
     /** @var context The context in which everything is happening. */
     protected $pagecontext;
 
@@ -56,8 +55,15 @@ class report implements renderable, templatable {
      */
     public function __construct(context $pagecontext) {
         $this->pagecontext = $pagecontext;
-        $this->learningplantemplates = core_competency_api::list_templates('shortname', 'ASC', 0, 0, $this->pagecontext,
-                'children', true);
+        $this->learningplantemplates = core_competency_api::list_templates(
+            'shortname',
+            'ASC',
+            0,
+            0,
+            $this->pagecontext,
+            'children',
+            true
+        );
     }
 
     /**

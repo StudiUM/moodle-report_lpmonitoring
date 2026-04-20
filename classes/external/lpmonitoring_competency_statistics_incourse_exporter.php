@@ -28,7 +28,6 @@ use renderer_base;
 use core\external\exporter;
 use report_lpmonitoring\external\scale_competency_incourse_statistics_exporter;
 
-
 /**
  * Class for exporting lpmonitoring_competency_statistics_incourse data.
  *
@@ -37,7 +36,6 @@ use report_lpmonitoring\external\scale_competency_incourse_statistics_exporter;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lpmonitoring_competency_statistics_incourse_exporter extends exporter {
-
     /**
      * Return the list of additional properties used only for display.
      *
@@ -84,13 +82,14 @@ class lpmonitoring_competency_statistics_incourse_exporter extends exporter {
             $scaleinfo->name = $scalename;
             $scaleinfo->color = $data->reportscaleconfig[$id - 1]->color;
 
-            $scalecompetencyitemexporter = new scale_competency_incourse_statistics_exporter($scaleinfo,
-                    ['ratings' => $data->listratings]);
+            $scalecompetencyitemexporter = new scale_competency_incourse_statistics_exporter(
+                $scaleinfo,
+                ['ratings' => $data->listratings]
+            );
             $scalecompetencyitem = $scalecompetencyitemexporter->export($output);
             $result->nbratings += $scalecompetencyitem->nbratings;
             $result->scalecompetencyitems[] = $scalecompetencyitem;
         }
         return (array) $result;
     }
-
 }

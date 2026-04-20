@@ -29,25 +29,22 @@ global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
-
 use report_lpmonitoring\external;
 use report_lpmonitoring\api;
 use core_competency\api as core_competency_api;
 use tool_cohortroles\api as tool_cohortroles_api;
 use core_external\external_api;
 
-
 /**
  * External testcase.
  *
- * @covers     \report_lpmonitoring\api
  * @package    report_lpmonitoring
  * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
  * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\report_lpmonitoring\api::class)]
 final class external_cm_test extends \externallib_advanced_testcase {
-
     /** @var stdClass $appreciator User with enough permissions to access lpmonitoring report in system context. */
     protected $appreciator = null;
 
@@ -139,9 +136,9 @@ final class external_cm_test extends \externallib_advanced_testcase {
         // Create scales.
         $this->scale = $dg->create_scale(["name" => "Scale default", "scale" => "not good, good"]);
 
-        $scaleconfiguration = '[{"scaleid":"'.$this->scale->id.'"},' .
-                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
-                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+        $scaleconfiguration = '[{"scaleid":"' . $this->scale->id . '"},' .
+            '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
 
         // Create the framework competency.
         $framework = [
@@ -211,12 +208,12 @@ final class external_cm_test extends \externallib_advanced_testcase {
         );
 
         $appreciatorforcategory = $dg->create_user(
-                [
-                    'firstname' => 'Appreciator',
-                    'lastname' => 'Test',
-                    'username' => 'appreciator',
-                    'password' => 'appreciator',
-                ]
+            [
+                'firstname' => 'Appreciator',
+                'lastname' => 'Test',
+                'username' => 'appreciator',
+                'password' => 'appreciator',
+            ]
         );
 
         $cohort = $dg->create_cohort(['contextid' => $cat1ctx->id]);
@@ -322,8 +319,13 @@ final class external_cm_test extends \externallib_advanced_testcase {
         $this->setUser($this->appreciatorforcategory);
 
         $scalevalues = '[{"scalevalue" : 1, "scaleid" :' . $this->scale->id . '}]';
-        $result = \report_lpmonitoring\external::read_plan(null, $this->templateincategory->get('id'), $scalevalues,
-        'coursemodule', 'ASC');
+        $result = \report_lpmonitoring\external::read_plan(
+            null,
+            $this->templateincategory->get('id'),
+            $scalevalues,
+            'coursemodule',
+            'ASC'
+        );
         $result = external::clean_returnvalue(external::read_plan_returns(), $result);
         $this->assertEquals($this->user1->id, $result['plan']['user']['id']);
     }
@@ -410,17 +412,42 @@ final class external_cm_test extends \externallib_advanced_testcase {
         $cpg->create_course_module_competency(['competencyid' => $this->comp2->get('id'), 'cmid' => $cm22->id]);
 
         // Rate user1 in course modules cm1, cm2 and cm11.
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user1->id, $this->comp1->get('id'), 1,
-                'My note Data 1');
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user1->id, $this->comp1->get('id'), 1,
-                'My last note Data 1');
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm2, $this->user1->id, $this->comp1->get('id'), 2,
-                'My note Data 2');
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm11, $this->user1->id, $this->comp1->get('id'), 1,
-                'My note Data 11');
+        \tool_cmcompetency\api::grade_competency_in_coursemodule(
+            $cm1,
+            $this->user1->id,
+            $this->comp1->get('id'),
+            1,
+            'My note Data 1'
+        );
+        \tool_cmcompetency\api::grade_competency_in_coursemodule(
+            $cm1,
+            $this->user1->id,
+            $this->comp1->get('id'),
+            1,
+            'My last note Data 1'
+        );
+        \tool_cmcompetency\api::grade_competency_in_coursemodule(
+            $cm2,
+            $this->user1->id,
+            $this->comp1->get('id'),
+            2,
+            'My note Data 2'
+        );
+        \tool_cmcompetency\api::grade_competency_in_coursemodule(
+            $cm11,
+            $this->user1->id,
+            $this->comp1->get('id'),
+            1,
+            'My note Data 11'
+        );
         // Rate user2 in course modules cm1.
-        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm1, $this->user2->id, $this->comp1->get('id'), 1,
-                'My note Data 1 u2');
+        \tool_cmcompetency\api::grade_competency_in_coursemodule(
+            $cm1,
+            $this->user2->id,
+            $this->comp1->get('id'),
+            1,
+            'My note Data 1 u2'
+        );
 
         // Test for user1 for comp1.
         $planuser1 = \core_competency\plan::get_record(['userid' => $this->user1->id]);
@@ -552,8 +579,10 @@ final class external_cm_test extends \externallib_advanced_testcase {
         $this->setUser($this->appreciator);
 
         // Check info for competency 1.
-        $result = external::get_competency_statistics_incoursemodules($this->comp1->get('id'),
-            $this->templateincategory->get('id'));
+        $result = external::get_competency_statistics_incoursemodules(
+            $this->comp1->get('id'),
+            $this->templateincategory->get('id')
+        );
         $result = external::clean_returnvalue(external::get_competency_statistics_incoursemodules_returns(), $result);
 
         // Check info returned.
@@ -568,8 +597,10 @@ final class external_cm_test extends \externallib_advanced_testcase {
         $this->assertEquals(1, $result['scalecompetencyitems'][1]['nbratings']);
 
         // Test no rating for the competency 2.
-        $result = external::get_competency_statistics_incoursemodules($this->comp2->get('id'),
-            $this->templateincategory->get('id'));
+        $result = external::get_competency_statistics_incoursemodules(
+            $this->comp2->get('id'),
+            $this->templateincategory->get('id')
+        );
         $result = external::clean_returnvalue(external::get_competency_statistics_incourse_returns(), $result);
         $this->assertEquals($this->comp2->get('id'), $result['competencyid']);
         $this->assertEquals(8, $result['nbratingtotal']);
@@ -601,8 +632,14 @@ final class external_cm_test extends \externallib_advanced_testcase {
         // Link competency to course module.
         $lpg->create_course_module_competency(['competencyid' => $c1->get('id'), 'cmid' => $cm->id]);
 
-        \tool_cmcompetency\external::grade_competency_in_coursemodule($cm->id, $this->user1->id, $c1->get('id'), 1,
-            'New note', false);
+        \tool_cmcompetency\external::grade_competency_in_coursemodule(
+            $cm->id,
+            $this->user1->id,
+            $c1->get('id'),
+            1,
+            'New note',
+            false
+        );
 
         // Do the tests as the student in the course.
         $this->setUser($this->user1);

@@ -31,14 +31,15 @@ define(['jquery',
     'core/modal_factory',
     'core/modal_events',
     'report_lpmonitoring/user_competency_popup',
-    'tool_lp/grade_user_competency_inline',
+    'report_lpmonitoring/grade_user_competency_inline',
     'report_lpmonitoring/fieldsettoggler',
     'report_lpmonitoring/colorcontrast',
     'report_lpmonitoring/paginated_datatable',
-    'report_lpmonitoring/resetgrade_dialogue'],
+    'report_lpmonitoring/resetgrade_dialogue',
+    'core_form/changechecker'],
     function($, templates, ajax, notification, str, Chart, autocomplete, ModalFactory, ModalEvents,
         Popup, InlineGrader, fieldsettoggler,
-        colorcontrast, DataTable, ResetGradeDialogue) {
+        colorcontrast, DataTable, ResetGradeDialogue, FormChangeChecker) {
 
         /**
          * Learning plan report.
@@ -1515,6 +1516,14 @@ define(['jquery',
          */
         LearningplanReport.prototype.initPage = function() {
             var self = this;
+
+            // Disable form change checker on the report filter form.
+            // This form is not a moodleform and does not need unsaved changes warnings.
+            var reportFilterForm = document.getElementById('reportFilter');
+            if (reportFilterForm) {
+                FormChangeChecker.unWatchForm(reportFilterForm);
+            }
+
             str.get_strings([
                 { key: 'selectuser', component: 'report_lpmonitoring' },
                 { key: 'nouserselected', component: 'report_lpmonitoring' }]
