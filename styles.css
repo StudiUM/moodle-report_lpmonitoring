@@ -706,7 +706,8 @@
     margin-top: 20px;
 }
 .competencyreport canvas.detail-competency {
-    margin: 1px 1px 1px 0;
+    display: block;
+    margin: 1px auto;
     width: 80px;
     height: 80px;
 }
@@ -732,6 +733,7 @@
     padding: 0.1em;
     height: 74px;
     width: 74px;
+    margin: 0 auto;
     white-space: normal;
 }
 .competencyreport .no-data-available span {
@@ -779,6 +781,7 @@
 .competencyreport td.convaschart {
     padding-top: 30px;
     vertical-align: top;
+    text-align: center;
 }
 .competencyreport .loaderstatscompetency {
     text-align: center;
