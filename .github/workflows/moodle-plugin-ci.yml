@@ -1,0 +1,17 @@
+name: Moodle plugin CI
+
+on:
+  - push
+  - pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    uses: StudiUM/common-workflows/.github/workflows/moodle-plugin-ci-template.yml@main
+    with:
+      moodle-branches: '["MOODLE_501_STABLE"]'
+      php-versions: '["8.4", "8.3"]'
+      databases: '["mariadb", "pgsql"]'
+
