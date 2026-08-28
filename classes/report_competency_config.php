@@ -54,10 +54,9 @@ class report_competency_config extends \core\persistent {
      * @return mixed
      */
     final public function __call($method, $arguments) {
-        debugging('deprecated magic method in report_competency_config', DEBUG_DEVELOPER);
         if (strpos($method, 'get_') === 0) {
             return $this->get(substr($method, 4));
-        } else if (strpos($method, 'set_') === 0) {
+        } elseif (strpos($method, 'set_') === 0) {
             return $this->set(substr($method, 4), $arguments[0]);
         }
         throw new \coding_exception('Unexpected method call: ' . $method);
@@ -140,7 +139,7 @@ class report_competency_config extends \core\persistent {
      * @return bool|lang_string
      */
     protected function validate_scaleconfiguration($value) {
-        $scale = self::get_scale();
+        $scale = $this->get_scale();
         if (!$scale) {
             return true;
         }
@@ -160,7 +159,7 @@ class report_competency_config extends \core\persistent {
      *
      */
     public function set_default_scaleconfiguration() {
-        $scale = self::get_scale();
+        $scale = $this->get_scale();
         $scaleitems = $scale->scale_items;
         $scaleconfiguration = json_decode($this->get('scaleconfiguration'));
         foreach ($scaleitems as $key => $value) {
