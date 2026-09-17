@@ -15,22 +15,28 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version info
+ * Upgrade the report_lpmonitoring plugin.
  *
- * @package    report_lpmonitoring
- * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
- * @copyright  2016 Université de Montréal
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   report_lpmonitoring
+ * @param int $oldversion
+ * @copyright 2026 Université de Montréal
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @return bool
  */
+function xmldb_report_lpmonitoring_upgrade($oldversion) {
+    global $DB;
 
-defined('MOODLE_INTERNAL') || die();
+    $dbman = $DB->get_manager();
 
-$plugin->version  = 2026091700;
-$plugin->requires = 2025100600;
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '2.0.0';
-$plugin->component = 'report_lpmonitoring';
+    if ($oldversion < 2026091700) {
+        $table = new xmldb_table('report_competency_config');
 
-$plugin->dependencies = [
-    'tool_lp' => 2025100600,
-];
+        if ($dbman->table_exists($table)) {
+            $dbman->rename_table($table, 'report_lpmonitoring_competency_config');
+        }
+
+        upgrade_plugin_savepoint(true, 2026091700, 'report', 'lpmonitoring');
+    }
+
+    return true;
+}
