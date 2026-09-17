@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * Step definitions for learning plan report.
  *
@@ -30,6 +30,15 @@ use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Exception\ExpectationException;
 use report_lpmonitoring\api;
 
+/**
+ * Step definition to generate database fixtures for learning plan report.
+ *
+ * @package    report_lpmonitoring
+ * @category   test
+ * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
+ * @copyright  2016 Université de Montréal
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class behat_report_lpmonitoring extends behat_base {
     /**
      * Checks, that the specified element contains the specified text in the competency detail rating.
@@ -52,8 +61,8 @@ class behat_report_lpmonitoring extends behat_base {
     ) {
         // Building xpath.
         $xpath = "//table[contains(@class, 'tile_info') and contains(@data-type, '$type') and "
-                . "ancestor-or-self::div[contains(., '$competencyname')]]/"
-                . "tbody/tr[$rownumber]/td[contains(., '$scalevalue')]/following-sibling::td[1]";
+            . "ancestor-or-self::div[contains(., '$competencyname')]]/"
+            . "tbody/tr[$rownumber]/td[contains(., '$scalevalue')]/following-sibling::td[1]";
         $this->execute(
             "behat_general::assert_element_contains_text",
             [$numberrating, $xpath, "xpath_element"]
@@ -85,7 +94,7 @@ class behat_report_lpmonitoring extends behat_base {
                 $xpath = "//span[contains(@class, '$targetclass') and ancestor-or-self::div/h4/a[contains(., '$compname')]]";
                 break;
             case 'no-data-available':
-                 $xpath = "//div[contains(., '$compname')]/div/div/div/div/div/"
+                $xpath = "//div[contains(., '$compname')]/div/div/div/div/div/"
                     . "table/tbody/tr/td/div[contains(@class, '$targetclass')]";
                 break;
             case 'incourse':
@@ -148,8 +157,8 @@ class behat_report_lpmonitoring extends behat_base {
     ) {
         // Building xpath.
         $xpath = "//table[contains(@class, 'tile_info') and contains(@data-type, '$type') and "
-                . "ancestor-or-self::div[contains(., '$competencyname')]]/tbody/"
-                . "tr[$rownumber]/td[contains(., '$scalevalue')]/following-sibling::td[1]/a[contains(., '$numberrating')]";
+            . "ancestor-or-self::div[contains(., '$competencyname')]]/tbody/"
+            . "tr[$rownumber]/td[contains(., '$scalevalue')]/following-sibling::td[1]/a[contains(., '$numberrating')]";
         $this->execute('behat_general::i_click_on', [$xpath, "xpath_element"]);
     }
 
@@ -227,11 +236,11 @@ class behat_report_lpmonitoring extends behat_base {
         } else {
             // Header can be in thead or tbody (first row), following xpath should work.
             $theadheaderxpath = "thead/tr[1]/th[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
-                    $columnliteral . "] or div[normalize-space(text())=" .
-                    $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
+                $columnliteral . "] or div[normalize-space(text())=" .
+                $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
             $tbodyheaderxpath = "tbody/tr[1]/td[(normalize-space(.)=" . $columnliteral . " or a[normalize-space(text())=" .
-                    $columnliteral . "] or div[normalize-space(text())=" .
-                    $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
+                $columnliteral . "] or div[normalize-space(text())=" .
+                $columnliteral . "])][not(contains(@class, 'switchsearchhidden'))]";
 
             // Check if column exists.
             $columnheaderxpath = $tablexpath . "[" . $theadheaderxpath . " | " . $tbodyheaderxpath . "]";
@@ -376,7 +385,7 @@ class behat_report_lpmonitoring extends behat_base {
     /**
      * Checks that the specified lpmonitoring checkbox is checked.
      *
-     * @Then /^the lpmonitoring "(?P<checkbox_string>(?:[^"]|\\")*)" "(?P<element_string>(?:[^"]|\\")*)" checkbox should be checked$/
+     * @Then /^the lpmonitoring "(?P<checkbox>(?:[^"]|\\")*)" "(?P<selectortype>[^"]*)" checkbox should be checked$/
      * @throws ExpectationException
      * @param string $checkbox
      * @param string $selectortype
@@ -385,15 +394,17 @@ class behat_report_lpmonitoring extends behat_base {
         $node = $this->get_selected_node($selectortype, $checkbox);
 
         if (!$node->hasAttribute('checked')) {
-            throw new ExpectationException('The lpmonitoring checkbox "' . $checkbox . '" is not checked',
-                $this->getSession());
+            throw new ExpectationException(
+                'The lpmonitoring checkbox "' . $checkbox . '" is not checked',
+                $this->getSession()
+            );
         }
     }
 
     /**
      * Checks that the specified lpmonitoring checkbox is not checked.
      *
-     * @Then /^the lpmonitoring "(?P<checkbox_string>(?:[^"]|\\")*)" "(?P<element_string>(?:[^"]|\\")*)" checkbox should not be checked$/
+     * @Then /^the lpmonitoring "(?P<checkbox>(?:[^"]|\\")*)" "(?P<selectortype>[^"]*)" checkbox should not be checked$/
      * @throws ExpectationException
      * @param string $checkbox
      * @param string $selectortype
@@ -402,9 +413,10 @@ class behat_report_lpmonitoring extends behat_base {
         $node = $this->get_selected_node($selectortype, $checkbox);
 
         if ($node->hasAttribute('checked')) {
-            throw new ExpectationException('The lpmonitoring checkbox "' . $checkbox . '" is checked',
-                $this->getSession());
+            throw new ExpectationException(
+                'The lpmonitoring checkbox "' . $checkbox . '" is checked',
+                $this->getSession()
+            );
         }
     }
-
 }
