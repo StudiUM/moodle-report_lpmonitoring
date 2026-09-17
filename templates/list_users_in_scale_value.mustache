@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/list_users_in_scale_value
+    Example context (json):
+    {}
+}}
+{{!
     List users associated to a scale value in competency template
 
     Context variables required for this template:
@@ -30,7 +35,7 @@
 <div class="lpmonitoringdialogue">
 <table class="usersbyscalevalue dataTable table table-striped" id="list-user-{{competencyid}}-{{scalevalue}}">
     <caption class="cr-caption">
-        {{#str}}rating, tool_lp{{/str}} <span class="badge cr-scalename truncate" style="background-color: {{scalecompetencyitem.color}}">{{scalecompetencyitem.name}}</span>
+        {{#str}}rating, tool_lp{{/str}} <span class="badge cr-scalename truncate"{{#scalecompetencyitem.color}} style="background-color: {{scalecompetencyitem.color}}"{{/scalecompetencyitem.color}}>{{scalecompetencyitem.name}}</span>
     </caption>
     <thead>
         <tr>

@@ -1,4 +1,6 @@
 {{!
+    @template report_lpmonitoring/scale_filter
+
     Competency scale filter template.
 
     Classes required for JS:
@@ -11,6 +13,19 @@
       * color - the color of the scale value
       * id - scale value
       * name - name of the scale value
+
+    Example context (json):
+    {
+        "scales": [
+            {
+                "scaleid": 1,
+                "name": "Example scale",
+                "scaleconfiguration": [
+                    {"id": 1, "name": "Not competent", "color": "#cc0000"}
+                ]
+            }
+        ]
+    }
 }}
 <div class="scalecontainer">
     {{#scales}}

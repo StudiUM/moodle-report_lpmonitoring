@@ -33,16 +33,25 @@
     * pdfreporttitle - The title given to the report.
     * dategenerated - String describing when the PDF was generated.
     * pdfimage - Points to a temporary copy of the configured logo.
+
+    Example context (json):
+    {}
 }}
 
-<style>
-    {{styles}}
-</style>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{#pdfreporttitle}}{{pdfreporttitle}}{{/pdfreporttitle}}{{^pdfreporttitle}}Learning plan report{{/pdfreporttitle}}</title>
+    <style>
+        {{styles}}
+    </style>
+</head>
+<body>
 <br />
 <br />
 <table class="logo">
     <tr>
-        <td class="left"><img src="{{pdfimage}}" /></td>
+        <td class="left">{{#pdfimage}}<img src="{{pdfimage}}" alt="{{pdfreporttitle}}">{{/pdfimage}}</td>
         <td class="right">{{pdfreporttitle}}</td>
     </tr>
 </table>
@@ -112,7 +121,7 @@
 
                 {{^last}}
                 <tr>
-                    <td class="borderleft borderright" colspan="4"></td> 
+                    <td class="borderleft borderright" colspan="4"></td>
                 </tr>
                 {{/last}}
 
@@ -135,3 +144,5 @@
     <br />
     <br />
 {{/plans}}
+</body>
+</html>
