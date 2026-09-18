@@ -1,3 +1,4 @@
+// Third-party DataTables source; intentionally excluded from ESLint.
 /* eslint-disable */
 /*! DataTables 1.10.13-dev
  * ©2008-2015 SpryMedia Ltd - datatables.net/license

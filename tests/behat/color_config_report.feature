@@ -54,4 +54,3 @@ Feature: Manage configuration for monitoring of learning plans report
     And I should see "Colors for the scale: Scale specific"
     And "//input[@name='not qualified' and @value='#2ca9d3']" "xpath_element" should exist
     And "//input[@name='qualified' and @value='#e6e00d']" "xpath_element" should exist
-
