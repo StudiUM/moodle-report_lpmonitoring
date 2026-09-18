@@ -20,4 +20,5 @@ jobs:
       max-grunt-lint-warnings: 1
       dependent-plugins: |
         --branch main StudiUM/moodle-tool_cmcompetency
+        --branch main StudiUM/moodle-report_cmcompetency
 
