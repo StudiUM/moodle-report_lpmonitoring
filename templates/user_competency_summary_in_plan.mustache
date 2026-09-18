@@ -17,11 +17,6 @@
 {{!
     @template report_lpmonitoring/user_competency_summary_in_plan
 
-    Override of tool_lp/user_competency_summary_in_plan that uses
-    report_lpmonitoring/grade_user_competency_inline instead of
-    tool_lp/grade_user_competency_inline to fix a timing issue where
-    the grade dialogue's form JS runs before the DOM is ready.
-
     Example context (json):
     {}
 }}
@@ -64,7 +59,7 @@
             {{/cangrade}}
         </dd>
         {{#js}}
-        require(['jquery', 'report_lpmonitoring/grade_user_competency_inline', 'tool_lp/user_competency_info', 'tool_lp/user_competency_workflow'], function($, mod, info, UserCompWorkflow) {
+        require(['jquery', 'tool_lp/grade_user_competency_inline', 'tool_lp/user_competency_info', 'tool_lp/user_competency_workflow'], function($, mod, info, UserCompWorkflow) {
 
             var competencyElement = $('[data-region-id="{{uniqid}}"]');
             var infoReloader = new info(competencyElement, '{{competency.competency.id}}', '{{user.id}}', '{{plan.id}}');

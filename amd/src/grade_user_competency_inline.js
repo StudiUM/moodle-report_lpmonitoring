@@ -30,7 +30,7 @@ define(['jquery',
     'core/notification',
     'core/ajax',
     'core/log',
-    'report_lpmonitoring/grade_dialogue',
+    'tool_lp/grade_dialogue',
     'tool_lp/event_base',
     'tool_lp/scalevalues',
 ], function($, notification, ajax, log, GradeDialogue, EventBase, ScaleValues) {
@@ -61,11 +61,13 @@ define(['jquery',
         this._planId = planId;
         this._courseId = courseId;
         this._chooseStr = chooseStr;
-        this._setUp();
+        this._ready = this._setUp();
 
         trigger.click(function(e) {
             e.preventDefault();
-            this._dialogue.display();
+            return this._ready.then(function() {
+                this._dialogue.display();
+            }.bind(this));
         }.bind(this));
 
         if (this._planId) {
@@ -101,8 +103,7 @@ define(['jquery',
             self = this;
 
         M.util.js_pending('report_lpmonitoring/grade_user_competency_inline:_setUp');
-        var promise = ScaleValues.get_values(self._scaleId);
-        promise.then(function(scalevalues) {
+        var promise = ScaleValues.get_values(self._scaleId).then(function(scalevalues) {
             options.push({
                 value: '',
                 name: self._chooseStr
@@ -141,10 +142,12 @@ define(['jquery',
             .then(function(dialogue) {
                 self._dialogue = dialogue;
 
-                M.util.js_complete('report_lpmonitoring/grade_user_competency_inline:_setUp');
-                return;
-            })
-            .fail(notification.exception);
+            return dialogue;
+        });
+
+        return promise.always(function() {
+            M.util.js_complete('report_lpmonitoring/grade_user_competency_inline:_setUp');
+        }).fail(notification.exception);
     };
 
     /** @property {Number} The scale id for this competency. */
@@ -159,6 +162,8 @@ define(['jquery',
     InlineEditor.prototype._courseId = null;
     /** @property {String} The text for Choose rating. */
     InlineEditor.prototype._chooseStr = null;
+    /** @property {Promise} Promise resolved when the dialogue is ready. */
+    InlineEditor.prototype._ready = null;
     /** @property {GradeDialogue} The grading dialogue. */
     InlineEditor.prototype._dialogue = null;
 
