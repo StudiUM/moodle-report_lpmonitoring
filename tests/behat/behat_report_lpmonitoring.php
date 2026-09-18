@@ -298,25 +298,30 @@ class behat_report_lpmonitoring extends behat_base {
     }
 
     /**
-     * If course module competency grading is not enabled, skip the test.
+     * Force course module competency grading to be considered enabled for this scenario.
      *
      * @Given /^course module competency grading is enabled$/
      */
     public function course_module_competency_grading_is_enabled() {
-        if (!api::is_cm_comptency_grading_enabled()) {
-            throw new \Moodle\BehatExtension\Exception\SkippedException();
-        }
+        set_config('behat_iscmcompetencygradingenabled', 1, 'report_lpmonitoring');
     }
 
     /**
-     * If course module competency grading is enabled, skip the test.
+     * Force course module competency grading to be considered not enabled for this scenario.
      *
      * @Given /^course module competency grading is not enabled$/
      */
     public function course_module_competency_grading_is_not_enabled() {
-        if (api::is_cm_comptency_grading_enabled()) {
-            throw new \Moodle\BehatExtension\Exception\SkippedException();
-        }
+        set_config('behat_iscmcompetencygradingenabled', 0, 'report_lpmonitoring');
+    }
+
+    /**
+     * Reset the forced course module competency grading state after each scenario.
+     *
+     * @AfterScenario
+     */
+    public function reset_cm_competency_grading_override(): void {
+        unset_config('behat_iscmcompetencygradingenabled', 'report_lpmonitoring');
     }
 
     /**
