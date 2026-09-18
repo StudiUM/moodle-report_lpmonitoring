@@ -1256,6 +1256,14 @@ class api {
         ) {
             return self::$iscmcompetencygradingenabled;
         }
+        // Behat runs in a separate process from the site under test, so a forced value
+        // needs to be persisted via config rather than the static property used by PHPUnit.
+        if (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING) {
+            $forced = get_config('report_lpmonitoring', 'behat_iscmcompetencygradingenabled');
+            if ($forced !== false) {
+                return (bool) $forced;
+            }
+        }
         if (\core_component::get_component_directory('tool_cmcompetency')) {
             return true;
         }
