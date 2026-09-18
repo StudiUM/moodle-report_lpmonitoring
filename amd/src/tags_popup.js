@@ -26,18 +26,18 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
         /**
          * Constructor.
          *
-         * @param {String} selector_button The CSS selector used to find triggers for the new group modal.
-         * @param {string} selector_nbtags The CSS selector used to display the new number of tags for the plan.
+         * @param {String} selectorButton The CSS selector used to find triggers for the new group modal.
+         * @param {string} selectorNbtags The CSS selector used to display the new number of tags for the plan.
          * @param {int} contextid
          * @param {int} planid The learning plan id.
          *
          * Each call to init gets it's own instance of this class.
          */
-        var TagsPopup = function(selector_button, selector_nbtags, contextid, planid) {
+        var TagsPopup = function(selectorButton, selectorNbtags, contextid, planid) {
             this.contextid = contextid;
             this.planid = planid;
-            this.selector_nbtags = selector_nbtags;
-            $(selector_button).on('click', this.init.bind(this));
+            this.selectorNbtags = selectorNbtags;
+            $(selectorButton).on('click', this.init.bind(this));
         };
 
         /**
@@ -59,10 +59,10 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
         TagsPopup.prototype.planid = -1;
 
         /**
-         * @var {string} selector_nbtags  The CSS selector used to display the new number of tags for the plan.
+         * @var {string} selectorNbtags  The CSS selector used to display the new number of tags for the plan.
          * @private
          */
-        TagsPopup.prototype.selector_nbtags = '';
+        TagsPopup.prototype.selectorNbtags = '';
 
         /**
          * Initialise the class.
@@ -177,7 +177,7 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
             }]);
 
             promises[0].done(function(response) {
-                $(tagspopup.selector_nbtags).text(response);
+                $(tagspopup.selectorNbtags).text(response);
                 tagspopup.modal.hide();
             }).fail(function(exp) {
                 Notification.exception(exp);
@@ -202,14 +202,14 @@ define(['jquery', 'core/str', 'core/modal_factory', 'core/modal_events', 'core/f
              * Attach event listeners to initialise this module.
              *
              * @method init
-             * @param {string} selector_button The CSS selector used to find nodes that will trigger this module.
-             * @param {string} selector_nbtags The CSS selector used to display the new number of tags for the plan.
+             * @param {string} selectorButton The CSS selector used to find nodes that will trigger this module.
+             * @param {string} selectorNbtags The CSS selector used to display the new number of tags for the plan.
              * @param {int} contextid The contextid.
              * @param {int} planid The learning plan id.
              * @return {TagsPopup} A new instance of TagsPopup.
              */
-            init: function(selector_button, selector_nbtags, contextid, planid) {
-                return new TagsPopup(selector_button, selector_nbtags, contextid, planid);
+            init: function(selectorButton, selectorNbtags, contextid, planid) {
+                return new TagsPopup(selectorButton, selectorNbtags, contextid, planid);
             }
         };
     });
