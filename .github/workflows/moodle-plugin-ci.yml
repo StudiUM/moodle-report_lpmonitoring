@@ -9,9 +9,13 @@ permissions:
 
 jobs:
   test:
+    # jquery.dataTables.js is third-party and is intentionally excluded from ESLint.
+    # The shared workflow must avoid reporting ignored files as lint warnings.
     uses: StudiUM/common-workflows/.github/workflows/moodle-plugin-ci-template.yml@main
     with:
       moodle-branches: '["MOODLE_501_STABLE"]'
       php-versions: '["8.4", "8.3"]'
       databases: '["mariadb", "pgsql"]'
+      # Allow the single warning for the ignored third-party DataTables file.
+      max-grunt-lint-warnings: 1
 

@@ -46,13 +46,11 @@ Feature: Manage configuration for monitoring of learning plans report
     And I set the field with xpath "//input[@name='qualified']" to "#e6e00d"
     And I press "Save"
     Then I should see "scale were saved successfully"
-# Reactiver ce code dans tache MDLUM-6027
-#    And I set the field "templateselector" to "Choose a competency framework"
-#    And the "scaleselector" select box should contain "No scale available"
-#    And the "scaleselector" "select" should be disabled
-#    And I set the field "templateselector" to "Framework Medicine (Medicine)"
-#    And I set the field "scaleselector" to "Scale specific"
-#    And I should see "Colors for the scale: Scale specific"
-#    And "//input[@name='not qualified' and @value='#2ca9d3']" "xpath_element" should exist
-#    And "//input[@name='qualified' and @value='#e6e00d']" "xpath_element" should exist
-
+    And I set the field "templateselector" to "Choose a competency framework"
+    And the "scaleselector" select box should contain "No scale available"
+    And the "scaleselector" "select" should be disabled
+    And I set the field "templateselector" to "Framework Medicine (Medicine)"
+    And I set the field "scaleselector" to "Scale specific"
+    And I should see "Colors for the scale: Scale specific"
+    And "//input[@name='not qualified' and @value='#2ca9d3']" "xpath_element" should exist
+    And "//input[@name='qualified' and @value='#e6e00d']" "xpath_element" should exist

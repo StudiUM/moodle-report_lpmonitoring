@@ -206,8 +206,8 @@ define(['jquery',
                     }
                 }]);
 
-                promise[0].then(function(results) {
-                    str.get_string('selecttag', 'report_lpmonitoring').done(
+                return promise[0].then(function(results) {
+                    return str.get_string('selecttag', 'report_lpmonitoring').done(
                         function(selecttag) {
                             $(self.tagSelector).append($('<option>').text(selecttag).val(''));
 
@@ -216,7 +216,7 @@ define(['jquery',
                             });
 
                             // Select the option that was selected before.
-                            var optionExists = ( $(self.tagSelector + " option[value=" + self.tagId + "]").length > 0 );
+                            var optionExists = ($(self.tagSelector + " option[value=" + self.tagId + "]").length > 0);
                             if (optionExists === true) {
                                 $(self.tagSelector).val(self.tagId);
                             } else {
@@ -236,6 +236,7 @@ define(['jquery',
                     }
                 );
             }
+            return null;
         };
 
         /**
@@ -276,14 +277,15 @@ define(['jquery',
                 }
             }]);
 
-            promise[0].then(function(results) {
+            self.checkDataFormReady();
+            return promise[0].then(function(results) {
                 var label = '';
                 // Render the options of the select for learning plans.
                 var oldTagLearningplanId = self.tagLearningplanId;
                 $(self.learningplanTagSelector + ' option').remove();
 
                 if (results.length > 0) {
-                    str.get_string('selectlearningplan', 'report_lpmonitoring').done(
+                    return str.get_string('selectlearningplan', 'report_lpmonitoring').done(
                         function(selectlearningplan) {
                             $(self.learningplanTagSelector).append($('<option>').text(selectlearningplan).val(''));
 
@@ -295,31 +297,30 @@ define(['jquery',
 
                             // Select the option that was selected before.
                             var selectorOption = self.learningplanTagSelector + " option[value=" + oldTagLearningplanId + "]";
-                            var optionExists = ( $(selectorOption).length > 0 );
+                            var optionExists = ($(selectorOption).length > 0);
                             if (optionExists === true) {
                                 $(self.learningplanTagSelector).val(oldTagLearningplanId);
                                 self.tagLearningplanId = oldTagLearningplanId;
                             } else {
                                 self.tagLearningplanId = null;
                             }
+                            $(self.learningplanTagSelector).trigger('change');
                         }
                     );
                 } else {
                     $(self.learningplanTagSelector).prop("disabled", true);
-                    str.get_string('nolearningplanavailable', 'report_lpmonitoring').done(
+                    return str.get_string('nolearningplanavailable', 'report_lpmonitoring').done(
                         function(nolearningplanavailable) {
                             $(self.learningplanTagSelector).append($('<option>').text(nolearningplanavailable).val(''));
+                            return nolearningplanavailable;
                         }
                     );
                 }
-                $(self.learningplanTagSelector).trigger('change');
-
             }).fail(
                 function(exp) {
                     notification.exception(exp);
                 }
             );
-            self.checkDataFormReady();
         };
 
         /**
@@ -346,7 +347,7 @@ define(['jquery',
          */
         LearningplanReport.prototype.changeDisplayRating = function(e) {
             var displayrating = 0;
-            if ($(e.target).is( ":checked" )) {
+            if ($(e.target).is(":checked")) {
                 displayrating = 1;
             }
             var planid = $(e.target).data('displayrating-plan');
@@ -365,8 +366,8 @@ define(['jquery',
             }
             ]);
 
-            promise[0].then(function() {
-                promise[1].then(function(canresetdisplayrating) {
+            return promise[0].then(function() {
+                return promise[1].done(function(canresetdisplayrating) {
                     if (displayrating) {
                         $('.competencyreport .displayratings input[type=checkbox]').prop("checked", true);
                     } else {
@@ -376,9 +377,9 @@ define(['jquery',
                         $('.competencyreport .resetdisplayrating').show();
                     }
                 }).fail(
-                function(exp) {
-                    notification.exception(exp);
-                }
+                    function(exp) {
+                        notification.exception(exp);
+                    }
                 );
             }).fail(
                 function(exp) {
@@ -409,8 +410,8 @@ define(['jquery',
             }
             ]);
 
-            promise[0].then(function() {
-                promise[1].then(function(displayrating) {
+            return promise[0].then(function() {
+                return promise[1].done(function(displayrating) {
                     if (displayrating) {
                         $('.competencyreport .displayratings input[type=checkbox]').prop("checked", true);
                     } else {
@@ -418,9 +419,9 @@ define(['jquery',
                     }
                     $('.competencyreport .resetdisplayrating').hide();
                 }).fail(
-                function(exp) {
-                    notification.exception(exp);
-                }
+                    function(exp) {
+                        notification.exception(exp);
+                    }
                 );
             }).fail(
                 function(exp) {
@@ -438,8 +439,8 @@ define(['jquery',
          */
         LearningplanReport.prototype.resetUserUsingLPTemplateSelection = function() {
             var self = this,
-            autocomplete = $('.competencyreport .templatefilter .form-autocomplete-selection'),
-            selection = autocomplete.find('span[aria-selected="true"]');
+                autocomplete = $('.competencyreport .templatefilter .form-autocomplete-selection'),
+                selection = autocomplete.find('span[aria-selected="true"]');
             self.learningplanId = null;
             if (selection.length) {
                 selection.remove();
@@ -460,8 +461,8 @@ define(['jquery',
          */
         LearningplanReport.prototype.disableUserTemplateSelector = function(state = true) {
             var userAutocomplete = $('.competencyreport .templatefilter .for-autocomplete .fautocomplete .position-relative'),
-            inputSelector = userAutocomplete.find(':text'),
-            arrowSelector = userAutocomplete.find('.form-autocomplete-downarrow');
+                inputSelector = userAutocomplete.find(':text'),
+                arrowSelector = userAutocomplete.find('.form-autocomplete-downarrow');
 
             if (inputSelector.length > 0) {
                 inputSelector.prop("disabled", state);
@@ -487,13 +488,14 @@ define(['jquery',
                     templateid: parseInt(templateid)
                 }
             }]);
-            promise[0].then(function(results) {
+            return promise[0].then(function(results) {
                 var context = {};
                 context.scales = results;
                 context.cmcompgradingenabled = self.cmcompgradingEnabled;
                 templates.render('report_lpmonitoring/scale_filter', context).done(function(html, js) {
                     $('.competencyreport #scale').html(html);
                     templates.runTemplateJS(js);
+                    return html;
                 });
                 if (results.length > 0) {
                     $('.competencyreport #scalefilterapply').show();
@@ -512,6 +514,7 @@ define(['jquery',
                     $('.competencyreport #scalefilter').html('');
                     $('.competencyreport #scalesortorder').html('');
                 }
+                return results;
             }).fail(
                 function(exp) {
                     notification.exception(exp);
@@ -571,7 +574,7 @@ define(['jquery',
                     }
                 }]);
 
-                promise[0].then(function(results) {
+                return promise[0].then(function(results) {
                     // Reset options learning plans.
                     $(self.studentPlansSelector + ' option').remove();
                     if (results.length > 0) {
@@ -584,13 +587,16 @@ define(['jquery',
                         str.get_string('nolearningplanavailable', 'report_lpmonitoring').done(
                             function(nolearningplanavailable) {
                                 $(self.studentPlansSelector).append($('<option>').text(nolearningplanavailable).val(''));
+                                return nolearningplanavailable;
                             }
                         );
                     }
                     $(self.studentPlansSelector).trigger('change');
+                    return results;
                 }, notification.exception);
             }
             self.checkDataFormReady();
+            return null;
         };
 
         /**
@@ -623,14 +629,14 @@ define(['jquery',
             if (self.userView === false) {
                 conditionByTemplate = $('#template').is(':checked') && $(self.templateSelector).val() !== '';
                 conditionStudent = $('#student').is(':checked') && $(self.studentSelector).val() !== null &&
-                        $('option:selected', $(self.studentSelector)).attr('value') !== undefined &&
-                        $("option:selected", $(self.studentPlansSelector)).attr('value') !== null &&
-                        $("option:selected", $(self.studentPlansSelector)).attr('value') !== undefined &&
-                        $("option:selected", $(self.studentPlansSelector)).attr('value') !== '';
+                    $('option:selected', $(self.studentSelector)).attr('value') !== undefined &&
+                    $("option:selected", $(self.studentPlansSelector)).attr('value') !== null &&
+                    $("option:selected", $(self.studentPlansSelector)).attr('value') !== undefined &&
+                    $("option:selected", $(self.studentPlansSelector)).attr('value') !== '';
                 conditionByTag = $('#tag').is(':checked') && $(self.tagSelector).val() !== '';
             } else {
                 conditionStudent = $(self.studentPlansSelector).val() !== null &&
-                        $(self.studentPlansSelector).val() !== '';
+                    $(self.studentPlansSelector).val() !== '';
             }
 
             if (conditionByTemplate || conditionStudent || conditionByTag) {
@@ -658,10 +664,13 @@ define(['jquery',
                     id: plan.id
                 }
             }]);
-            promiselistCompetencies[0].then(function(results) {
+            return promiselistCompetencies[0].then(function(results) {
                 if (results.length > 0) {
                     // Get the "Detail" tab content.
-                    var competencies = {competencies_list:results, plan:plan, hascompetencies: true};
+                    var competencies = {plan: plan, hascompetencies: true};
+                    // This key is part of the Mustache template context contract.
+                    // eslint-disable-next-line camelcase
+                    competencies.competencies_list = results;
                     templates.render('report_lpmonitoring/list_competencies', competencies).done(function(html, js) {
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
@@ -680,6 +689,7 @@ define(['jquery',
                 }
                 self.loadSummaryTab(plan);
                 self.loadReportTab(plan);
+                return results;
             }).fail(
                 function(exp) {
                     elementloading.removeClass('loading');
@@ -704,7 +714,7 @@ define(['jquery',
 
             $.each(competencies, function(index, record) {
                 // Locally store user competency information.
-                self.competencies[record.competency.id] = {usercompetency:record.usercompetency};
+                self.competencies[record.competency.id] = {usercompetency: record.usercompetency};
                 requests.push({
                     methodname: 'report_lpmonitoring_get_competency_detail',
                     args: {
@@ -717,13 +727,13 @@ define(['jquery',
 
             var promises = ajax.call(requests);
             $.each(promises, function(index, promise) {
-                promise.then(function(context) {
+                return promise.then(function(context) {
                     // Locally store competency information.
                     self.competencies[context.competencyid].competencydetail = context;
                     context.plan = plan;
                     context.plan.userid = plan.user.id;
                     context.cmcompgradingenabled = self.cmcompgradingEnabled;
-                    templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
+                    return templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
                         var compid = context.competencyid;
                         var userid = plan.user.id;
                         var planid = plan.id;
@@ -779,17 +789,21 @@ define(['jquery',
                     id: plan.id
                 }
             }]);
-            promiseCompetenciesReport[0].then(function(results) {
-                if (results['competencies_list'].length > 0) {
-                    var competencies = {reportinfos:results, plan:plan, hascompetencies: true};
+            return promiseCompetenciesReport[0].then(function(results) {
+                var competencies;
+                if (results.competencies_list.length > 0) {
+                    competencies = {reportinfos: results, plan: plan, hascompetencies: true};
 
                     // Keep the filter and search values.
                     var checkedvalue = $('input[type=radio][name=reportfilter]:checked').val();
                     if (checkedvalue == 'course') {
+                        // eslint-disable-next-line camelcase
                         competencies.filterchecked_course = true;
                     } else if (checkedvalue == 'module') {
+                        // eslint-disable-next-line camelcase
                         competencies.filterchecked_module = true;
                     } else {
+                        // eslint-disable-next-line camelcase
                         competencies.filterchecked_both = true;
                     }
 
@@ -798,7 +812,7 @@ define(['jquery',
                     competencies.scalefilterreport = $('#scale-filter-report option:selected').val();
 
                     // Render the "Report" data table template.
-                    templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
+                    return templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
                         $("#report-content").html(html);
                         templates.runTemplateJS(js);
                         var popup = new Popup('[data-region=report-competencies-section]', '[data-user-competency=true]');
@@ -810,8 +824,8 @@ define(['jquery',
                         };
                     });
                 } else {
-                    var competencies = {hascompetencies: false};
-                    templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
+                    competencies = {hascompetencies: false};
+                    return templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
                         $("#report-content").html(html);
                         templates.runTemplateJS(js);
                     });
@@ -839,17 +853,21 @@ define(['jquery',
                     id: plan.id
                 }
             }]);
-            promiseCompetenciesSummary[0].then(function(results) {
-                if (results['scale_competency'].length > 0) {
-                    var competencies = {reportinfos:results, plan:plan, hascompetencies: true};
+            return promiseCompetenciesSummary[0].then(function(results) {
+                var competencies;
+                if (results.scale_competency.length > 0) {
+                    competencies = {reportinfos: results, plan: plan, hascompetencies: true};
 
                     // Keep the filter and search values.
                     var checkedvalue = $('input[type=radio][name=summaryfilter]:checked').val();
                     if (checkedvalue == 'course') {
+                        // eslint-disable-next-line camelcase
                         competencies.filterchecked_course = true;
                     } else if (checkedvalue == 'module') {
+                        // eslint-disable-next-line camelcase
                         competencies.filterchecked_module = true;
                     } else {
+                        // eslint-disable-next-line camelcase
                         competencies.filterchecked_both = true;
                     }
 
@@ -860,12 +878,12 @@ define(['jquery',
                         if (scaleid == scaleselected) {
                             competencies.reportinfos.scale_competency[i].scaleselected = true;
                         }
-                        var searchvalue = $( '#summary-search-competency-' + scaleid ).val();
+                        var searchvalue = $('#summary-search-competency-' + scaleid).val();
                         competencies.reportinfos.scale_competency[i].tablesearchvalue = searchvalue;
                     }
 
                     // Render the "Summary" data table template.
-                    templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
+                    return templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
                         $("#summary-content").html(html);
                         templates.runTemplateJS(js);
                         var popup = new Popup('[data-region=summary-competencies-section]', '[data-user-competency=true]');
@@ -877,8 +895,8 @@ define(['jquery',
                         };
                     });
                 } else {
-                    var competencies = {hascompetencies: false};
-                    templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
+                    competencies = {hascompetencies: false};
+                    return templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
                         $("#summary-content").html(html);
                         templates.runTemplateJS(js);
                     });
@@ -937,7 +955,7 @@ define(['jquery',
             self.competencies[competencyid] = {};
             var promise = ajax.call([{
                 methodname: 'core_competency_read_plan',
-                args: { id: planid }
+                args: {id: planid}
             }, {
                 methodname: 'report_lpmonitoring_get_competency_detail',
                 args: {
@@ -959,8 +977,7 @@ define(['jquery',
             }
             ]);
 
-            promise[0].then(function(plan) {
-                promise[1].then(function(results) {
+            return $.when.apply($, promise).then(function(plan, results, stats) {
                     // Locally store competency information.
                     self.competencies[results.competencyid].competencydetail = results;
                     results.plan = plan;
@@ -994,19 +1011,17 @@ define(['jquery',
                         $('#comp-' + results.competencyid + ' span.level').html(html);
                         templates.runTemplateJS(js);
                     });
-                    // Reload plan stats.
-                    promise[2].then(function(results) {
-                        templates.render('report_lpmonitoring/plan_stats_report',
-                        {
-                            plan:results.plan,
-                            hascompetencies:true
-                        }).done(function(html, js) {
-                            $('#plan-stats-report').html(html);
-                            templates.runTemplateJS(js);
-                        });
+                // Reload plan stats.
+                templates.render('report_lpmonitoring/plan_stats_report',
+                    {
+                        plan: stats.plan,
+                        hascompetencies: true
+                    }).done(function(html, js) {
+                        $('#plan-stats-report').html(html);
+                        templates.runTemplateJS(js);
                     });
-                });
-            });
+                return results;
+            }).fail(notification.exception);
 
         };
 
@@ -1104,7 +1119,7 @@ define(['jquery',
             var scalefiltervalues = [];
             $('.competencyreport .scalefiltervalues').each(function() {
                 if ($(this).is(":checked")) {
-                    scalefiltervalues.push({scalevalue : $(this).data("scalevalue"), scaleid : $(this).data("scaleid")});
+                    scalefiltervalues.push({scalevalue: $(this).data("scalevalue"), scaleid: $(this).data("scaleid")});
                 }
             });
 
@@ -1223,12 +1238,12 @@ define(['jquery',
                         modal.getRoot().on(ModalEvents.hidden, function() {
                             modal.destroy();
                             self.focusContentItem(trigger);
-                        }.bind(this));
+                        });
                         modal.getRoot().on(ModalEvents.bodyRendered, function() {
                             DataTable.apply('#listevidencecompetency-' + evidences.competencyid, true, true);
-                        }.bind(this));
+                        });
                         modal.show();
-                    }.bind(this));
+                    });
                 }).fail(notification.exception);
             }
         };
@@ -1255,12 +1270,12 @@ define(['jquery',
                         modal.getRoot().on(ModalEvents.hidden, function() {
                             modal.destroy();
                             self.focusContentItem(trigger);
-                        }.bind(this));
+                        });
                         modal.getRoot().on(ModalEvents.bodyRendered, function() {
                             DataTable.apply('#listcoursecompetency-' + listcourses.competencyid, true, true);
-                        }.bind(this));
+                        });
                         modal.show();
-                    }.bind(this));
+                    });
                 }).fail(notification.exception);
             }
         };
@@ -1287,12 +1302,12 @@ define(['jquery',
                         modal.getRoot().on(ModalEvents.hidden, function() {
                             modal.destroy();
                             self.focusContentItem(trigger);
-                        }.bind(this));
+                        });
                         modal.getRoot().on(ModalEvents.bodyRendered, function() {
                             DataTable.apply('#listcmcompetency-' + listcms.competencyid, true, true);
-                        }.bind(this));
+                        });
                         modal.show();
-                    }.bind(this));
+                    });
                 }).fail(notification.exception);
             }
         };
@@ -1309,7 +1324,7 @@ define(['jquery',
          */
         LearningplanReport.prototype.displayPlan = function(planid, templateid, tagid) {
             var elementloading = null,
-                    self = this;
+                self = this;
             if ($('#plan-user-info').length) {
                 elementloading = $('#plan-user-info');
             } else {
@@ -1335,7 +1350,7 @@ define(['jquery',
                     withplans: self.withplans
                 }
             }]);
-            promise[0].then(function(results) {
+            return promise[0].then(function(results) {
                 results.templateid = parseInt(templateid);
                 M.cfg.contextid = results.plan.usercontext;
                 if (results.hasnavigation === false) {
@@ -1357,30 +1372,34 @@ define(['jquery',
                         });
                     });
                 } else {
-                    str.get_string('learningplancompetencies', 'report_lpmonitoring', results.plan.name).done(function(planname) {
+                    return str.get_string(
+                        'learningplancompetencies', 'report_lpmonitoring', results.plan.name
+                    ).done(function(planname) {
                         $('#planInfoContainer h3').text(planname);
                         self.loadListCompetencies(results.plan, elementloading);
+                        return planname;
                     });
                 }
             }).fail(
-                    function(exp) {
-                        elementloading.removeClass('loading');
-                        if (exp.errorcode === 'emptytemplate') {
-                            var exception = {exception:exp};
-                            return templates.render('report_lpmonitoring/user_info', exception).done(function(html) {
-                                $("#userInfoContainer").html(html);
-                                $("#listPlanCompetencies").empty();
-                                $("#plan-stats-report").empty();
-                                $("#report-content").empty();
-                                $("#summary-content").empty();
-                                $("#nav-tabs").hide();
-                                $("#users-list-full-navigation").empty();
-                            });
-                        } else {
-                            notification.exception(exp);
-                        }
+                function(exp) {
+                    elementloading.removeClass('loading');
+                    if (exp.errorcode === 'emptytemplate') {
+                        var exception = {exception: exp};
+                        return templates.render('report_lpmonitoring/user_info', exception).done(function(html) {
+                            $("#userInfoContainer").html(html);
+                            $("#listPlanCompetencies").empty();
+                            $("#plan-stats-report").empty();
+                            $("#report-content").empty();
+                            $("#summary-content").empty();
+                            $("#nav-tabs").hide();
+                            $("#users-list-full-navigation").empty();
+                        });
+                    } else {
+                        notification.exception(exp);
+                        return null;
                     }
-                );
+                }
+            );
         };
 
         /**
@@ -1405,13 +1424,13 @@ define(['jquery',
                         modal.getRoot().on(ModalEvents.hidden, function() {
                             modal.destroy();
                             self.focusContentItem(trigger);
-                        }.bind(this));
+                        });
                         modal.getRoot().on(ModalEvents.bodyRendered, function() {
                             DataTable.apply('#listscalecoursecompetency-' + listcourses.competencyid, true, true);
                             self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
-                        }.bind(this));
+                        });
                         modal.show();
-                    }.bind(this));
+                    });
                 }).fail(notification.exception);
             }
         };
@@ -1438,13 +1457,13 @@ define(['jquery',
                         modal.getRoot().on(ModalEvents.hidden, function() {
                             modal.destroy();
                             self.focusContentItem(trigger);
-                        }.bind(this));
+                        });
                         modal.getRoot().on(ModalEvents.bodyRendered, function() {
                             DataTable.apply('#listscalecmcompetency-' + listitems.competencyid, true, true);
                             self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
-                        }.bind(this));
+                        });
                         modal.show();
-                    }.bind(this));
+                    });
                 }).fail(notification.exception);
             }
         };
@@ -1498,6 +1517,7 @@ define(['jquery',
                     } else {
                         self.reloadCompetencyDetail(competencyid, userid, planid);
                     }
+                    return null;
                 }).fail(
                     function(exp) {
                         notification.exception(exp);
@@ -1525,8 +1545,8 @@ define(['jquery',
             }
 
             str.get_strings([
-                { key: 'selectuser', component: 'report_lpmonitoring' },
-                { key: 'nouserselected', component: 'report_lpmonitoring' }]
+                {key: 'selectuser', component: 'report_lpmonitoring'},
+                {key: 'nouserselected', component: 'report_lpmonitoring'}]
             ).done(
                 function(strings) {
                     // Autocomplete users in templates.
@@ -1538,7 +1558,8 @@ define(['jquery',
                         false,
                         true,
                         strings[1])
-                        .then(()=> self.disableUserTemplateSelector());
+                        .then(() => self.disableUserTemplateSelector())
+                        .catch(notification.exception);
                     // Autocomplete users.
                     autocomplete.enhance(
                         self.studentSelector,
@@ -1576,8 +1597,8 @@ define(['jquery',
             $(".competencyreport").on('click', '.collapse-link', function(event) {
                 event.preventDefault();
                 var e = $(this).closest(".x_panel"),
-                t = $(this).find("i"),
-                n = e.find(".x_content");
+                    t = $(this).find("i"),
+                    n = e.find(".x_content");
                 t.toggleClass("fa-chevron-right fa-chevron-down");
                 n.slideToggle();
                 e.toggleClass("panel-collapsed");
@@ -1604,8 +1625,8 @@ define(['jquery',
                 }
             });
 
-            $('.competencyreport #student').on('change', function(){
-                if ($(this).is(':checked')){
+            $('.competencyreport #student').on('change', function() {
+                if ($(this).is(':checked')) {
                     $('.competencyreport .studentfilter').toggleClass('disabled-option', false);
                     $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
                     $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
@@ -1613,8 +1634,8 @@ define(['jquery',
                 self.checkDataFormReady();
             });
 
-            $('.competencyreport #template').on('change', function(){
-                if ($(this).is(':checked')){
+            $('.competencyreport #template').on('change', function() {
+                if ($(this).is(':checked')) {
                     $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
                     $('.competencyreport .templatefilter').toggleClass('disabled-option', false);
                     $('.competencyreport .tagfilter').toggleClass('disabled-option', true);
@@ -1622,8 +1643,8 @@ define(['jquery',
                 self.checkDataFormReady();
             });
 
-            $('.competencyreport #tag').on('change', function(){
-                if ($(this).is(':checked')){
+            $('.competencyreport #tag').on('change', function() {
+                if ($(this).is(':checked')) {
                     self.loadTags();
                     $('.competencyreport .studentfilter').toggleClass('disabled-option', true);
                     $('.competencyreport .templatefilter').toggleClass('disabled-option', true);
@@ -1633,7 +1654,7 @@ define(['jquery',
             });
 
             // Filter form submit.
-            $(document).on('submit', '#reportFilter', function(){
+            $(document).on('submit', '#reportFilter', function() {
                 self.submitFormHandler();
                 return false;
             });
@@ -1744,8 +1765,8 @@ define(['jquery',
 
             // Collapse/Expand all.
             str.get_strings([
-                { key: 'collapseall'},
-                { key: 'expandall'}]
+                {key: 'collapseall'},
+                {key: 'expandall'}]
             ).done(
                 function(strings) {
                     var collapseall = strings[0];
@@ -1831,7 +1852,7 @@ define(['jquery',
                     }
                 }]);
 
-                promise[0].then(function(results) {
+                return promise[0].then(function(results) {
                     var promises = [],
                         i = 0;
                     // Render the label.
@@ -1849,13 +1870,13 @@ define(['jquery',
                     });
 
                     // Apply the label to the results.
-                    return $.when.apply($.when, promises).then(function() {
+                    return $.when.apply($.when, promises).done(function() {
                         var args = arguments;
                         $.each(results, function(index, user) {
                             user._label = args[i];
                             i++;
                         });
-                        success(results);
+                        return success(results);
                     });
 
                 }, failure);
