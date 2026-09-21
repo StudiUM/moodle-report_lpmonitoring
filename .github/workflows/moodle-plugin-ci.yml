@@ -18,5 +18,7 @@ jobs:
       databases: '["mariadb"]'
       # Allow the single warning for the ignored third-party DataTables file.
       max-grunt-lint-warnings: 1
-      behat-timeout-factor: 3
+      dependent-plugins: |
+        --branch main StudiUM/moodle-tool_cmcompetency
+        --branch main StudiUM/moodle-report_cmcompetency
 
