@@ -14,23 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace report_lpmonitoring;
+
+use report_lpmonitoring\api as nontestable_api;
+
 /**
- * Plugin version info
+ * Test subclass that makes some variables or methods we want to test public.
  *
  * @package    report_lpmonitoring
- * @author     Issam Taboubi <issam.taboubi@umontreal.ca>
- * @copyright  2016 Université de Montréal
+ * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
+ * @copyright  2019 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version  = 2026091700;
-$plugin->requires = 2025100600;
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '2.0.1 (Build 2026091700)';
-$plugin->component = 'report_lpmonitoring';
-
-$plugin->dependencies = [
-    'tool_lp' => 2025100600,
-];
+class testapi extends nontestable_api {
+    /**
+     * Change value for the iscmcompetencygradingenabled variable.
+     *
+     * @param bool $value True or false value for iscmcompetencygradingenabled
+     */
+    public static function set_is_cm_comptency_grading_enabled($value) {
+        self::$iscmcompetencygradingenabled = $value;
+    }
+}

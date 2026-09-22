@@ -64,10 +64,10 @@ define(['jquery'],
          * @return {Number}
          * @function
          */
-        ColorContrast.prototype.luminance = function (r, g, b) {
-            var a = [r,g,b].map(function(v) {
+        ColorContrast.prototype.luminance = function(r, g, b) {
+            var a = [r, g, b].map(function(v) {
                 v /= 255;
-                return (v <= 0.03928) ? v / 12.92 : Math.pow( ((v + 0.055) / 1.055), 2.4 );
+                return (v <= 0.03928) ? v / 12.92 : Math.pow(((v + 0.055) / 1.055), 2.4);
             });
             return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
         };
@@ -90,31 +90,33 @@ define(['jquery'],
                 var bgc = $(this).css('background-color');
 
                 // Handle 100% transparent background.
-                if(bgc === 'transparent' || bgc === 'rgba(0, 0, 0, 0)') {
+                if (bgc === 'transparent' || bgc === 'rgba(0, 0, 0, 0)') {
                     // Scan each parent's background color looking at a non-transparent background.
                     $(this).parents().each(function() {
                         bgc = $(this).css('background-color');
                         if (bgc !== 'transparent' && bgc !== 'rgba(0, 0, 0, 0)') {
                             return false;
                         }
+                        return true;
                     });
                     // If all parents is transparent use default and go to next element.
-                    if(bgc === 'transparent' || bgc === 'rgba(0, 0, 0, 0)') {
+                    if (bgc === 'transparent' || bgc === 'rgba(0, 0, 0, 0)') {
                         return true;
                     }
                 }
 
                 // Extract RGB and convert it into luminance from the YIQ equation from https://www.w3.org/TR/AERT#color-contrast.
-                var rgb = bgc.replace(/^(rgb|rgba)\(/,'').replace(/\)$/,'').replace(/\s/g,'').split(',');
+                var rgb = bgc.replace(/^(rgb|rgba)\(/, '').replace(/\)$/, '').replace(/\s/g, '').split(',');
                 var luminancebackground = self.luminance(rgb[0], rgb[1], rgb[2]);
                 var luminanceforeground = self.luminance(0, 0, 0);
                 var ratio = (luminancebackground + 0.05) / (luminanceforeground + 0.05);
 
-                if(ratio >= 4.5) {
+                if (ratio >= 4.5) {
                     $(this).removeClass(self.lightColorClassName);
                 } else {
                     $(this).addClass(self.lightColorClassName);
                 }
+                return true;
             });
         };
 

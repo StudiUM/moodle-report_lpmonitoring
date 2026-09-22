@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/plan_stats_report
+    Example context (json):
+    {}
+}}
+{{!
     Statistics for learning plan.
 
 
@@ -30,9 +35,9 @@
             * nbtags
             * commentarea
 
-    Classes required for JS : 
+    Classes required for JS :
     * tags_popup
-      
+
 }}
 <div class="report-stats-competencies">
     <div class="space-block-stats"></div>
@@ -68,7 +73,7 @@
                     <i class="fa fa-search fa-stack-1x fa-inverse"></i>
                 </span>
             {{/plan.isinreview}}
-            
+
         </div>
         <div class="stats-cmp-proficient plan-status"><span>{{#str}}status, tool_lp{{/str}}:  </span><span style="font-weight: bold">{{plan.statusname}}</span></div>
     </div>
@@ -83,27 +88,27 @@
 <div class="report-stats-competencies">
     <div class="space-block-stats"></div>
     <div>
-        <div class="count-stats 
+        <div class="count-stats
 
              {{#plan.stats.nbcompetenciesnotproficient}}
              blue
              {{/plan.stats.nbcompetenciesnotproficient}}
              {{^plan.stats.nbcompetenciesnotproficient}}
-             empty-value 
+             empty-value
              {{/plan.stats.nbcompetenciesnotproficient}}
               notproficient-stats">{{plan.stats.nbcompetenciesnotproficient}}</div>
         <div class="stats-cmp-proficient">{{#str}}notproficientcompetencies, report_lpmonitoring{{/str}}</div>
     </div>
 </div>
 <div class="report-stats-competencies">
-    <div class="space-block-stats"><span></div>
+    <div class="space-block-stats"></div>
     <div>
-        <div class="count-stats 
+        <div class="count-stats
              {{#plan.stats.nbcompetenciesnotrated}}
              blue
              {{/plan.stats.nbcompetenciesnotrated}}
              {{^plan.stats.nbcompetenciesnotrated}}
-             empty-value 
+             empty-value
              {{/plan.stats.nbcompetenciesnotrated}}
               notrated-stats">{{plan.stats.nbcompetenciesnotrated}}</div>
         <div class="stats-cmp-proficient">{{#str}}notratedcompetencies, report_lpmonitoring{{/str}}</div>
@@ -113,7 +118,7 @@
 {{#plan.stats.commentarea}}
     {{#canpostorhascomments}}
         <div class="report-stats-competencies">
-            <div class="space-block-stats"><span></div>
+            <div class="space-block-stats"></div>
             <div>
                 <div class="count-stats comments-stats blue" data-comments-plan="{{plan.id}}">{{count}}</div>
                 <div class="stats-cmp-proficient">{{#str}}comments, report_lpmonitoring{{/str}}</div>
@@ -125,7 +130,7 @@
 
 {{#plan.cangrade}}
     <div class="report-stats-competencies">
-        <div class="space-block-stats"><span></div>
+        <div class="space-block-stats"></div>
         <div>
             <div class="count-stats tags-stats blue" data-tags-plan="{{plan.id}}">{{plan.stats.nbtags}}</div>
             <div class="stats-cmp-proficient">{{#str}}tags, report_lpmonitoring{{/str}}</div>
@@ -135,7 +140,7 @@
     {{#plan.isactive}}
     {{#plan.isdisplayratingenabled}}
     <div class="report-stats-competencies displayratings">
-        <div class="space-block-stats"><span></div>
+        <div class="space-block-stats"></div>
         <div>
             <div class="stats-display-rating">
                 <div class="resetdisplayrating {{^plan.canresetdisplayrating}}hidden{{/plan.canresetdisplayrating}}">
@@ -149,7 +154,7 @@
                     </button>
                 </div>
             </div>
-            <div class="switcher-container form-check form-switch">                
+            <div class="switcher-container form-check form-switch">
                 <input class="form-check-input" id="customSwitch1" type="checkbox" role="switch"
                     data-displayrating-plan="{{plan.id}}"
                     {{#plan.displayrating}}checked{{/plan.displayrating}} />

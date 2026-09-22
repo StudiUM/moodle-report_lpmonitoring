@@ -35,7 +35,7 @@ define(['jquery'],
             $(container).on('click', '.fheader', function(event) {
                 event.preventDefault();
                 var f = $(this).closest(".collapsible"),
-                h = $(this);
+                    h = $(this);
                 f.toggleClass("collapsed");
                 if (h.attr('aria-expanded') === 'true') {
                     h.attr('aria-expanded', 'false');

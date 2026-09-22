@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/list_competencies_stats
+    Example context (json):
+    {}
+}}
+{{!
     List competencies template.
 
     Classes required for JS:
@@ -32,7 +37,7 @@
         <div class="x_title">
             <h4 class="truncate">
                 <a role="button" title="{{shortname}} {{idnumber}}" data-action="competency-dialogue" href="#" data-id="{{id}}">
-                    {{shortname}} 
+                    {{shortname}}
                     <em>
                         <small>{{idnumber}}</small>
                     </em>

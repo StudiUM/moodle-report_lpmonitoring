@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/scale_filter_sortorder
+    Example context (json):
+    {}
+}}
+{{!
     Competency scale filter template application.
 
     Classes required for JS:
@@ -27,7 +32,7 @@
     <div class="fitem fitem_fradio fitem_fradiogroup">
         <div class="fradio radio radio-primary">
             <span class="radiocontainer">
-                <input type="radio" name="optionscalesortorder" id="scalesortorderasc" value="1" disabled="disabled" aria-labelledby="scalesortorderlabel">
+                <input type="radio" name="optionscalesortorder" id="scalesortorderasc" value="1" disabled="disabled">
                 <label for="scalesortorderasc">{{#str}}sortasc, grades{{/str}}</label>
             </span>
         </div>
@@ -35,7 +40,7 @@
     <div class="fitem fitem_fradio femptylabel">
         <div class="fradio radio radio-primary">
             <span class="radiocontainer">
-                <input type="radio" name="optionscalesortorder" id="scalesortorderdesc" value="1" disabled="disabled" aria-labelledby="scalesortorderlabel">
+                <input type="radio" name="optionscalesortorder" id="scalesortorderdesc" value="1" disabled="disabled">
                 <label for="scalesortorderdesc">{{#str}}sortdesc, grades{{/str}}</label>
             </span>
         </div>

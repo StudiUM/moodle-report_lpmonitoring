@@ -15,20 +15,25 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/scale_filter_apply
+
     Competency scale filter template application.
 
     Classes required for JS:
     * learningplan
 
     Context variables required for this template:
-    none.
+    * none.
+
+    Example context (json):
+    {}
 }}
 <div class="scalefiltercontainer">
     {{#cmcompgradingenabled}}
     <div class="fitem fradio radio radio-primary fitem_fradiogroup">
         <div class="fradio radio radio-primary">
             <span class="radiocontainer">
-                <input type="radio" name="optionscalefilter" id="scalefiltercoursemodule" value="2" disabled="disabled" aria-labelledby="scalefilterapply">
+                <input type="radio" name="optionscalefilter" id="scalefiltercoursemodule" value="2" disabled="disabled">
                 <label for="scalefiltercoursemodule">{{#str}}finalratingcoursemodule, report_lpmonitoring{{/str}}</label>
             </span>
         </div>
@@ -37,7 +42,7 @@
     <div class="fitem fitem_fradio fitem_fradiogroup">
         <div class="fradio radio radio-primary">
             <span class="radiocontainer">
-                <input type="radio" name="optionscalefilter" id="scalefiltercourse" value="1" disabled="disabled" aria-labelledby="scalefilterapply">
+                <input type="radio" name="optionscalefilter" id="scalefiltercourse" value="1" disabled="disabled">
                 <label for="scalefiltercourse">{{#str}}finalratingcourse, report_lpmonitoring{{/str}}</label>
             </span>
         </div>
@@ -45,7 +50,7 @@
     <div class="fitem fitem_fradio femptylabel">
         <div class="fradio radio radio-primary">
             <span class="radiocontainer">
-                <input type="radio" name="optionscalefilter" id="scalefilterplan" value="0" disabled="disabled"  aria-labelledby="scalefilterapply">
+                <input type="radio" name="optionscalefilter" id="scalefilterplan" value="0" disabled="disabled">
                 <label for="scalefilterplan">{{#str}}finalrating, report_lpmonitoring{{/str}}</label>
             </span>
         </div>

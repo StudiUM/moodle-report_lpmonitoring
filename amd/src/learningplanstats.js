@@ -34,7 +34,7 @@ define(['jquery',
     'core/modal_events',
     'report_lpmonitoring/paginated_datatable'],
     function($, templates, ajax, notification, str, Chart, autocomplete, Toggler,
-            colorcontrast, ModalFactory, ModalEvents, DataTable) {
+        colorcontrast, ModalFactory, ModalEvents, DataTable) {
 
         /**
          * Learning plan stats.
@@ -102,7 +102,8 @@ define(['jquery',
          * @function
          */
         LearningplanStats.prototype.loadListCompetencies = function(templateid) {
-            var self = this, ratingtype = 'course';
+            var self = this,
+ratingtype = 'course';
 
             if ($("#ratinginplanoption").is(':checked')) {
                 ratingtype = 'plan';
@@ -120,7 +121,10 @@ define(['jquery',
             elementloading.addClass('loading');
             promiselistCompetencies[0].then(function(results) {
                 if (results.length > 0) {
-                    var competencies = {competencies_list:results};
+                    var competencies = {};
+                    // This key is part of the Mustache template context contract.
+                    // eslint-disable-next-line camelcase
+                    competencies.competencies_list = results;
                     return templates.render('report_lpmonitoring/list_competencies_stats', competencies).done(function(html, js) {
                         $("#list-competencies-template").html(html);
                         templates.runTemplateJS(js);
@@ -158,7 +162,7 @@ define(['jquery',
                 // Wrap with a deferred.
                 var defer = $.Deferred();
                 var promiserequest = ajax.call(request);
-                promiserequest[0].done(function(context){
+                promiserequest[0].done(function(context) {
                     var compid = context.competencyid;
                     // Locally store competency statitstics.
                     self.competencies[compid].competencydetail = context;
@@ -181,7 +185,7 @@ define(['jquery',
                             });
                             applygraph = true;
                         }
-                        if ( (ratingtype === 'course' || ratingtype === 'coursemodule') && context.nbratings !== 0) {
+                        if ((ratingtype === 'course' || ratingtype === 'coursemodule') && context.nbratings !== 0) {
                             $.each(context.scalecompetencyitems, function(index, record) {
                                 colors.push(record.color);
                                 datascales.push(record.nbratings);
@@ -279,13 +283,13 @@ define(['jquery',
                         modal.getRoot().on(ModalEvents.hidden, function() {
                             modal.destroy();
                             self.focusContentItem(trigger);
-                        }.bind(this));
+                        });
                         modal.getRoot().on(ModalEvents.bodyRendered, function() {
                             DataTable.apply('#list-user-' + competencyid + '-' + scalevalue, true, true);
                             self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
-                        }.bind(this));
+                        });
                         modal.show();
-                    }.bind(this));
+                    });
                 }).fail(notification.exception);
             }
         };
@@ -313,13 +317,13 @@ define(['jquery',
                         modal.getRoot().on(ModalEvents.hidden, function() {
                             modal.destroy();
                             self.focusContentItem(trigger);
-                        }.bind(this));
+                        });
                         modal.getRoot().on(ModalEvents.bodyRendered, function() {
                             DataTable.apply('#list-users-stats-' + listusers.competencyid, true, true);
                             self.colorContrast.apply('.moodle-dialogue-base .badge.cr-scalename');
-                        }.bind(this));
+                        });
                         modal.show();
-                    }.bind(this));
+                    });
                 }).fail(notification.exception);
             }
         };
@@ -350,10 +354,10 @@ define(['jquery',
         LearningplanStats.prototype.initPage = function() {
             var self = this;
             str.get_strings([
-                { key: 'selectlearningplantemplate', component: 'report_lpmonitoring' },
-                { key: 'notemplateselected', component: 'report_lpmonitoring' }]
+                {key: 'selectlearningplantemplate', component: 'report_lpmonitoring'},
+                {key: 'notemplateselected', component: 'report_lpmonitoring'}]
             ).done(
-                function (strings) {
+                function(strings) {
                     // Autocomplete for templates.
                     autocomplete.enhance(
                         self.templateSelector,
@@ -370,7 +374,7 @@ define(['jquery',
             Toggler.init();
 
             // Filter form submit.
-            $(document).on('submit', '#statstFilter', function(){
+            $(document).on('submit', '#statstFilter', function() {
                 self.submitFormHandler();
                 return false;
             });
@@ -455,7 +459,7 @@ define(['jquery',
                     }
                 }]);
 
-                promise[0].then(function(results) {
+                return promise[0].then(function(results) {
                     var promises = [],
                         i = 0;
 
@@ -465,7 +469,7 @@ define(['jquery',
                     });
 
                     // Apply the label to the results.
-                    return $.when.apply($.when, promises).then(function() {
+                    return $.when.apply($.when, promises).done(function() {
                         var args = arguments;
                         $.each(results, function(index, template) {
                             template._label = args[i];

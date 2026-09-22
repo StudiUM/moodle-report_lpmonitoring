@@ -22,7 +22,9 @@
  * @copyright  2016 Université de Montréal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace report_lpmonitoring;
+
 defined('MOODLE_INTERNAL') || die();
 
 use core_competency\competency_framework;
@@ -39,7 +41,7 @@ require_once($CFG->libdir . '/grade/grade_scale.php');
  */
 class report_competency_config extends \core\persistent {
     /** Table name. */
-    const TABLE = 'report_competency_config';
+    const TABLE = 'report_lpmonitoring_competency_config';
 
     /** Default color. */
     const DEFAULT_COLOR = '#C1C7C9';
@@ -54,7 +56,6 @@ class report_competency_config extends \core\persistent {
      * @return mixed
      */
     final public function __call($method, $arguments) {
-        debugging('deprecated magic method in report_competency_config', DEBUG_DEVELOPER);
         if (strpos($method, 'get_') === 0) {
             return $this->get(substr($method, 4));
         } else if (strpos($method, 'set_') === 0) {
@@ -140,7 +141,7 @@ class report_competency_config extends \core\persistent {
      * @return bool|lang_string
      */
     protected function validate_scaleconfiguration($value) {
-        $scale = self::get_scale();
+        $scale = $this->get_scale();
         if (!$scale) {
             return true;
         }
@@ -160,7 +161,7 @@ class report_competency_config extends \core\persistent {
      *
      */
     public function set_default_scaleconfiguration() {
-        $scale = self::get_scale();
+        $scale = $this->get_scale();
         $scaleitems = $scale->scale_items;
         $scaleconfiguration = json_decode($this->get('scaleconfiguration'));
         foreach ($scaleitems as $key => $value) {
