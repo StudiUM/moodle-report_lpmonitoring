@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->version  = 2026091700;
 $plugin->requires = 2025100600;
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '2.0.0';
+$plugin->release   = '2.0.1 (Build 2026091700)';
 $plugin->component = 'report_lpmonitoring';
 
 $plugin->dependencies = [
