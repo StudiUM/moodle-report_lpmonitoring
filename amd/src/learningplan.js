@@ -132,6 +132,8 @@ define(['jquery',
         LearningplanReport.prototype.withplans = false;
         /** @var {Boolean} Is course module competency grading enabled. */
         LearningplanReport.prototype.cmcompgradingEnabled = false;
+        /** @var {Boolean} Whether a plan navigation request is in progress. */
+        LearningplanReport.prototype.navigationBusy = false;
 
         /** @var {String} The template select box selector. */
         LearningplanReport.prototype.templateSelector = "#templateSelectorReport";
@@ -674,7 +676,6 @@ define(['jquery',
                     templates.render('report_lpmonitoring/list_competencies', competencies).done(function(html, js) {
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
-                        self.loadCompetencyDetail(results, plan, elementloading);
                         $("#nav-tabs").removeClass("hidden");
                     });
                 } else {
@@ -687,9 +688,11 @@ define(['jquery',
                         $("#nav-tabs").addClass("hidden");
                     });
                 }
-                self.loadSummaryTab(plan);
-                self.loadReportTab(plan);
-                return results;
+                var requests = [self.loadSummaryTab(plan), self.loadReportTab(plan)];
+                if (results.length > 0) {
+                    requests.push(self.loadCompetencyDetail(results, plan, elementloading));
+                }
+                return $.when.apply($, requests);
             }).fail(
                 function(exp) {
                     elementloading.removeClass('loading');
@@ -772,6 +775,7 @@ define(['jquery',
                     });
                 });
             });
+            return $.when.apply($, promises);
         };
 
         /**
@@ -1325,6 +1329,10 @@ define(['jquery',
         LearningplanReport.prototype.displayPlan = function(planid, templateid, tagid) {
             var elementloading = null,
                 self = this;
+            if (self.navigationBusy) {
+                return null;
+            }
+            self.navigationBusy = true;
             if ($('#plan-user-info').length) {
                 elementloading = $('#plan-user-info');
             } else {
@@ -1366,7 +1374,9 @@ define(['jquery',
                 if (self.userView === false) {
                     return templates.render('report_lpmonitoring/user_info', results).done(function(html) {
                         $("#userInfoContainer").html(html);
-                        self.loadListCompetencies(results.plan, elementloading);
+                        self.loadListCompetencies(results.plan, elementloading).always(function() {
+                            self.navigationBusy = false;
+                        });
                         return templates.render('report_lpmonitoring/users_list_navigation', results).done(function(html) {
                             $("#users-list-full-navigation").html(html);
                         });
@@ -1376,13 +1386,16 @@ define(['jquery',
                         'learningplancompetencies', 'report_lpmonitoring', results.plan.name
                     ).done(function(planname) {
                         $('#planInfoContainer h3').text(planname);
-                        self.loadListCompetencies(results.plan, elementloading);
+                        self.loadListCompetencies(results.plan, elementloading).always(function() {
+                            self.navigationBusy = false;
+                        });
                         return planname;
                     });
                 }
             }).fail(
                 function(exp) {
                     elementloading.removeClass('loading');
+                    self.navigationBusy = false;
                     if (exp.errorcode === 'emptytemplate') {
                         var exception = {exception: exp};
                         return templates.render('report_lpmonitoring/user_info', exception).done(function(html) {

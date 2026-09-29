@@ -2780,4 +2780,667 @@ final class api_test extends \advanced_testcase {
         $this->assertEventContextNotUsed($event);
         $this->assertDebuggingNotCalled();
     }
+
+    /**
+     * Build a minimal user/competency/course-module scenario for the race tests.
+     *
+     * Creates a plan for a user with a competency linked to a course and to a course
+     * module inside that course, then returns the ids required to call
+     * get_competency_detail() and to target the (userid, cmid, competencyid) triplet.
+     *
+     * @return array [userid, competencyid, planid, cmid]
+     */
+    private function setup_coursemodule_competency_scenario(): array {
+        global $DB;
+
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $mpg = $dg->get_plugin_generator('report_lpmonitoring');
+
+        // Explicit two-value scale with a matching framework scale configuration.
+        $scale = $dg->create_scale(['name' => 'Race scale', 'scale' => 'not good, good']);
+        $scaleconfiguration = '[{"scaleid":"' . $scale->id . '"},' .
+            '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+
+        $framework = $lpg->create_framework([
+            'scaleid' => $scale->id,
+            'scaleconfiguration' => $scaleconfiguration,
+        ]);
+        $comp = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
+
+        // Report scale configuration: one entry per scale item.
+        $scaleconfig = [];
+        $scaleconfig[] = ['id' => 1, 'name' => 'not good', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'good', 'color' => '#BBBBB'];
+        $record = new \stdClass();
+        $record->competencyframeworkid = $framework->get('id');
+        $record->scaleid = $scale->id;
+        $record->scaleconfiguration = json_encode($scaleconfig);
+        $mpg->create_report_competency_config($record);
+
+        // User with an active plan holding the competency.
+        $user = $dg->create_user();
+        $plan = $lpg->create_plan(['userid' => $user->id, 'status' => plan::STATUS_ACTIVE]);
+        $lpg->create_plan_competency(['planid' => $plan->get('id'), 'competencyid' => $comp->get('id')]);
+
+        // Course + course module linked to the competency, user enrolled.
+        $course = $dg->create_course();
+        $dg->enrol_user($user->id, $course->id);
+        $lpg->create_course_competency(['competencyid' => $comp->get('id'), 'courseid' => $course->id]);
+
+        $data = $dg->create_module('data', ['assessed' => 1, 'scale' => 100, 'course' => $course->id]);
+        $cm = get_coursemodule_from_id('data', $data->cmid);
+        $lpg->create_course_module_competency(['competencyid' => $comp->get('id'), 'cmid' => $cm->id]);
+
+        return [$user->id, $comp->get('id'), $plan->get('id'), $cm->id];
+    }
+
+    /**
+     * Install the race-condition database decorator as the global $DB.
+     *
+     * @param bool $insertconcurrentrow Whether the concurrent row is created before the failure (recoverable race).
+     * @return report_lpmonitoring_race_condition_database
+     */
+    private function install_race_database(
+        bool $insertconcurrentrow = true,
+        ?string $racetable = null
+    ): \report_lpmonitoring_race_condition_database {
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/report/lpmonitoring/tests/fixtures/race_condition_database.php');
+        $racedb = new \report_lpmonitoring_race_condition_database($DB, $insertconcurrentrow, $racetable);
+        $DB = $racedb;
+        return $racedb;
+    }
+
+    /**
+     * Restore the real database after a race test.
+     *
+     * @param report_lpmonitoring_race_condition_database $racedb The decorator currently installed.
+     */
+    private function restore_real_database(\report_lpmonitoring_race_condition_database $racedb): void {
+        global $DB;
+        $racedb->disarm();
+        $DB = $racedb->get_real_database();
+    }
+
+    /**
+     * Case 1 - Modules loop (~line 843): concurrent INSERT race on user_competency_coursemodule.
+     *
+     * Bug condition: NOT recordExists(userid, cmid, competencyid) AND concurrentRequests > 1.
+     * On the unfixed code the dml_write_exception raised by the losing INSERT propagates
+     * out of get_competency_detail(). This test encodes the expected (post-fix) behaviour:
+     * the exception is absorbed and the now-existing record is returned.
+     *
+     * Validates: Requirements 2.1
+     */
+    public function test_get_competency_detail_race_modules_loop(): void {
+        global $DB;
+
+        [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
+
+        // No user_competency_coursemodule exists yet for the triplet (record absent).
+        $this->assertFalse($DB->record_exists('tool_cmcompetency_usercompcm', [
+            'userid' => $userid,
+            'cmid' => $cmid,
+            'competencyid' => $competencyid,
+        ]));
+
+        $racedb = $this->install_race_database(true);
+        // Target the modules loop COURSE MODULE call site: it is the first INSERT attempt on the
+        // race table (ordinal targeting is robust to refactors of the api class).
+        $racedb->target_nth_insert(1);
+        try {
+            // Expected (post-fix) behaviour: no dml_write_exception propagates.
+            $result = api::get_competency_detail($userid, $competencyid, $planid);
+
+            // The concurrent request created the relation; the module detail is returned.
+            $this->assertNotEmpty($racedb->racetriggered);
+            $module = null;
+            foreach ($result->courses as $courseinfo) {
+                if (!empty($courseinfo->modules)) {
+                    $module = reset($courseinfo->modules);
+                    break;
+                }
+            }
+            $this->assertNotNull($module, 'The course module detail should be returned.');
+            $this->assertEquals($cmid, $module->get('cmid'));
+            $this->assertEquals($userid, $module->get('userid'));
+            $this->assertEquals($competencyid, $module->get('competencyid'));
+        } finally {
+            $this->restore_real_database($racedb);
+        }
+    }
+
+    /**
+     * Case 2 - CMs loop (~line 868): concurrent INSERT race on user_competency_coursemodule.
+     *
+     * Same race window on the second COURSE MODULE call site. On the unfixed code the
+     * dml_write_exception propagates. This test encodes the expected (post-fix) behaviour.
+     *
+     * Validates: Requirements 2.2
+     */
+    public function test_get_competency_detail_race_cms_loop(): void {
+        global $DB;
+
+        [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
+
+        $this->assertFalse($DB->record_exists('tool_cmcompetency_usercompcm', [
+            'userid' => $userid,
+            'cmid' => $cmid,
+            'competencyid' => $competencyid,
+        ]));
+
+        $racedb = $this->install_race_database(true);
+        // Target the cms loop COURSE MODULE call site: it is the second INSERT attempt on the
+        // race table. Suppress the modules-loop insert (the first attempt) so the triplet stays
+        // absent and the cms loop attempts its own INSERT (ordinal targeting is refactor-robust).
+        $racedb->target_nth_insert(2, true);
+        try {
+            // Expected (post-fix) behaviour: no dml_write_exception propagates.
+            $result = api::get_competency_detail($userid, $competencyid, $planid);
+
+            $this->assertNotEmpty($racedb->racetriggered);
+
+            // The cms collection carries the recovered course module competency record.
+            $this->assertNotEmpty($result->cms, 'The cms collection should be populated.');
+            $found = null;
+            foreach ($result->cms as $cminfo) {
+                if ((int) $cminfo->cmid === (int) $cmid) {
+                    $found = $cminfo;
+                    break;
+                }
+            }
+            $this->assertNotNull($found, 'The targeted course module should be present in cms.');
+            $this->assertNotNull($found->usecompetencyincm);
+            $this->assertEquals($cmid, $found->usecompetencyincm->get('cmid'));
+            $this->assertEquals($userid, $found->usecompetencyincm->get('userid'));
+            $this->assertEquals($competencyid, $found->usecompetencyincm->get('competencyid'));
+        } finally {
+            $this->restore_real_database($racedb);
+        }
+    }
+
+    /**
+     * Case 3 (control) - COURSE case (~line 805) already absorbs its own dml_write_exception.
+     *
+     * This site is already protected by a try/catch, so simulating the same race on the
+     * user_competency_course INSERT must NOT propagate an exception. This confirms the
+     * asymmetry of protection between the COURSE and COURSE MODULE call sites.
+     *
+     * Validates: Requirements 1.3 (protection asymmetry)
+     */
+    public function test_get_competency_detail_race_course_case_is_protected(): void {
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot . '/report/lpmonitoring/tests/testapi.php');
+
+        [$userid, $competencyid, $planid] = $this->setup_coursemodule_competency_scenario();
+
+        // Disable course module grading so only the protected COURSE path is exercised.
+        \report_lpmonitoring\testapi::set_is_cm_comptency_grading_enabled(false);
+
+        $this->assertFalse($DB->record_exists('competency_usercompcourse', [
+            'userid' => $userid,
+            'competencyid' => $competencyid,
+        ]));
+
+        // Arm the race on the COURSE table instead of the course module table.
+        $racedb = $this->install_race_database(true, 'competency_usercompcourse');
+
+        try {
+            // The COURSE case is protected, so no exception should propagate.
+            $result = api::get_competency_detail($userid, $competencyid, $planid);
+            $this->assertNotEmpty($racedb->racetriggered);
+            $this->assertNotEmpty($result->courses, 'Courses should still be returned.');
+            $courseinfo = reset($result->courses);
+            $this->assertNotNull($courseinfo->usecompetencyincourse);
+            $this->assertEquals($userid, $courseinfo->usecompetencyincourse->get('userid'));
+            $this->assertEquals($competencyid, $courseinfo->usecompetencyincourse->get('competencyid'));
+        } finally {
+            $this->restore_real_database($racedb);
+            \report_lpmonitoring\testapi::set_is_cm_comptency_grading_enabled(true);
+        }
+    }
+
+    /**
+     * Preservation Case 1 - Normal creation outside concurrency (validates 3.1).
+     *
+     * isBugCondition(X) is FALSE: the user_competency_coursemodule record is absent but there
+     * is a single request (no concurrency). get_competency_detail() must create the missing
+     * record and return the module detail exactly as before the fix.
+     *
+     * Observation-first: this behaviour is observed on the UNFIXED code and frozen here.
+     *
+     * Validates: Requirements 3.1
+     */
+    public function test_get_competency_detail_preserves_normal_creation_without_concurrency(): void {
+        global $DB;
+
+        [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
+
+        // Record absent before the call.
+        $this->assertFalse($DB->record_exists('tool_cmcompetency_usercompcm', [
+            'userid' => $userid,
+            'cmid' => $cmid,
+            'competencyid' => $competencyid,
+        ]));
+
+        // No race decorator: a single, non-concurrent request.
+        $result = api::get_competency_detail($userid, $competencyid, $planid);
+
+        // The missing record was created and the module detail returned.
+        $this->assertTrue($DB->record_exists('tool_cmcompetency_usercompcm', [
+            'userid' => $userid,
+            'cmid' => $cmid,
+            'competencyid' => $competencyid,
+        ]));
+
+        $module = null;
+        foreach ($result->courses as $courseinfo) {
+            if (!empty($courseinfo->modules)) {
+                $module = reset($courseinfo->modules);
+                break;
+            }
+        }
+        $this->assertNotNull($module, 'The course module detail should be returned.');
+        $this->assertEquals($cmid, $module->get('cmid'));
+        $this->assertEquals($userid, $module->get('userid'));
+        $this->assertEquals($competencyid, $module->get('competencyid'));
+
+        // The cms collection also carries the record for the same triplet.
+        $found = null;
+        foreach ($result->cms as $cminfo) {
+            if ((int) $cminfo->cmid === (int) $cmid) {
+                $found = $cminfo;
+                break;
+            }
+        }
+        $this->assertNotNull($found, 'The cms collection should contain the module.');
+        $this->assertEquals($competencyid, $found->usecompetencyincm->get('competencyid'));
+    }
+
+    /**
+     * Preservation Case 2 - Existing record is reused without a new INSERT (validates 3.2).
+     *
+     * isBugCondition(X) is FALSE: the record already exists for the triplet, so no INSERT is
+     * attempted. We arm the race decorator (which only ever fails on an INSERT into the target
+     * table); because the record is pre-created, no INSERT happens and the decorator never
+     * triggers - proving the existing record is reused.
+     *
+     * Validates: Requirements 3.2
+     */
+    public function test_get_competency_detail_preserves_existing_record_no_insert(): void {
+        global $DB;
+
+        [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
+
+        // Pre-create the user_competency_coursemodule record for the triplet.
+        $existing = \tool_cmcompetency\api::get_user_competency_in_coursemodule($cmid, $userid, $competencyid);
+        $this->assertTrue($DB->record_exists('tool_cmcompetency_usercompcm', [
+            'userid' => $userid,
+            'cmid' => $cmid,
+            'competencyid' => $competencyid,
+        ]));
+
+        // Arm the race: it fails on ANY insert into the target table. If get_competency_detail()
+        // tried to INSERT again, the decorator would trigger and raise an exception.
+        $racedb = $this->install_race_database(true);
+        try {
+            $result = api::get_competency_detail($userid, $competencyid, $planid);
+
+            // No INSERT was attempted on the target table, so the race never triggered.
+            $this->assertSame(0, $racedb->racetriggered, 'No INSERT should be attempted when the record exists.');
+
+            // The existing record is reused, identified by the same id.
+            $module = null;
+            foreach ($result->courses as $courseinfo) {
+                if (!empty($courseinfo->modules)) {
+                    $module = reset($courseinfo->modules);
+                    break;
+                }
+            }
+            $this->assertNotNull($module, 'The course module detail should be returned.');
+            $this->assertEquals($existing->get('id'), $module->get('id'));
+        } finally {
+            $this->restore_real_database($racedb);
+        }
+    }
+
+    /**
+     * Preservation Case 3 - dml_write_exception with no recoverable record is propagated (validates 3.3).
+     *
+     * isBugCondition(X) is FALSE for recovery purposes: a dml_write_exception is raised on the
+     * INSERT but NO record exists afterwards (insertconcurrentrow = false). This is an unrelated
+     * write failure, not a recoverable race, and must propagate unchanged. On the UNFIXED code
+     * there is no try/catch on the COURSE MODULE call, so it propagates; the fix (which only
+     * recovers when a record is found) must keep propagating it.
+     *
+     * Validates: Requirements 3.3
+     */
+    public function test_get_competency_detail_propagates_unrecoverable_write_exception(): void {
+        global $DB;
+
+        [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
+
+        $this->assertFalse($DB->record_exists('tool_cmcompetency_usercompcm', [
+            'userid' => $userid,
+            'cmid' => $cmid,
+            'competencyid' => $competencyid,
+        ]));
+
+        // The insertconcurrentrow flag is false: throw without creating the row, so nothing is recoverable.
+        $racedb = $this->install_race_database(false);
+        // Target the modules loop COURSE MODULE call site: the first INSERT attempt on the race table.
+        $racedb->target_nth_insert(1);
+        try {
+            $this->expectException(\dml_write_exception::class);
+            api::get_competency_detail($userid, $competencyid, $planid);
+        } finally {
+            $this->restore_real_database($racedb);
+        }
+    }
+
+    /**
+     * Preservation Case 4 - Complete competency detail data (validates 3.4).
+     *
+     * isBugCondition(X) is FALSE (single request, no race). Verify that the full detail payload
+     * (competency, framework, scale, courses, modules, evidences, literal notes) is produced,
+     * capturing the pre-fix behaviour so the fix cannot alter it.
+     *
+     * Validates: Requirements 3.4
+     */
+    public function test_get_competency_detail_preserves_full_detail_data(): void {
+        global $DB;
+
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $mpg = $dg->get_plugin_generator('report_lpmonitoring');
+
+        $scale = $dg->create_scale(['name' => 'Detail scale', 'scale' => 'not good, good']);
+        $scaleconfiguration = '[{"scaleid":"' . $scale->id . '"},' .
+            '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+        $framework = $lpg->create_framework([
+            'scaleid' => $scale->id,
+            'scaleconfiguration' => $scaleconfiguration,
+        ]);
+        $comp = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
+
+        $scaleconfig = [];
+        $scaleconfig[] = ['id' => 1, 'name' => 'not good', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'good', 'color' => '#BBBBB'];
+        $record = new \stdClass();
+        $record->competencyframeworkid = $framework->get('id');
+        $record->scaleid = $scale->id;
+        $record->scaleconfiguration = json_encode($scaleconfig);
+        $mpg->create_report_competency_config($record);
+
+        $user = $dg->create_user();
+        $plan = $lpg->create_plan(['userid' => $user->id, 'status' => plan::STATUS_ACTIVE]);
+        $lpg->create_plan_competency(['planid' => $plan->get('id'), 'competencyid' => $comp->get('id')]);
+
+        $course = $dg->create_course();
+        $dg->enrol_user($user->id, $course->id);
+        $lpg->create_course_competency(['competencyid' => $comp->get('id'), 'courseid' => $course->id]);
+
+        $data = $dg->create_module('data', ['assessed' => 1, 'scale' => 100, 'course' => $course->id]);
+        $cm = get_coursemodule_from_id('data', $data->cmid);
+        $lpg->create_course_module_competency(['competencyid' => $comp->get('id'), 'cmid' => $cm->id]);
+
+        // Prior learning evidence linked to the competency.
+        $uc = $lpg->create_user_competency(['userid' => $user->id, 'competencyid' => $comp->get('id')]);
+        $ue = $lpg->create_user_evidence(['userid' => $user->id]);
+        $lpg->create_user_evidence_competency([
+            'userevidenceid' => $ue->get('id'),
+            'competencyid' => $comp->get('id'),
+        ]);
+
+        // Course final grade with a known letter boundary.
+        $courseitem = \grade_item::fetch_course_item($course->id);
+        $courseitem->update_final_grade($user->id, 81, 'import', null);
+        $context = \context_course::instance($course->id);
+        $this->assign_good_letter_boundary($context->id);
+
+        $result = api::get_competency_detail($user->id, $comp->get('id'), $plan->get('id'));
+
+        // Core identity.
+        $this->assertEquals($user->id, $result->userid);
+        $this->assertEquals($plan->get('id'), $result->planid);
+        $this->assertEquals($comp->get('id'), $result->competency->get('id'));
+        $this->assertEquals($framework->get('id'), $result->framework->get('id'));
+
+        // Scale and report scale configuration.
+        $this->assertCount(2, $result->scaleconfig);
+        $this->assertCount(2, $result->scale);
+        $this->assertEquals('not good', $result->scale[1]);
+        $this->assertEquals('good', $result->scale[2]);
+        $this->assertCount(2, $result->reportscaleconfig);
+        $this->assertEquals('#AAAAA', $result->reportscaleconfig[0]->color);
+        $this->assertEquals('#BBBBB', $result->reportscaleconfig[1]->color);
+
+        // Prior learning evidence.
+        $this->assertCount(1, $result->userevidences);
+
+        // Courses, modules and literal note.
+        $this->assertCount(1, $result->courses);
+        $courseinfo = reset($result->courses);
+        $this->assertEquals($course->id, $courseinfo->course->id);
+        $this->assertEquals('B+', $courseinfo->gradetxt);
+        $this->assertNotEmpty($courseinfo->modules);
+        $module = reset($courseinfo->modules);
+        $this->assertEquals($cm->id, $module->get('cmid'));
+        $this->assertEquals($comp->get('id'), $module->get('competencyid'));
+
+        // Course module collection with literal grade fallback.
+        $this->assertNotEmpty($result->cms);
+        $cminfo = reset($result->cms);
+        $this->assertEquals($cm->id, $cminfo->cmid);
+        $this->assertNotNull($cminfo->usecompetencyincm);
+        $this->assertObjectHasProperty('grade', $cminfo);
+        $this->assertObjectHasProperty('cmevidences', $cminfo);
+    }
+
+    /**
+     * Preservation Case 5 - Unrelated statistics calls are unchanged (validates 3.5).
+     *
+     * The statistics paths (get_user_competency_in_course ~line 970 and
+     * get_user_competency_in_coursemodule ~line 1007) are NOT part of the race fix. Observe that
+     * they behave normally on the unfixed code so the fix leaves them untouched.
+     *
+     * Validates: Requirements 3.5
+     */
+    public function test_statistics_calls_unaffected_by_fix(): void {
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $mpg = $dg->get_plugin_generator('report_lpmonitoring');
+
+        $cat = $dg->create_category();
+        $catctx = \context_coursecat::instance($cat->id);
+
+        $scale = $dg->create_scale(['name' => 'Stats scale', 'scale' => 'not good, good']);
+        $scaleconfiguration = '[{"scaleid":"' . $scale->id . '"},' .
+            '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+            '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+        $framework = $lpg->create_framework([
+            'scaleid' => $scale->id,
+            'scaleconfiguration' => $scaleconfiguration,
+            'contextid' => $catctx->id,
+        ]);
+        $comp = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
+
+        $scaleconfig = [];
+        $scaleconfig[] = ['id' => 1, 'name' => 'not good', 'color' => '#AAAAA'];
+        $scaleconfig[] = ['id' => 2, 'name' => 'good', 'color' => '#BBBBB'];
+        $record = new \stdClass();
+        $record->competencyframeworkid = $framework->get('id');
+        $record->scaleid = $scale->id;
+        $record->scaleconfiguration = json_encode($scaleconfig);
+        $mpg->create_report_competency_config($record);
+
+        $template = $lpg->create_template(['contextid' => $catctx->id]);
+        $lpg->create_template_competency(['templateid' => $template->get('id'), 'competencyid' => $comp->get('id')]);
+
+        $user = $dg->create_user();
+        $plan = $lpg->create_plan([
+            'userid' => $user->id,
+            'templateid' => $template->get('id'),
+            'status' => plan::STATUS_ACTIVE,
+        ]);
+
+        $course = $dg->create_course();
+        $dg->enrol_user($user->id, $course->id);
+        $lpg->create_course_competency(['competencyid' => $comp->get('id'), 'courseid' => $course->id]);
+
+        $data = $dg->create_module('data', ['assessed' => 1, 'scale' => 100, 'course' => $course->id]);
+        $cm = get_coursemodule_from_id('data', $data->cmid);
+        $lpg->create_course_module_competency(['competencyid' => $comp->get('id'), 'cmid' => $cm->id]);
+
+        // Grade the competency in the course and in the course module so the statistics have data.
+        core_competency_api::grade_competency_in_course($course->id, $user->id, $comp->get('id'), 2);
+        \tool_cmcompetency\api::grade_competency_in_coursemodule($cm->id, $user->id, $comp->get('id'), 2);
+
+        // Statistics in course (~line 970).
+        $statscourse = api::get_competency_statistics_in_course($comp->get('id'), $template->get('id'));
+        $this->assertNotEmpty($statscourse->listratings);
+        $courserating = reset($statscourse->listratings);
+        $this->assertEquals($user->id, $courserating->get('userid'));
+        $this->assertEquals($comp->get('id'), $courserating->get('competencyid'));
+        $this->assertEquals(2, $courserating->get('grade'));
+
+        // Statistics in course modules (~line 1007).
+        $statscm = api::get_competency_statistics_in_coursemodules($comp->get('id'), $template->get('id'));
+        $this->assertNotEmpty($statscm->listratings);
+        $cmrating = reset($statscm->listratings);
+        $this->assertEquals($user->id, $cmrating->get('userid'));
+        $this->assertEquals($cm->id, $cmrating->get('cmid'));
+        $this->assertEquals($comp->get('id'), $cmrating->get('competencyid'));
+        $this->assertEquals(2, $cmrating->get('grade'));
+    }
+
+    /**
+     * Property-based preservation - Detail is consistent across varied module configurations.
+     *
+     * Property 2 (Preservation): For inputs where isBugCondition(X) is FALSE (single request,
+     * no race), get_competency_detail() produces a coherent detail payload regardless of how
+     * many course modules are attached to the competency and how many of them are graded.
+     *
+     * A smart generator constrains the input space to the relevant dimension - the number of
+     * modules and which ones are graded - keeping the test deterministic and fast while
+     * exercising many shapes of the module/cms collections. This freezes the pre-fix behaviour
+     * so the fix cannot regress it.
+     *
+     * Validates: Requirements 3.4, 3.5
+     */
+    public function test_get_competency_detail_preservation_property_varied_modules(): void {
+        $this->setAdminUser();
+        $dg = $this->getDataGenerator();
+        $lpg = $dg->get_plugin_generator('core_competency');
+        $mpg = $dg->get_plugin_generator('report_lpmonitoring');
+
+        // Smart generator: vary module count and the subset that is graded, within the input
+        // space that does NOT satisfy the bug condition (no concurrency, records created inline).
+        $scenarios = [
+            ['modules' => 1, 'graded' => [0]],
+            ['modules' => 2, 'graded' => []],
+            ['modules' => 2, 'graded' => [0, 1]],
+            ['modules' => 3, 'graded' => [1]],
+            ['modules' => 3, 'graded' => [0, 2]],
+        ];
+
+        foreach ($scenarios as $index => $scenario) {
+            $scale = $dg->create_scale(['name' => 'Prop scale ' . $index, 'scale' => 'not good, good']);
+            $scaleconfiguration = '[{"scaleid":"' . $scale->id . '"},' .
+                '{"name":"not good","id":1,"scaledefault":1,"proficient":0},' .
+                '{"name":"good","id":2,"scaledefault":0,"proficient":1}]';
+            $framework = $lpg->create_framework([
+                'scaleid' => $scale->id,
+                'scaleconfiguration' => $scaleconfiguration,
+            ]);
+            $comp = $lpg->create_competency(['competencyframeworkid' => $framework->get('id')]);
+
+            $scaleconfig = [];
+            $scaleconfig[] = ['id' => 1, 'name' => 'not good', 'color' => '#AAAAA'];
+            $scaleconfig[] = ['id' => 2, 'name' => 'good', 'color' => '#BBBBB'];
+            $reportrecord = new \stdClass();
+            $reportrecord->competencyframeworkid = $framework->get('id');
+            $reportrecord->scaleid = $scale->id;
+            $reportrecord->scaleconfiguration = json_encode($scaleconfig);
+            $mpg->create_report_competency_config($reportrecord);
+
+            $user = $dg->create_user();
+            $plan = $lpg->create_plan(['userid' => $user->id, 'status' => plan::STATUS_ACTIVE]);
+            $lpg->create_plan_competency(['planid' => $plan->get('id'), 'competencyid' => $comp->get('id')]);
+
+            $course = $dg->create_course();
+            $dg->enrol_user($user->id, $course->id);
+            $lpg->create_course_competency(['competencyid' => $comp->get('id'), 'courseid' => $course->id]);
+
+            $cmids = [];
+            for ($m = 0; $m < $scenario['modules']; $m++) {
+                $data = $dg->create_module('data', ['assessed' => 1, 'scale' => 100, 'course' => $course->id]);
+                $cm = get_coursemodule_from_id('data', $data->cmid);
+                $lpg->create_course_module_competency(['competencyid' => $comp->get('id'), 'cmid' => $cm->id]);
+                $cmids[] = (int) $cm->id;
+            }
+
+            // Grade the selected subset of modules.
+            foreach ($scenario['graded'] as $gradedindex) {
+                \tool_cmcompetency\api::grade_competency_in_coursemodule(
+                    $cmids[$gradedindex],
+                    $user->id,
+                    $comp->get('id'),
+                    2
+                );
+            }
+
+            $result = api::get_competency_detail($user->id, $comp->get('id'), $plan->get('id'));
+
+            $message = 'Scenario ' . $index . ' (modules=' . $scenario['modules'] . ')';
+
+            // Invariant: the course is always present with its modules resolved.
+            $this->assertCount(1, $result->courses, $message);
+            $courseinfo = reset($result->courses);
+            $this->assertEquals($course->id, $courseinfo->course->id, $message);
+            $this->assertCount($scenario['modules'], $courseinfo->modules, $message);
+
+            // Invariant: every module carries a user_competency_coursemodule for the triplet.
+            $seencmids = [];
+            foreach ($courseinfo->modules as $module) {
+                $this->assertEquals($user->id, $module->get('userid'), $message);
+                $this->assertEquals($comp->get('id'), $module->get('competencyid'), $message);
+                $this->assertContains($module->get('cmid'), $cmids, $message);
+                $seencmids[] = $module->get('cmid');
+            }
+            sort($seencmids);
+            $expectedcmids = $cmids;
+            sort($expectedcmids);
+            $this->assertEquals($expectedcmids, $seencmids, $message);
+
+            // Invariant: the cms collection resolves the same set of modules.
+            $this->assertCount($scenario['modules'], $result->cms, $message);
+            foreach ($result->cms as $cminfo) {
+                $this->assertContains((int) $cminfo->cmid, $cmids, $message);
+                $this->assertNotNull($cminfo->usecompetencyincm, $message);
+                $this->assertEquals($comp->get('id'), $cminfo->usecompetencyincm->get('competencyid'), $message);
+            }
+
+            // Invariant: graded modules expose the assigned grade in their record.
+            foreach ($scenario['graded'] as $gradedindex) {
+                $gradedcmid = $cmids[$gradedindex];
+                $found = null;
+                foreach ($result->cms as $cminfo) {
+                    if ((int) $cminfo->cmid === (int) $gradedcmid) {
+                        $found = $cminfo;
+                        break;
+                    }
+                }
+                $this->assertNotNull($found, $message . ' graded cm ' . $gradedcmid);
+                $this->assertEquals(2, $found->usecompetencyincm->get('grade'), $message);
+            }
+        }
+    }
 }
