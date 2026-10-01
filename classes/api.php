@@ -754,6 +754,53 @@ class api {
     }
 
     /**
+     * Get the plan competency, tolerating concurrent creation of the user competency.
+     *
+     * The upstream get-or-create in \core_competency\api::get_plan_competency() is not atomic.
+     * For a plan that is not complete and whose user_competency is still absent, the method
+     * reads it as missing and then INSERTs a new row into competency_usercomp. When rapid,
+     * repeated navigation triggers concurrent report requests for the same userid-competencyid
+     * pair, both requests may attempt the INSERT and the second violates the usecom_uix unique
+     * key with a dml_write_exception. We absorb that exception and rebuild the same result
+     * object from the row the concurrent request has now created.
+     *
+     * @param int|\core_competency\plan $planorid The plan, or its id.
+     * @param int $competencyid Competency id.
+     * @return \stdClass Object with keys competency, usercompetency and usercompetencyplan,
+     *                   matching the shape returned by \core_competency\api::get_plan_competency().
+     */
+    private static function get_plan_competency_safe($planorid, $competencyid) {
+        try {
+            return core_competency_api::get_plan_competency($planorid, $competencyid);
+        } catch (\dml_write_exception $exception) {
+            // A concurrent report request may have created the user_competency after the lookup.
+            $plan = is_object($planorid) ? $planorid : new plan($planorid);
+
+            // A completed plan never creates a user_competency (it reads from the archive), so a
+            // write failure there is unrelated to this race: do not mask it.
+            if ($plan->get('status') == plan::STATUS_COMPLETE) {
+                throw $exception;
+            }
+
+            $uc = user_competency::get_record([
+                'userid' => $plan->get('userid'),
+                'competencyid' => $competencyid,
+            ]);
+            if (!$uc) {
+                // The write failure is not the concurrent-creation race: do not mask it.
+                throw $exception;
+            }
+
+            $plancompetency = (object) [
+                'competency' => $plan->get_competency($competencyid),
+                'usercompetency' => $uc,
+                'usercompetencyplan' => null,
+            ];
+            return $plancompetency;
+        }
+    }
+
+    /**
      * Get comptency information for lpmonitoring report.
      *
      * @param int $userid User id.
@@ -766,7 +813,7 @@ class api {
 
         $competencydetails = new \stdClass();
 
-        $plancompetency = core_competency_api::get_plan_competency($planid, $competencyid);
+        $plancompetency = self::get_plan_competency_safe($planid, $competencyid);
         $competency = $plancompetency->competency;
 
         // User has necessary capapbility if he can read the framework.
@@ -968,7 +1015,7 @@ class api {
                 continue;
             }
 
-            $plancompetency = core_competency_api::get_plan_competency($userplan->get('id'), $competencyid);
+            $plancompetency = self::get_plan_competency_safe($userplan->get('id'), $competencyid);
             $user->usercompetency = $plancompetency->usercompetency;
             $user->usercompetencyplan = $plancompetency->usercompetencyplan;
             $competencystatistics->listusers[] = $user;

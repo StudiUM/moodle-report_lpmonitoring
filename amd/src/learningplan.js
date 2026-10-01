@@ -667,20 +667,21 @@ define(['jquery',
                 }
             }]);
             return promiselistCompetencies[0].then(function(results) {
+                var listrender;
                 if (results.length > 0) {
                     // Get the "Detail" tab content.
                     var competencies = {plan: plan, hascompetencies: true};
                     // This key is part of the Mustache template context contract.
                     // eslint-disable-next-line camelcase
                     competencies.competencies_list = results;
-                    templates.render('report_lpmonitoring/list_competencies', competencies).done(function(html, js) {
+                    listrender = templates.render('report_lpmonitoring/list_competencies', competencies).done(function(html, js) {
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         $("#nav-tabs").removeClass("hidden");
                     });
                 } else {
                     elementloading.removeClass('loading');
-                    templates.render('report_lpmonitoring/list_competencies', {}).done(function(html, js) {
+                    listrender = templates.render('report_lpmonitoring/list_competencies', {}).done(function(html, js) {
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         $("#report-content").empty();
@@ -688,7 +689,9 @@ define(['jquery',
                         $("#nav-tabs").addClass("hidden");
                     });
                 }
-                var requests = [self.loadSummaryTab(plan), self.loadReportTab(plan)];
+                // Include the list render so navigation is only considered finished once the list
+                // template is rendered as well as all the tab and detail requests below.
+                var requests = [listrender, self.loadSummaryTab(plan), self.loadReportTab(plan)];
                 if (results.length > 0) {
                     requests.push(self.loadCompetencyDetail(results, plan, elementloading));
                 }
@@ -729,53 +732,64 @@ define(['jquery',
             });
 
             var promises = ajax.call(requests);
-            $.each(promises, function(index, promise) {
+
+            // Render a single competency detail once its AJAX context resolves.
+            // Returning this from the .then() keeps the render inside the promise chain so the
+            // caller can await the full render (not just the raw AJAX request).
+            var renderCompetencyDetail = function(context, index) {
+                // Locally store competency information.
+                self.competencies[context.competencyid].competencydetail = context;
+                context.plan = plan;
+                context.plan.userid = plan.user.id;
+                context.cmcompgradingenabled = self.cmcompgradingEnabled;
+                return templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
+                    var compid = context.competencyid;
+                    var userid = plan.user.id;
+                    var planid = plan.id;
+                    var scaleid = context.scaleid;
+                    $('#comp-' + compid + ' .x_content').html(html);
+
+                    // Show comptency ratings details tabs.
+                    if (self.compDetailActiveTab === 'incoursemodule') {
+                        $('.detail-comp-tab a[href="#tab-incms-content-' + context.competencyid + '"]').tab('show');
+                    } else {
+                        $('.detail-comp-tab a[href="#tab-incourses-content-' + context.competencyid + '"]').tab('show');
+                    }
+                    if (context.cangrade) {
+                        // Apply inline grader.
+                        self.applyInlineGrader(compid, userid, planid, scaleid);
+                    }
+
+                    // Apply Donut Graph to the competency in courses.
+                    if (context.hasrating !== false) {
+                        self.ApplyDonutGraph(compid, context, false);
+                    }
+
+                    // Apply Donut Graph to the competency in courses modules.
+                    if (context.hasratingincms !== false && self.cmcompgradingEnabled) {
+                        self.ApplyDonutGraph(compid, context, true);
+                    }
+
+                    // If all template are loaded then hide the loader.
+                    if (index === requests.length - 1) {
+                        element.removeClass('loading');
+                        // Show collapse links.
+                        $('.competencyreport .competency-detail a.collapse-link').css('visibility', '');
+                    }
+                    templates.runTemplateJS(js);
+                    self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .badge.cr-scalename');
+                });
+            };
+
+            // Collect the promises that INCLUDE the render step. $.each would ignore the return
+            // values of its callbacks, so we use $.map to build an array of chained promises and
+            // await all of them, guaranteeing every competency_detail render is complete.
+            var rendered = $.map(promises, function(promise, index) {
                 return promise.then(function(context) {
-                    // Locally store competency information.
-                    self.competencies[context.competencyid].competencydetail = context;
-                    context.plan = plan;
-                    context.plan.userid = plan.user.id;
-                    context.cmcompgradingenabled = self.cmcompgradingEnabled;
-                    return templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
-                        var compid = context.competencyid;
-                        var userid = plan.user.id;
-                        var planid = plan.id;
-                        var scaleid = context.scaleid;
-                        $('#comp-' + compid + ' .x_content').html(html);
-
-                        // Show comptency ratings details tabs.
-                        if (self.compDetailActiveTab === 'incoursemodule') {
-                            $('.detail-comp-tab a[href="#tab-incms-content-' + context.competencyid + '"]').tab('show');
-                        } else {
-                            $('.detail-comp-tab a[href="#tab-incourses-content-' + context.competencyid + '"]').tab('show');
-                        }
-                        if (context.cangrade) {
-                            // Apply inline grader.
-                            self.applyInlineGrader(compid, userid, planid, scaleid);
-                        }
-
-                        // Apply Donut Graph to the competency in courses.
-                        if (context.hasrating !== false) {
-                            self.ApplyDonutGraph(compid, context, false);
-                        }
-
-                        // Apply Donut Graph to the competency in courses modules.
-                        if (context.hasratingincms !== false && self.cmcompgradingEnabled) {
-                            self.ApplyDonutGraph(compid, context, true);
-                        }
-
-                        // If all template are loaded then hide the loader.
-                        if (index === requests.length - 1) {
-                            element.removeClass('loading');
-                            // Show collapse links.
-                            $('.competencyreport .competency-detail a.collapse-link').css('visibility', '');
-                        }
-                        templates.runTemplateJS(js);
-                        self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .badge.cr-scalename');
-                    });
+                    return renderCompetencyDetail(context, index);
                 });
             });
-            return $.when.apply($, promises);
+            return $.when.apply($, rendered);
         };
 
         /**

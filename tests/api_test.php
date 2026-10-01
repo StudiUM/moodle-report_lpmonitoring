@@ -3480,4 +3480,94 @@ final class api_test extends \advanced_testcase {
             }
         }
     }
+
+    /**
+     * Fix checking - concurrent INSERT race on user_competency (competency_usercomp).
+     *
+     * This is the same class of bug as the COURSE and COURSE MODULE races, but on a third site:
+     * the get-or-create in \core_competency\api::get_plan_competency() called at the top of
+     * get_competency_detail(). For an active (not complete) plan whose user_competency is still
+     * absent, two concurrent requests both attempt the INSERT into competency_usercomp and the
+     * loser violates the usecom_uix unique key with a dml_write_exception.
+     *
+     * On the unfixed code that exception propagates out of get_competency_detail(). This test
+     * encodes the expected (post-fix) behaviour: the exception is absorbed and the detail is
+     * returned with usercompetency populated for the (userid, competencyid) pair.
+     *
+     * The race is armed on competency_usercomp and targets the first INSERT attempt on that
+     * table, which is exactly the get_plan_competency get-or-create: it runs before any of the
+     * course / course module paths of get_competency_detail().
+     *
+     * Validates: Requirements 2.1
+     */
+    public function test_get_competency_detail_race_plan_competency(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
+        global $DB;
+
+        [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
+
+        // No user_competency exists yet for the pair (record absent).
+        $this->assertFalse($DB->record_exists('competency_usercomp', [
+            'userid' => $userid,
+            'competencyid' => $competencyid,
+        ]));
+
+        // Arm the race on the user_competency table and target its first INSERT attempt, which is
+        // the get_plan_competency get-or-create at the top of get_competency_detail().
+        $racedb = $this->install_race_database(true, 'competency_usercomp');
+        $racedb->target_nth_insert(1);
+        try {
+            // Expected (post-fix) behaviour: no dml_write_exception propagates.
+            $result = api::get_competency_detail($userid, $competencyid, $planid);
+
+            // The concurrent request created the user_competency; the detail is returned with it.
+            $this->assertNotEmpty($racedb->racetriggered);
+            $this->assertNotNull($result->usercompetency, 'The user competency should be returned.');
+            $this->assertEquals($userid, $result->usercompetency->get('userid'));
+            $this->assertEquals($competencyid, $result->usercompetency->get('competencyid'));
+            // For a non-complete plan the usercompetencyplan key stays null.
+            $this->assertNull($result->usercompetencyplan);
+            $this->assertEquals($competencyid, $result->competency->get('id'));
+        } finally {
+            $this->restore_real_database($racedb);
+        }
+    }
+
+    /**
+     * Preservation - unrecoverable write exception on user_competency is propagated.
+     *
+     * insertconcurrentrow is false: the race fixture throws a dml_write_exception on the
+     * competency_usercomp INSERT WITHOUT creating a recoverable row. get_plan_competency_safe()
+     * finds no user_competency to recover and must re-raise the original exception, confirming
+     * that a write failure unrelated to the concurrent-creation race is never masked.
+     *
+     * Validates: Requirements 3.3
+     */
+    public function test_get_competency_detail_plan_competency_propagates_unrecoverable_write_exception(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
+        global $DB;
+
+        [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
+
+        $this->assertFalse($DB->record_exists('competency_usercomp', [
+            'userid' => $userid,
+            'competencyid' => $competencyid,
+        ]));
+
+        // The insertconcurrentrow flag is false: throw without creating the row, so nothing is recoverable.
+        $racedb = $this->install_race_database(false, 'competency_usercomp');
+        $racedb->target_nth_insert(1);
+        try {
+            $this->expectException(\dml_write_exception::class);
+            api::get_competency_detail($userid, $competencyid, $planid);
+        } finally {
+            $this->restore_real_database($racedb);
+        }
+    }
 }
