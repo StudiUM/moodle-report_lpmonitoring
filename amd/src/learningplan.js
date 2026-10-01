@@ -132,8 +132,8 @@ define(['jquery',
         LearningplanReport.prototype.withplans = false;
         /** @var {Boolean} Is course module competency grading enabled. */
         LearningplanReport.prototype.cmcompgradingEnabled = false;
-        /** @var {Boolean} Whether a plan navigation request is in progress. */
-        LearningplanReport.prototype.navigationBusy = false;
+        /** @var {Number} Monotonic token identifying the most recent plan navigation. Older in-flight loads are ignored. */
+        LearningplanReport.prototype.navigationToken = 0;
 
         /** @var {String} The template select box selector. */
         LearningplanReport.prototype.templateSelector = "#templateSelectorReport";
@@ -654,11 +654,17 @@ define(['jquery',
          * @name   loadListCompetencies
          * @param  {Object} plan
          * @param  {Object} elementloading element
+         * @param  {Function} [isCurrent] Optional latest-wins guard. When provided and it returns
+         *                     false, the asynchronous results are not applied to the DOM. When
+         *                     omitted the navigation is always treated as current.
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.loadListCompetencies = function(plan, elementloading) {
+        LearningplanReport.prototype.loadListCompetencies = function(plan, elementloading, isCurrent) {
             var self = this;
+            var isCurrentNavigation = function() {
+                return !isCurrent || isCurrent();
+            };
 
             var promiselistCompetencies = ajax.call([{
                 methodname: 'report_lpmonitoring_list_plan_competencies',
@@ -667,6 +673,11 @@ define(['jquery',
                 }
             }]);
             return promiselistCompetencies[0].then(function(results) {
+                // Drop stale results: a newer navigation owns the screen now, so neither the
+                // renders below nor the loader removal must touch the current user's DOM.
+                if (!isCurrentNavigation()) {
+                    return null;
+                }
                 var listrender;
                 if (results.length > 0) {
                     // Get the "Detail" tab content.
@@ -675,31 +686,43 @@ define(['jquery',
                     // eslint-disable-next-line camelcase
                     competencies.competencies_list = results;
                     listrender = templates.render('report_lpmonitoring/list_competencies', competencies).done(function(html, js) {
+                        if (!isCurrentNavigation()) {
+                            return null;
+                        }
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         $("#nav-tabs").removeClass("hidden");
+                        return null;
                     });
                 } else {
                     elementloading.removeClass('loading');
                     listrender = templates.render('report_lpmonitoring/list_competencies', {}).done(function(html, js) {
+                        if (!isCurrentNavigation()) {
+                            return null;
+                        }
                         $("#listPlanCompetencies").html(html);
                         templates.runTemplateJS(js);
                         $("#report-content").empty();
                         $("#summary-content").empty();
                         $("#nav-tabs").addClass("hidden");
+                        return null;
                     });
                 }
                 // Include the list render so navigation is only considered finished once the list
                 // template is rendered as well as all the tab and detail requests below.
-                var requests = [listrender, self.loadSummaryTab(plan), self.loadReportTab(plan)];
+                var requests = [listrender, self.loadSummaryTab(plan, isCurrent), self.loadReportTab(plan, isCurrent)];
                 if (results.length > 0) {
-                    requests.push(self.loadCompetencyDetail(results, plan, elementloading));
+                    requests.push(self.loadCompetencyDetail(results, plan, elementloading, isCurrent));
                 }
                 return $.when.apply($, requests);
             }).fail(
                 function(exp) {
+                    if (!isCurrentNavigation()) {
+                        return null;
+                    }
                     elementloading.removeClass('loading');
                     notification.exception(exp);
+                    return null;
                 }
             );
         };
@@ -711,12 +734,18 @@ define(['jquery',
          * @param {Object[]} competencies
          * @param {Object} plan
          * @param {Object} element loader
+         * @param {Function} [isCurrent] Optional latest-wins guard. When provided and it returns
+         *                    false, the asynchronous results are not applied to the DOM. When
+         *                    omitted the navigation is always treated as current.
          * @return {Void}
          * @function
          */
-        LearningplanReport.prototype.loadCompetencyDetail = function(competencies, plan, element) {
+        LearningplanReport.prototype.loadCompetencyDetail = function(competencies, plan, element, isCurrent) {
             var requests = [];
             var self = this;
+            var isCurrentNavigation = function() {
+                return !isCurrent || isCurrent();
+            };
 
             $.each(competencies, function(index, record) {
                 // Locally store user competency information.
@@ -743,6 +772,11 @@ define(['jquery',
                 context.plan.userid = plan.user.id;
                 context.cmcompgradingenabled = self.cmcompgradingEnabled;
                 return templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
+                    // Discard this render if a newer navigation has taken over: it must not write
+                    // into the DOM nor remove the loader belonging to the current user's screen.
+                    if (!isCurrentNavigation()) {
+                        return;
+                    }
                     var compid = context.competencyid;
                     // The actual DOM/graph rendering of a single competency is wrapped in a
                     // try/finally so that a failure while rendering ONE competency (e.g. an
@@ -781,8 +815,8 @@ define(['jquery',
                         self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .badge.cr-scalename');
                     } catch (e) {
                         // Report the render failure without letting it bubble up: a broken single
-                        // competency render must not reject the aggregate promise nor keep
-                        // navigationBusy locked until the safety timeout fires.
+                        // competency render must not reject the aggregate promise nor prevent the
+                        // other competencies from rendering.
                         notification.exception(e);
                     } finally {
                         // If all templates are loaded then hide the loader. This runs even when a
@@ -815,8 +849,7 @@ define(['jquery',
             // once its server request has responded AND its render has been attempted, the
             // aggregate $.when settles as soon as all get_competency_detail requests have returned.
             // $.when is fail-fast, so wrapping each render in a deferred that only resolves (never
-            // rejects) guarantees the returned promise settles in the nominal case, releasing
-            // navigationBusy immediately instead of waiting for the 10s safety timeout.
+            // rejects) guarantees the returned promise settles in the nominal case.
             var rendered = $.map(promises, function(promise, index) {
                 return settleRender(promise, index);
             });
@@ -827,10 +860,16 @@ define(['jquery',
          * Load the report tab.
          *
          * @param {Object} plan
+         * @param {Function} [isCurrent] Optional latest-wins guard. When provided and it returns
+         *                    false, the asynchronous results are not applied to the DOM. When
+         *                    omitted the navigation is always treated as current.
          * @function
          */
-        LearningplanReport.prototype.loadReportTab = function(plan) {
+        LearningplanReport.prototype.loadReportTab = function(plan, isCurrent) {
             var learningplan = this;
+            var isCurrentNavigation = function() {
+                return !isCurrent || isCurrent();
+            };
             // Get the "Report" tab content.
             var promiseCompetenciesReport = ajax.call([{
                 methodname: 'report_lpmonitoring_list_plan_competencies_report',
@@ -839,6 +878,9 @@ define(['jquery',
                 }
             }]);
             return promiseCompetenciesReport[0].then(function(results) {
+                if (!isCurrentNavigation()) {
+                    return null;
+                }
                 var competencies;
                 if (results.competencies_list.length > 0) {
                     competencies = {reportinfos: results, plan: plan, hascompetencies: true};
@@ -862,6 +904,9 @@ define(['jquery',
 
                     // Render the "Report" data table template.
                     return templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
+                        if (!isCurrentNavigation()) {
+                            return;
+                        }
                         $("#report-content").html(html);
                         templates.runTemplateJS(js);
                         var popup = new Popup('[data-region=report-competencies-section]', '[data-user-competency=true]');
@@ -875,6 +920,9 @@ define(['jquery',
                 } else {
                     competencies = {hascompetencies: false};
                     return templates.render('report_lpmonitoring/datatable', competencies).done(function(html, js) {
+                        if (!isCurrentNavigation()) {
+                            return;
+                        }
                         $("#report-content").html(html);
                         templates.runTemplateJS(js);
                     });
@@ -890,10 +938,16 @@ define(['jquery',
          * Load the summary tab.
          *
          * @param {Object} plan
+         * @param {Function} [isCurrent] Optional latest-wins guard. When provided and it returns
+         *                    false, the asynchronous results are not applied to the DOM. When
+         *                    omitted the navigation is always treated as current.
          * @function
          */
-        LearningplanReport.prototype.loadSummaryTab = function(plan) {
+        LearningplanReport.prototype.loadSummaryTab = function(plan, isCurrent) {
             var learningplan = this;
+            var isCurrentNavigation = function() {
+                return !isCurrent || isCurrent();
+            };
 
             // Get the "Summary" tab content.
             var promiseCompetenciesSummary = ajax.call([{
@@ -903,6 +957,9 @@ define(['jquery',
                 }
             }]);
             return promiseCompetenciesSummary[0].then(function(results) {
+                if (!isCurrentNavigation()) {
+                    return null;
+                }
                 var competencies;
                 if (results.scale_competency.length > 0) {
                     competencies = {reportinfos: results, plan: plan, hascompetencies: true};
@@ -933,6 +990,9 @@ define(['jquery',
 
                     // Render the "Summary" data table template.
                     return templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
+                        if (!isCurrentNavigation()) {
+                            return;
+                        }
                         $("#summary-content").html(html);
                         templates.runTemplateJS(js);
                         var popup = new Popup('[data-region=summary-competencies-section]', '[data-user-competency=true]');
@@ -946,6 +1006,9 @@ define(['jquery',
                 } else {
                     competencies = {hascompetencies: false};
                     return templates.render('report_lpmonitoring/summary', competencies).done(function(html, js) {
+                        if (!isCurrentNavigation()) {
+                            return;
+                        }
                         $("#summary-content").html(html);
                         templates.runTemplateJS(js);
                     });
@@ -1374,19 +1437,11 @@ define(['jquery',
         LearningplanReport.prototype.displayPlan = function(planid, templateid, tagid) {
             var elementloading = null,
                 self = this;
-            if (self.navigationBusy) {
-                return null;
-            }
-            self.navigationBusy = true;
-            var releaseNavigation = function() {
-                self.navigationBusy = false;
-            };
-            // Safety net: never leave navigation permanently blocked if a render/graph
-            // in the detail chain throws or a promise never settles.
-            var navigationGuardTimeout = setTimeout(releaseNavigation, 10000);
-            var release = function() {
-                clearTimeout(navigationGuardTimeout);
-                releaseNavigation();
+            // Latest-wins: each navigation gets a token. Any asynchronous result from an older
+            // navigation is ignored so rapid clicks switch users instantly without blocking.
+            var token = ++self.navigationToken;
+            var isCurrent = function() {
+                return token === self.navigationToken;
             };
             if ($('#plan-user-info').length) {
                 elementloading = $('#plan-user-info');
@@ -1414,6 +1469,11 @@ define(['jquery',
                 }
             }]);
             return promise[0].then(function(results) {
+                // Abort if a more recent navigation started while this read_plan was in flight:
+                // a stale result must not overwrite the display of the newer user.
+                if (!isCurrent()) {
+                    return null;
+                }
                 results.templateid = parseInt(templateid);
                 M.cfg.contextid = results.plan.usercontext;
                 if (results.hasnavigation === false) {
@@ -1428,35 +1488,41 @@ define(['jquery',
                 }
                 if (self.userView === false) {
                     return templates.render('report_lpmonitoring/user_info', results).done(function(html) {
-                        $("#userInfoContainer").html(html);
-                        var listpromise = self.loadListCompetencies(results.plan, elementloading);
-                        if (listpromise && typeof listpromise.always === 'function') {
-                            listpromise.always(release);
-                        } else {
-                            release();
+                        // Re-check after the user_info render completes: a newer navigation may
+                        // have started during the render, in which case we must not touch the DOM.
+                        if (!isCurrent()) {
+                            return null;
                         }
+                        $("#userInfoContainer").html(html);
+                        self.loadListCompetencies(results.plan, elementloading, isCurrent);
                         return templates.render('report_lpmonitoring/users_list_navigation', results).done(function(html) {
+                            if (!isCurrent()) {
+                                return null;
+                            }
                             $("#users-list-full-navigation").html(html);
+                            return null;
                         });
                     });
                 } else {
                     return str.get_string(
                         'learningplancompetencies', 'report_lpmonitoring', results.plan.name
                     ).done(function(planname) {
-                        $('#planInfoContainer h3').text(planname);
-                        var listpromise = self.loadListCompetencies(results.plan, elementloading);
-                        if (listpromise && typeof listpromise.always === 'function') {
-                            listpromise.always(release);
-                        } else {
-                            release();
+                        if (!isCurrent()) {
+                            return null;
                         }
+                        $('#planInfoContainer h3').text(planname);
+                        self.loadListCompetencies(results.plan, elementloading, isCurrent);
                         return planname;
                     });
                 }
             }).fail(
                 function(exp) {
+                    // Ignore failures tied to a navigation that has since been superseded, so a
+                    // stale error/emptytemplate does not clobber the newer user's screen.
+                    if (!isCurrent()) {
+                        return null;
+                    }
                     elementloading.removeClass('loading');
-                    release();
                     if (exp.errorcode === 'emptytemplate') {
                         var exception = {exception: exp};
                         return templates.render('report_lpmonitoring/user_info', exception).done(function(html) {
