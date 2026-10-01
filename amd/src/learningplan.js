@@ -747,6 +747,14 @@ define(['jquery',
                 return !isCurrent || isCurrent();
             };
 
+            // Latest-wins guard applied up front: if this navigation is already stale by the time
+            // the method is invoked, do not initialise the shared self.competencies cache nor fire
+            // the AJAX requests. Returning a resolved promise keeps the return type consistent with
+            // the nominal path so loadListCompetencies' aggregate $.when still settles.
+            if (!isCurrentNavigation()) {
+                return $.when();
+            }
+
             $.each(competencies, function(index, record) {
                 // Locally store user competency information.
                 self.competencies[record.competency.id] = {usercompetency: record.usercompetency};
@@ -766,17 +774,22 @@ define(['jquery',
             // Returning this from the .then() keeps the render inside the promise chain so the
             // caller can await the full render (not just the raw AJAX request).
             var renderCompetencyDetail = function(context, index) {
+                // Discard this render if a newer navigation has taken over. The guard is applied
+                // at the very top, BEFORE any write into the shared self.competencies cache and
+                // before templates.render, so a stale load can neither pollute the cache (which is
+                // read by the course/module/evidence popup click handlers) nor touch the DOM, and
+                // crucially does not remove the loader belonging to the current user's screen.
+                // settleRender still resolves its deferred in all cases via its .always(), so the
+                // aggregate $.when keeps settling even when this returns early.
+                if (!isCurrentNavigation()) {
+                    return null;
+                }
                 // Locally store competency information.
                 self.competencies[context.competencyid].competencydetail = context;
                 context.plan = plan;
                 context.plan.userid = plan.user.id;
                 context.cmcompgradingenabled = self.cmcompgradingEnabled;
                 return templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
-                    // Discard this render if a newer navigation has taken over: it must not write
-                    // into the DOM nor remove the loader belonging to the current user's screen.
-                    if (!isCurrentNavigation()) {
-                        return;
-                    }
                     var compid = context.competencyid;
                     // The actual DOM/graph rendering of a single competency is wrapped in a
                     // try/finally so that a failure while rendering ONE competency (e.g. an
