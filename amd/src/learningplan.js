@@ -744,50 +744,81 @@ define(['jquery',
                 context.cmcompgradingenabled = self.cmcompgradingEnabled;
                 return templates.render('report_lpmonitoring/competency_detail', context).done(function(html, js) {
                     var compid = context.competencyid;
-                    var userid = plan.user.id;
-                    var planid = plan.id;
-                    var scaleid = context.scaleid;
-                    $('#comp-' + compid + ' .x_content').html(html);
+                    // The actual DOM/graph rendering of a single competency is wrapped in a
+                    // try/finally so that a failure while rendering ONE competency (e.g. an
+                    // exception thrown by the inline grader, a donut graph or the colour contrast
+                    // helper) can neither prevent the other competencies from rendering nor keep
+                    // the navigation blocked. The loader removal and the collapse links are placed
+                    // in the finally block so they always run once the last request has rendered.
+                    try {
+                        var userid = plan.user.id;
+                        var planid = plan.id;
+                        var scaleid = context.scaleid;
+                        $('#comp-' + compid + ' .x_content').html(html);
 
-                    // Show comptency ratings details tabs.
-                    if (self.compDetailActiveTab === 'incoursemodule') {
-                        $('.detail-comp-tab a[href="#tab-incms-content-' + context.competencyid + '"]').tab('show');
-                    } else {
-                        $('.detail-comp-tab a[href="#tab-incourses-content-' + context.competencyid + '"]').tab('show');
-                    }
-                    if (context.cangrade) {
-                        // Apply inline grader.
-                        self.applyInlineGrader(compid, userid, planid, scaleid);
-                    }
+                        // Show comptency ratings details tabs.
+                        if (self.compDetailActiveTab === 'incoursemodule') {
+                            $('.detail-comp-tab a[href="#tab-incms-content-' + context.competencyid + '"]').tab('show');
+                        } else {
+                            $('.detail-comp-tab a[href="#tab-incourses-content-' + context.competencyid + '"]').tab('show');
+                        }
+                        if (context.cangrade) {
+                            // Apply inline grader.
+                            self.applyInlineGrader(compid, userid, planid, scaleid);
+                        }
 
-                    // Apply Donut Graph to the competency in courses.
-                    if (context.hasrating !== false) {
-                        self.ApplyDonutGraph(compid, context, false);
-                    }
+                        // Apply Donut Graph to the competency in courses.
+                        if (context.hasrating !== false) {
+                            self.ApplyDonutGraph(compid, context, false);
+                        }
 
-                    // Apply Donut Graph to the competency in courses modules.
-                    if (context.hasratingincms !== false && self.cmcompgradingEnabled) {
-                        self.ApplyDonutGraph(compid, context, true);
-                    }
+                        // Apply Donut Graph to the competency in courses modules.
+                        if (context.hasratingincms !== false && self.cmcompgradingEnabled) {
+                            self.ApplyDonutGraph(compid, context, true);
+                        }
 
-                    // If all template are loaded then hide the loader.
-                    if (index === requests.length - 1) {
-                        element.removeClass('loading');
-                        // Show collapse links.
-                        $('.competencyreport .competency-detail a.collapse-link').css('visibility', '');
+                        templates.runTemplateJS(js);
+                        self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .badge.cr-scalename');
+                    } catch (e) {
+                        // Report the render failure without letting it bubble up: a broken single
+                        // competency render must not reject the aggregate promise nor keep
+                        // navigationBusy locked until the safety timeout fires.
+                        notification.exception(e);
+                    } finally {
+                        // If all templates are loaded then hide the loader. This runs even when a
+                        // previous render step threw, so the loader is always removed in the
+                        // nominal case.
+                        if (index === requests.length - 1) {
+                            element.removeClass('loading');
+                            // Show collapse links.
+                            $('.competencyreport .competency-detail a.collapse-link').css('visibility', '');
+                        }
                     }
-                    templates.runTemplateJS(js);
-                    self.colorContrast.apply('#comp-' + compid + ' .x_content .tile-stats .badge.cr-scalename');
                 });
             };
 
-            // Collect the promises that INCLUDE the render step. $.each would ignore the return
-            // values of its callbacks, so we use $.map to build an array of chained promises and
-            // await all of them, guaranteeing every competency_detail render is complete.
-            var rendered = $.map(promises, function(promise, index) {
-                return promise.then(function(context) {
+            // Chain the render step onto a single AJAX promise and always resolve a dedicated
+            // deferred once the request + render attempt has settled (success or failure). This is
+            // extracted into a named function so the chained promise handlers are not nested inside
+            // the $.map callback (avoids promise/no-nesting lint warnings).
+            var settleRender = function(promise, index) {
+                var deferred = $.Deferred();
+                promise.then(function(context) {
                     return renderCompetencyDetail(context, index);
+                }).always(function() {
+                    deferred.resolve();
                 });
+                return deferred.promise();
+            };
+
+            // Collect one always-resolving promise per competency. Because every entry resolves
+            // once its server request has responded AND its render has been attempted, the
+            // aggregate $.when settles as soon as all get_competency_detail requests have returned.
+            // $.when is fail-fast, so wrapping each render in a deferred that only resolves (never
+            // rejects) guarantees the returned promise settles in the nominal case, releasing
+            // navigationBusy immediately instead of waiting for the 10s safety timeout.
+            var rendered = $.map(promises, function(promise, index) {
+                return settleRender(promise, index);
             });
             return $.when.apply($, rendered);
         };
@@ -1347,6 +1378,16 @@ define(['jquery',
                 return null;
             }
             self.navigationBusy = true;
+            var releaseNavigation = function() {
+                self.navigationBusy = false;
+            };
+            // Safety net: never leave navigation permanently blocked if a render/graph
+            // in the detail chain throws or a promise never settles.
+            var navigationGuardTimeout = setTimeout(releaseNavigation, 10000);
+            var release = function() {
+                clearTimeout(navigationGuardTimeout);
+                releaseNavigation();
+            };
             if ($('#plan-user-info').length) {
                 elementloading = $('#plan-user-info');
             } else {
@@ -1388,9 +1429,12 @@ define(['jquery',
                 if (self.userView === false) {
                     return templates.render('report_lpmonitoring/user_info', results).done(function(html) {
                         $("#userInfoContainer").html(html);
-                        self.loadListCompetencies(results.plan, elementloading).always(function() {
-                            self.navigationBusy = false;
-                        });
+                        var listpromise = self.loadListCompetencies(results.plan, elementloading);
+                        if (listpromise && typeof listpromise.always === 'function') {
+                            listpromise.always(release);
+                        } else {
+                            release();
+                        }
                         return templates.render('report_lpmonitoring/users_list_navigation', results).done(function(html) {
                             $("#users-list-full-navigation").html(html);
                         });
@@ -1400,16 +1444,19 @@ define(['jquery',
                         'learningplancompetencies', 'report_lpmonitoring', results.plan.name
                     ).done(function(planname) {
                         $('#planInfoContainer h3').text(planname);
-                        self.loadListCompetencies(results.plan, elementloading).always(function() {
-                            self.navigationBusy = false;
-                        });
+                        var listpromise = self.loadListCompetencies(results.plan, elementloading);
+                        if (listpromise && typeof listpromise.always === 'function') {
+                            listpromise.always(release);
+                        } else {
+                            release();
+                        }
                         return planname;
                     });
                 }
             }).fail(
                 function(exp) {
                     elementloading.removeClass('loading');
-                    self.navigationBusy = false;
+                    release();
                     if (exp.errorcode === 'emptytemplate') {
                         var exception = {exception: exp};
                         return templates.render('report_lpmonitoring/user_info', exception).done(function(html) {
