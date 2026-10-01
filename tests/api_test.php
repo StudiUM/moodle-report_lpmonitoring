@@ -2841,6 +2841,7 @@ final class api_test extends \advanced_testcase {
      * Install the race-condition database decorator as the global $DB.
      *
      * @param bool $insertconcurrentrow Whether the concurrent row is created before the failure (recoverable race).
+     * @param string|null $racetable Optional target table (defaults to the usercompcm table).
      * @return report_lpmonitoring_race_condition_database
      */
     private function install_race_database(
@@ -2876,6 +2877,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 2.1
      */
     public function test_get_competency_detail_race_modules_loop(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         global $DB;
 
         [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
@@ -2922,6 +2927,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 2.2
      */
     public function test_get_competency_detail_race_cms_loop(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         global $DB;
 
         [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
@@ -2972,6 +2981,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 1.3 (protection asymmetry)
      */
     public function test_get_competency_detail_race_course_case_is_protected(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         global $DB, $CFG;
 
         require_once($CFG->dirroot . '/report/lpmonitoring/tests/testapi.php');
@@ -3016,6 +3029,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 3.1
      */
     public function test_get_competency_detail_preserves_normal_creation_without_concurrency(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         global $DB;
 
         [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
@@ -3072,6 +3089,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 3.2
      */
     public function test_get_competency_detail_preserves_existing_record_no_insert(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         global $DB;
 
         [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
@@ -3120,6 +3141,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 3.3
      */
     public function test_get_competency_detail_propagates_unrecoverable_write_exception(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         global $DB;
 
         [$userid, $competencyid, $planid, $cmid] = $this->setup_coursemodule_competency_scenario();
@@ -3152,6 +3177,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 3.4
      */
     public function test_get_competency_detail_preserves_full_detail_data(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         global $DB;
 
         $this->setAdminUser();
@@ -3253,6 +3282,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 3.5
      */
     public function test_statistics_calls_unaffected_by_fix(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
@@ -3336,6 +3369,10 @@ final class api_test extends \advanced_testcase {
      * Validates: Requirements 3.4, 3.5
      */
     public function test_get_competency_detail_preservation_property_varied_modules(): void {
+        if (!api::is_cm_comptency_grading_enabled()) {
+            $this->markTestSkipped('Skipped test, grading competency in course module is disabled');
+        }
+
         $this->setAdminUser();
         $dg = $this->getDataGenerator();
         $lpg = $dg->get_plugin_generator('core_competency');
