@@ -23,7 +23,7 @@ jobs:
       # Let's see if we can improve the behat test during the jquery migration.
       run-behat: false
       # Only necessary for the behat tests, which are disabled for now.
-      #dependent-plugins: |
-      #  --branch main StudiUM/moodle-tool_cmcompetency
-      #  --branch main StudiUM/moodle-report_cmcompetency
+      dependent-plugins: |
+        --branch main StudiUM/moodle-tool_cmcompetency
+        --branch main StudiUM/moodle-report_cmcompetency
 
