@@ -15,23 +15,28 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/competency_detail_stats
+    Example context (json):
+    {}
+}}
+{{!
     Competency detail template.
 
     Classes required for JS:
     * competencydialogue
 
     Context variables required for this template:
-    
+
 
     * competencyid - competency id
     * nbusersrated - number of user rated
-    * nbuserstotal - users number 
-    
+    * nbuserstotal - users number
+
     * scalecompetencyitems - scale used in the competency
       * color - color of the scale value
       * name - name of scale value
       * nbuser - number of users rated with this scale value
-    
+
 
 }}
 <div class="tile_count">
@@ -59,7 +64,7 @@
                          <td><span class="nbusers fa fa-user"> </span></td>
                         </tr>
                         {{#scalecompetencyitems}}
-                        <tr>        
+                        <tr>
                             <td>
                                 <p class="truncate"><i class="fa fa-square" style="color:{{color}}"></i>{{name}}</p>
                             </td>

@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/user_report
+    Example context (json):
+    {}
+}}
+{{!
     User competency report template.
 
     Classes required for JS:
@@ -28,10 +33,10 @@
 
             <!-- filter -->
             {{> report_lpmonitoring/filter_for_user }}
-            
+
             <!-- Plan name -->
             <div id="planInfoContainer">
-                <h3></h3>
+                <h3>{{#str}}learningplan, report_lpmonitoring{{/str}}</h3>
             </div>
 
             <!-- Details and Report tabs and content -->

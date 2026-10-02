@@ -70,7 +70,7 @@ define(['jquery',
          */
         ScaleColorConfiguration.prototype.frameworkChangeHandler = function(e) {
             var self = this,
-                    requests;
+                requests;
 
             self.frameworkid = $(e.target).val();
             if (self.frameworkid !== '') {
@@ -112,7 +112,7 @@ define(['jquery',
          */
         ScaleColorConfiguration.prototype.updateScaleHeader = function() {
             var selector = document.getElementById('scaleselector'),
-                    scale = selector.options[selector.selectedIndex].text;
+                scale = selector.options[selector.selectedIndex].text;
             str.get_string('colorsforscale', 'report_lpmonitoring', scale).done(function(s) {
                 $('#scaleheader').text(s);
             });
@@ -178,8 +178,10 @@ define(['jquery',
             $(self.scaleValuesSelector).hide();
             requests = ajax.call([{
                 methodname: 'report_lpmonitoring_read_report_competency_config',
-                args: {competencyframeworkid: self.frameworkid,
-                    scaleid: self.scaleid}
+                args: {
+                    competencyframeworkid: self.frameworkid,
+                    scaleid: self.scaleid
+                }
             }]);
 
             requests[0].done(function(context) {
@@ -201,15 +203,17 @@ define(['jquery',
          * @function
          */
         ScaleColorConfiguration.prototype.saveHandler = function() {
-            var colors = [], valuescaleid = 0, configid = '0';
+            var colors = [],
+                valuescaleid = 0,
+                configid = '0';
             var methodname;
             var self = this,
                 requests;
 
             valuescaleid = 1;
-            $('#savecolor input[type=color]').each(function () {
+            $('#savecolor input[type=color]').each(function() {
                 if ($(this).val() !== '') {
-                    colors.push({id : valuescaleid, color : $(this).val()});
+                    colors.push({id: valuescaleid, color: $(this).val()});
                     valuescaleid++;
                 }
             });
@@ -224,9 +228,11 @@ define(['jquery',
 
             requests = ajax.call([{
                 methodname: methodname,
-                args: {competencyframeworkid: self.frameworkid,
+                args: {
+                    competencyframeworkid: self.frameworkid,
                     scaleid: self.scaleid,
-                    scaleconfiguration: colors}
+                    scaleconfiguration: colors
+                }
             }]);
 
             requests[0].done(function(context) {
@@ -241,7 +247,7 @@ define(['jquery',
                         message: s,
                         type: "success"
                     });
-                    $('html, body').animate({scrollTop : 0}, 500);
+                    $('html, body').animate({scrollTop: 0}, 500);
                 }).fail(notification.exception);
             }).fail(notification.exception);
 

@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/summary
+    Example context (json):
+    {}
+}}
+{{!
     Competency report data table.
 
     Classes required for JS:
@@ -138,10 +143,10 @@
                     {{#competencies_list}}
                         <tr {{#showasparent}}class="summary-parent"{{/showasparent}}>
                             <td>
-                                {{competency.idnumber}} - 
+                                {{competency.idnumber}} -
                                 {{#isassessable}}
-                                    <a href="#" data-user-competency="true" data-userid="{{plan.user.id}}" 
-                                        data-competencyid="{{competency.id}}" data-planid="{{plan.id}}" 
+                                    <a href="#" data-user-competency="true" data-userid="{{plan.user.id}}"
+                                        data-competencyid="{{competency.id}}" data-planid="{{plan.id}}"
                                         title="{{competency.shortname}}" role="button">{{competency.shortname}}</a>
                                 {{/isassessable}}
                                 {{^isassessable}}
@@ -150,7 +155,7 @@
                             </td>
 
                         {{#evaluationslist_total}}
-                            <td class="total-cell" 
+                            <td class="total-cell"
                                 {{^empty}}
                                     {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}
                                 {{/empty}}
@@ -169,7 +174,7 @@
 
                         {{#iscmcompetencygradingenabled}}
                             {{#evaluationslist_course}}
-                                <td class="course-cell" 
+                                <td class="course-cell"
                                     {{^empty}}
                                         {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}
                                     {{/empty}}>
@@ -185,7 +190,7 @@
                                 </td>
                             {{/evaluationslist_course}}
                             {{#evaluationslist_cm}}
-                                <td class="cm-cell" 
+                                <td class="cm-cell"
                                     {{^empty}}
                                         {{^showasparent}}style="background-color: {{color}}"{{/showasparent}}
                                     {{/empty}}>

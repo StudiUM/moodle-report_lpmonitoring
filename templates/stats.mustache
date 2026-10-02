@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/stats
+    Example context (json):
+    {}
+}}
+{{!
     User competency report template.
 
     Classes required for JS:
@@ -28,9 +33,9 @@
 
             <!-- filter -->
             {{> report_lpmonitoring/filter_stats }}
-            
+
             <div class="compstats" data-region="list-competencies-section" id="list-competencies-template">
-                
+
             </div>
         </div>
         <!-- /page content -->

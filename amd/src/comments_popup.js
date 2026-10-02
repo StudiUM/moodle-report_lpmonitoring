@@ -23,29 +23,29 @@
  */
 
 define(['jquery',
-        'core/notification',
-        'core/str',
-        'core/ajax',
-        'core/templates',
-        'core/modal_factory',
-        'core/modal_events'],
+    'core/notification',
+    'core/str',
+    'core/ajax',
+    'core/templates',
+    'core/modal_factory',
+    'core/modal_events'],
     function($, notification, str, ajax, templates, ModalFactory, ModalEvents) {
 
         /**
          * Constructor.
          *
-         * @param {String} selector_button The CSS selector used to find triggers for the new dialogue.
-         * @param {string} selector_nbcomments The CSS selector used to display the new number of comments for the plan.
+         * @param {String} selectorButton The CSS selector used to find triggers for the new dialogue.
+         * @param {string} selectorNbcomments The CSS selector used to display the new number of comments for the plan.
          * @param {int} planid The learning plan id.
          *
          * Each call to init gets it's own instance of this class.
          */
-        var CommentsPopup = function(selector_button, selector_nbcomments, planid) {
+        var CommentsPopup = function(selectorButton, selectorNbcomments, planid) {
             var self = this;
             self.planid = planid;
-            self.selector_nbcomments = selector_nbcomments;
+            self.selectorNbcomments = selectorNbcomments;
 
-            $(selector_button).on('click', this.handleClick.bind(this));
+            $(selectorButton).on('click', this.handleClick.bind(this));
         };
 
         /**
@@ -55,10 +55,10 @@ define(['jquery',
         CommentsPopup.prototype.planid = -1;
 
         /**
-         * @var {string} selector_nbcomments  The CSS selector used to display the new number of comments for the plan.
+         * @var {string} selectorNbcomments  The CSS selector used to display the new number of comments for the plan.
          * @private
          */
-        CommentsPopup.prototype.selector_nbcomments = '';
+        CommentsPopup.prototype.selectorNbcomments = '';
 
         /**
          * @var {Dialogue} popup  The popup window (Dialogue).
@@ -67,10 +67,10 @@ define(['jquery',
         CommentsPopup.prototype.popup = null;
 
         /**
-         * @var float actual_size  The size of the comment area.
+         * @var float actualSize  The size of the comment area.
          * @private
          */
-        CommentsPopup.prototype.actual_size = 0;
+        CommentsPopup.prototype.actualSize = 0;
 
         /**
          * Get the data from the clicked cell and open the popup.
@@ -83,8 +83,8 @@ define(['jquery',
             var trigger = $(e.target);
             var self = this;
             var requests = ajax.call([{
-                methodname : 'report_lpmonitoring_get_comment_area_for_plan',
-                args: { planid: self.planid }
+                methodname: 'report_lpmonitoring_get_comment_area_for_plan',
+                args: {planid: self.planid}
             }]);
             $.when.apply($, requests).then(function(context) {
                 self.commentareaLoaded.bind(this)(context, trigger);
@@ -114,10 +114,10 @@ define(['jquery',
                     modal.getRoot().on(ModalEvents.hidden, function() {
                         self.close();
                         self.focusContentItem(trigger);
-                    }.bind(this));
+                    });
                     self.popup.show();
-                }.bind(this));
-        }).fail(notification.exception);
+                });
+            }).fail(notification.exception);
         };
 
         /**
@@ -155,16 +155,18 @@ define(['jquery',
             // Update the comment count.
             var self = this;
             var requests = ajax.call([{
-                methodname : 'report_lpmonitoring_get_comment_area_for_plan',
-                args: { planid: self.planid },
+                methodname: 'report_lpmonitoring_get_comment_area_for_plan',
+                args: {planid: self.planid},
                 fail: notification.exception
             }]);
 
-            requests[0].then(function (commentarea) {
-                $(self.selector_nbcomments).text(commentarea.count);
-            });
+            var updatePromise = requests[0].then(function(commentarea) {
+                $(self.selectorNbcomments).text(commentarea.count);
+                return commentarea;
+            }).catch(notification.exception);
             self.popup.destroy();
             self.popup = null;
+            return updatePromise;
         };
 
         return {
@@ -172,13 +174,13 @@ define(['jquery',
              * Attach event listeners to initialise this module.
              *
              * @method init
-             * @param {string} selector_button The CSS selector used to find nodes that will trigger this module.
-             * @param {string} selector_nbcomments The CSS selector used to display the new number of comments for the plan.
+             * @param {string} selectorButton The CSS selector used to find nodes that will trigger this module.
+             * @param {string} selectorNbcomments The CSS selector used to display the new number of comments for the plan.
              * @param {int} planid The learning plan id.
              * @return {CommentsPopup} A new instance of CommentsPopup.
              */
-            init: function(selector_button, selector_nbcomments, planid) {
-                return new CommentsPopup(selector_button, selector_nbcomments, planid);
+            init: function(selectorButton, selectorNbcomments, planid) {
+                return new CommentsPopup(selectorButton, selectorNbcomments, planid);
             }
         };
     });

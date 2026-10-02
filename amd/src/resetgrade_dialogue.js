@@ -76,7 +76,7 @@ define(['jquery',
          * @method close
          */
         ResetGradeDialogue.prototype.close = function() {
-            if(this._popup !== null) {
+            if (this._popup !== null) {
                 this._popup.close();
                 this._popup = null;
             }

@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="report_competency_config" COMMENT="Configuration for scale associated to a framework">
+    <TABLE NAME="report_lpmonitoring_competency_config" COMMENT="Configuration for scale associated to a framework">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="competencyframeworkid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>

@@ -46,11 +46,11 @@
       "nbcomments": "2",
       "hasidentity": true,
       "identity": "p001421, useremail@nomailtest.com"
-      
+
     }
 }}
 <span class="userplan-fullname">
-    <img height="18" src="{{profileimagesmall}}" alt="" role="presentation">
+    {{#profileimagesmall}}<img height="18" src="{{profileimagesmall}}" alt="">{{/profileimagesmall}}
     <span>{{fullname}}</span>
     {{#hasidentity}}
     <span><small>{{identity}}</small></span>

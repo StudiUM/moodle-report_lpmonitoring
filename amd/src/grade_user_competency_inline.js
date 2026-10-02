@@ -27,13 +27,13 @@
  */
 
 define(['jquery',
-        'core/notification',
-        'core/ajax',
-        'core/log',
-        'report_lpmonitoring/grade_dialogue',
-        'tool_lp/event_base',
-        'tool_lp/scalevalues',
-    ], function($, notification, ajax, log, GradeDialogue, EventBase, ScaleValues) {
+    'core/notification',
+    'core/ajax',
+    'core/log',
+    'report_lpmonitoring/grade_dialogue',
+    'tool_lp/event_base',
+    'tool_lp/scalevalues',
+], function($, notification, ajax, log, GradeDialogue, EventBase, ScaleValues) {
 
     /**
      * InlineEditor
@@ -118,33 +118,33 @@ define(['jquery',
 
             return options;
         })
-        .then(function(options) {
-            return new GradeDialogue(options);
-        })
-        .then(function(dialogue) {
-            dialogue.on('rated', function(e, data) {
-                var args = self._args;
-                args.grade = data.rating;
-                args.note = self._dialogue._find('form').serialize();
-                ajax.call([{
-                    methodname: self._methodName,
-                    args: args,
-                    done: function(evidence) {
-                        self._trigger('competencyupdated', {args: args, evidence: evidence});
-                    },
-                    fail: notification.exception
-                }]);
-            });
+            .then(function(options) {
+                return new GradeDialogue(options);
+            })
+            .then(function(dialogue) {
+                dialogue.on('rated', function(e, data) {
+                    var args = self._args;
+                    args.grade = data.rating;
+                    args.note = self._dialogue._find('form').serialize();
+                    ajax.call([{
+                        methodname: self._methodName,
+                        args: args,
+                        done: function(evidence) {
+                            self._trigger('competencyupdated', {args: args, evidence: evidence});
+                        },
+                        fail: notification.exception
+                    }]);
+                });
 
-            return dialogue;
-        })
-        .then(function(dialogue) {
-            self._dialogue = dialogue;
+                return dialogue;
+            })
+            .then(function(dialogue) {
+                self._dialogue = dialogue;
 
-            M.util.js_complete('report_lpmonitoring/grade_user_competency_inline:_setUp');
-            return;
-        })
-        .fail(notification.exception);
+                M.util.js_complete('report_lpmonitoring/grade_user_competency_inline:_setUp');
+                return;
+            })
+            .fail(notification.exception);
     };
 
     /** @property {Number} The scale id for this competency. */

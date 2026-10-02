@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/competency_detail
+    Example context (json):
+    {}
+}}
+{{!
     Competency detail template.
 
     Classes required for JS:
@@ -39,14 +44,14 @@
     * nbcoursestotal - courses number
 
     * nbcmsrated - number of course module rated
-    * nbcmstotal - courses modules number 
+    * nbcmstotal - courses modules number
 
     * scalecompetencyitems - scale used in the competency
       * color - color of the scale value
       * name - name of scale value
       * nbcourse - number of courses rated with this scale value
       * nbcm - number of courses modules rated with this scale value
-    
+
 
 }}
 <div class="tile_count">
@@ -68,7 +73,7 @@
             <a class="blue listevidence" role="button" title="{{#str}}userevidence, tool_lp{{/str}}" data-competencyid="{{competencyid}}" href="#">{{nbevidence}}</a>
         </div>
         {{/hasevidence}}
-        
+
     </div>
     <div class="tile_stats_count rating">
         <h5 class="count_top"><i class="fa fa-bar-chart-o"></i> {{#str}}rating, tool_lp{{/str}}</h5>
@@ -170,7 +175,7 @@
             </div>
             {{/cmcompgradingenabled}}
         </div>
-        
+
     </div>
     <div class="tile_stats_count finalrating">
         <h5 class="count_top"><i class="fa fa-gavel"></i> {{#str}}finalrating, report_lpmonitoring{{/str}}</h5>
@@ -189,7 +194,7 @@
             {{/isproficient}}
             <div class="count">
                 {{^isnotrated}}
-                <span class="badge cr-scalename truncate" style="background-color: {{finalgradecolor}}">{{finalgradename}}</span>
+                <span class="badge cr-scalename truncate"{{#finalgradecolor}} style="background-color: {{finalgradecolor}}"{{/finalgradecolor}}>{{finalgradename}}</span>
                 {{/isnotrated}}
             </div>
             {{#cangrade}}

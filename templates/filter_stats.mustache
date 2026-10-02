@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/filter_stats
+    Example context (json):
+    {}
+}}
+{{!
     Competency filter template.
 
     Classes required for JS:
@@ -48,7 +53,7 @@
                         <div class="scalefiltercontainer">
                                 <div class="radio radio-primary">
                                     <span>
-                                        <input checked="true" type="radio" name="ratingoptions" id="ratinginplanoption" value="0" aria-labelledby="ratingtargetbytemplate">
+                                        <input checked type="radio" name="ratingoptions" id="ratinginplanoption" value="0" aria-labelledby="ratingtargetbytemplate">
                                         <label for="ratinginplanoption">{{#str}}finalrating, report_lpmonitoring{{/str}}</label>
                                     </span>
                                 </div>

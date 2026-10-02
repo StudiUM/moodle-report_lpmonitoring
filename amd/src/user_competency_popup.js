@@ -23,12 +23,12 @@
  */
 
 define(['jquery',
-        'core/notification',
-        'core/str',
-        'core/ajax',
-        'core/templates',
-        'core/modal_factory',
-        'core/modal_events'],
+    'core/notification',
+    'core/str',
+    'core/ajax',
+    'core/templates',
+    'core/modal_factory',
+    'core/modal_events'],
     function($, notification, str, ajax, templates, ModalFactory, ModalEvents) {
 
         /**
@@ -62,20 +62,20 @@ define(['jquery',
             self._userId = $(cell).data('userid');
 
             var requests = ajax.call([{
-                methodname : 'tool_lp_data_for_user_competency_summary_in_plan',
-                args: { competencyid: self._competencyId , planid: self._planId },
+                methodname: 'tool_lp_data_for_user_competency_summary_in_plan',
+                args: {competencyid: self._competencyId, planid: self._planId},
                 fail: notification.exception
             }]);
 
             // Log the user competency viewed in plan event.
-            requests[0].then(function (result) {
+            return requests[0].then(function(result) {
                 self._contextLoaded.bind(self)(result, cell);
                 var eventMethodName = 'core_competency_user_competency_viewed_in_plan';
                 // Trigger core_competency_user_competency_plan_viewed event instead if plan is already completed.
                 if (result.plan.iscompleted) {
                     eventMethodName = 'core_competency_user_competency_plan_viewed';
                 }
-                ajax.call([{
+                return ajax.call([{
                     methodname: eventMethodName,
                     args: {competencyid: self._competencyId, userid: self._userId, planid: self._planId},
                     fail: notification.exception
@@ -106,7 +106,7 @@ define(['jquery',
                         self._refresh();
                     });
                     self.popup.show();
-                }.bind(this));
+                });
             }).fail(notification.exception);
         };
 
@@ -147,7 +147,9 @@ define(['jquery',
          *
          * @method _refresh
          */
-        UserCompetencyPopup.prototype._refresh = function() {};
+        UserCompetencyPopup.prototype._refresh = function() {
+                    return;
+                };
 
-        return  UserCompetencyPopup;
+        return UserCompetencyPopup;
     });

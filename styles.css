@@ -9,10 +9,11 @@
     font-weight: bold;
 }
 .competencyreport .mform .fitem .fgroup button:first-child {
-    margin-left : 0;
+    margin-left: 0;
 }
 .competencyreport .form-control:focus {
     border-color: #ccd0d7;
+    /* stylelint-disable-next-line declaration-no-important -- override Bootstrap's .form-control:focus box-shadow */
     box-shadow: none !important;
 }
 .competencyreport .x_panel {
@@ -247,13 +248,14 @@
     width: 90px;
 }
 
-@media (min-width: 1350px){
+@media (min-width: 1350px) {
     .competencyreport .compstats .competency-detail {
         flex: 0 1 315px;
         margin-right: 20px;
         min-width: 315px;
     }
 }
+
 @media (min-width: 380px) and (max-width: 1350px) {
     .competencyreport .compstats .competency-detail {
         flex: 0 1 400px;
@@ -261,15 +263,17 @@
         min-width: 400px;
     }
 }
+
 @media (min-width: 100px) and (max-width: 370px) {
     .competencyreport .compstats .competency-detail {
         flex: 0 1 235px;
         min-width: 235px;
     }
 }
+
 @media (max-width: 998px) {
     .competencyreport .widget_profile_box {
-        flex-flow : row wrap;
+        flex-flow: row wrap;
         height: auto;
         text-align: center;
         padding: 0 40px;
@@ -326,12 +330,14 @@
     }
 }
 .competencyreport .green {
+    /* stylelint-disable-next-line declaration-no-important -- override conflicting theme text color rules */
     color: #4cae4c !important;
 }
 .competencyreport .blue {
     color: #3590db;
 }
 .competencyreport .fail {
+    /* stylelint-disable-next-line declaration-no-important -- override conflicting theme text color rules */
     color: #ac2925 !important;
 }
 .competencyreport .breadcrumb {
@@ -362,13 +368,13 @@
     min-height: 60px;
     padding: 1px 5px;
 }
+
 @media (min-width: 768px) {
     .competencyreport .tile_count .tile_stats_count .count {
         font-size: 28px;
     }
 }
 .competencyreport .tile_count {
-    display: -webkit-flex;
     display: flex;
     -webkit-flex-flow: row wrap;
     flex-flow: row wrap;
@@ -391,6 +397,7 @@
 .competencyreport .tile_count .finalrating {
     min-width: 250px;
 }
+
 @media (min-width: 992px) {
     .competencyreport .tile_count .tile_stats_count {
         margin-bottom: 0;
@@ -409,6 +416,7 @@
     line-height: 47px;
     font-weight: 600;
 }
+
 @media (min-width: 992px) and (max-width: 1100px) {
     .competencyreport .tile_count .tile_stats_count .count {
         font-size: 28px;
@@ -421,18 +429,19 @@
     padding-bottom: 5px;
     border-bottom: 1px solid #cfd1d5;
 }
+
 @media (min-width: 768px) {
     .competencyreport .tile_count .tile_stats_count h5 {
         font-size: 15px;
     }
 }
 .competencyreport .btn {
-  border-radius: 3px;
-  box-shadow: none;
-  text-shadow: none;
+    border-radius: 3px;
+    box-shadow: none;
+    text-shadow: none;
 }
 .competencyreport .btn-primary {
-  background: #1375c7;
+    background: #1375c7;
 }
 .competencyreport .btn-primary:hover,
 .competencyreport .btn-primary:focus,
@@ -440,7 +449,7 @@
 .competencyreport .btn-primary.active,
 .competencyreport .btn-primary.disabled,
 .competencyreport .btn-primary[disabled] {
-  background: #1453c7;
+    background: #1453c7;
 }
 .competencyreport .tile-stats {
     min-height: 125px;
@@ -495,7 +504,6 @@
     text-align: center;
     margin-top: 5px;
     padding: 3px 0;
-    color: #fff;
     color: rgba(255, 255, 255, 0.8);
     display: block;
     z-index: 10;
@@ -555,7 +563,7 @@
 .competencyreport table.tile_info td a,
 .competencyreport table.tile_info td span.nbcourses,
 .competencyreport table.tile_info td span.nbcms,
-.competencyreport table.tile_info td span.nbusers{
+.competencyreport table.tile_info td span.nbusers {
     display: inline-block;
     text-align: center;
     width: 100%;
@@ -720,9 +728,6 @@
     border-radius: 50%;
     text-align: center;
     background: rgb(255, 255, 255);
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
     -webkit-box-align: center;
     -webkit-align-items: center;
@@ -762,14 +767,14 @@
     }
     .competencyreport #scalevalues .fitemtitle.proficient {
         padding-top: 0;
-        margin-top : -2px;
+        margin-top: -2px;
     }
     .competencyreport #loaderscalevalues {
         width: 462px;
     }
 }
 .competencyreport .templatelist input {
-    width:35%;
+    width: 35%;
 }
 .competencyreport .compstats {
     display: flex;
@@ -800,11 +805,6 @@
 }
 
 .competencyreport .plan-info-report {
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -moz-flex;
-    display: -webkit-flex;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
@@ -854,9 +854,10 @@
     color: #cfd1d5;
 }
 .competencyreport .plan-info-report .report-stats-competencies .form-switch .form-check-label {
-   font-size: 12px;
+    font-size: 12px;
 }
-.competencyreport .reset-grade a, .competencyreport .reset-grade-all a {
+.competencyreport .reset-grade a,
+.competencyreport .reset-grade-all a {
     font-size: 12px;
 }
 .competencyreport .reset-grade-all {
@@ -865,7 +866,7 @@
 .competencyreport .collapsible-actions {
     text-align: right;
     position: relative;
-    color:#555;
+    color: #555;
     align-self: end;
     min-width: 120px;
     margin-bottom: 7px;
@@ -883,7 +884,6 @@
     font-size: 11px;
     margin: 10px 0;
     max-width: 130px;
-    padding: 0;
     padding: 0 0 0 5px;
 }
 .competencyreport .compstats .competency-detail td.convaschart {
@@ -964,7 +964,6 @@
 .lpmonitoringdialogue .dataTables_wrapper {
     position: relative;
     clear: both;
-    *zoom: 1;
     zoom: 1;
 }
 .lpmonitoringdialogue .dataTables_wrapper .dataTables_length {
@@ -979,6 +978,7 @@
 }
 .lpmonitoringdialogue table.dataTable thead th {
     position: relative;
+    /* stylelint-disable-next-line declaration-no-important -- override DataTables default sort background image */
     background-image: none !important;
 }
 
@@ -1045,10 +1045,10 @@
 .competencyreport .form-autocomplete-suggestions li::before {
     content: "";
 }
-.competencyreport .form-autocomplete-suggestions li>span.userplan-fullname {
+.competencyreport .form-autocomplete-suggestions li > span.userplan-fullname {
     margin-right: 1rem;
 }
-.competencyreport .form-autocomplete-suggestions li>span.nbratinguser {
+.competencyreport .form-autocomplete-suggestions li > span.nbratinguser {
     margin-left: auto;
     margin-right: 0.5rem;
 }
@@ -1059,25 +1059,25 @@
     font-size: 1.5em;
 }
 .competencyreport .status-icon .draft {
-  color: #ff7200;
+    color: #ff7200;
 }
 .competencyreport .status-icon .waiting {
-  color: #00cce4;
+    color: #00cce4;
 }
 .competencyreport .status-icon .review {
-  color: #833fff;
+    color: #833fff;
 }
 .competencyreport .status-icon .active {
-  color: #00d30f;
+    color: #00d30f;
 }
 .competencyreport .status-icon .complete {
-  color: #0078ff;
+    color: #0078ff;
 }
 .competencyreport .x_title small {
     color: #333;
 }
 .competencyreport .mform .fitem_fradiogroup {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 .lpmonitoringdialogue .dataTables_filter input {
     background-clip: padding-box;
@@ -1088,7 +1088,6 @@
     font-size: 1rem;
     line-height: 1.25;
     padding: 0.5rem 0.75rem;
-    width: 100%;
     display: inline-block;
     vertical-align: middle;
     width: auto;
@@ -1143,7 +1142,6 @@
 .lpmonitoringdialogue .dataTables_wrapper {
     position: relative;
     clear: both;
-    *zoom: 1;
     zoom: 1;
 }
 .lpmonitoringdialogue .dataTables_wrapper .dataTables_length {
@@ -1158,6 +1156,7 @@
 }
 .lpmonitoringdialogue table.dataTable thead th {
     position: relative;
+    /* stylelint-disable-next-line declaration-no-important -- override DataTables default sort background image */
     background-image: none !important;
 }
 
@@ -1200,12 +1199,14 @@
     background: transparent none repeat scroll 0 0;
     border: 1px solid transparent;
     box-shadow: none;
+    /* stylelint-disable-next-line declaration-no-important -- override DataTables default paginate_button color */
     color: #666 !important;
     cursor: default;
 }
 .lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button:not(.page-item) {
     box-sizing: border-box;
-    color: #333333 !important;
+    /* stylelint-disable-next-line declaration-no-important -- override DataTables default paginate_button color */
+    color: #333 !important;
     cursor: pointer;
     display: inline-block;
     line-height: 1.5em;
@@ -1213,6 +1214,7 @@
     min-width: 1.5em;
     padding: 0.2em 0.6em;
     text-align: center;
+    /* stylelint-disable-next-line declaration-no-important -- override DataTables default paginate_button underline */
     text-decoration: none !important;
     border-radius: 3px;
 }
@@ -1220,7 +1222,8 @@
 .lpmonitoringdialogue .dataTables_wrapper .dataTables_paginate .paginate_button.current:not(.page-item):hover {
     background: rgba(0, 0, 0, 0) linear-gradient(to bottom, white 0%, gainsboro 100%) repeat scroll 0 0;
     border: 1px solid #cacaca;
-    color: #333333 !important;
+    /* stylelint-disable-next-line declaration-no-important -- override DataTables default paginate_button color */
+    color: #333 !important;
 }
 .lpmonitoringdialogue .dataTables_paginate {
     text-align: center;
@@ -1256,7 +1259,8 @@
 .competencyreport:not(.boost) .row {
     margin-left: 0;
 }
-.button-displayratinghelp, .button-resethelp {
+.button-displayratinghelp,
+.button-resethelp {
     background: transparent;
     background-color: transparent;
     border: none;
@@ -1269,43 +1273,41 @@
 }
 
 .competencyreport .table-scroll {
-  position: relative;
-  width:100%;
-  z-index: 1;
-  margin: auto;
-  overflow: scroll;
-  height: 500px;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    margin: auto;
+    overflow: scroll;
+    height: 500px;
 }
 .competencyreport .table-scroll table {
-  width: 98%;
-  margin: auto;
-  border-collapse: separate;
-  border-spacing: 0;
+    width: 98%;
+    margin: auto;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 .competencyreport .table-scroll th,
 .competencyreport .table-scroll td {
-  padding: 3px 3px;
-  border: 1px solid #000;
-  background: #fff;
-  vertical-align: top;
+    padding: 3px 3px;
+    border: 1px solid #000;
+    background: #fff;
+    vertical-align: top;
 }
 .competencyreport .table-scroll thead th {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  min-width: 150px;
+    position: sticky;
+    top: 0;
+    min-width: 150px;
 }
 .competencyreport .table-scroll th:first-child,
 .competencyreport .table-scroll td:first-child {
-  position: -webkit-sticky;
-  position: sticky;
-  left: 0;
-  z-index: 2;
+    position: sticky;
+    left: 0;
+    z-index: 2;
 }
 .competencyreport .table-scroll thead th:first-child,
 .competencyreport .table-scroll tfoot th:first-child {
-  z-index: 5;
-  min-width: 300px;
+    z-index: 5;
+    min-width: 300px;
 }
 .competencyreport .dataTables_filter {
     display: none;
@@ -1315,7 +1317,8 @@
     margin-bottom: 15px;
     height: 30px;
 }
-#report-content .filter-report-custom .radio-primary, #summary-content .filter-report-custom .radio-primary {
+#report-content .filter-report-custom .radio-primary,
+#summary-content .filter-report-custom .radio-primary {
     float: left;
     margin-right: 30px;
 }
@@ -1334,14 +1337,16 @@
     clear: both;
 }
 #report-content .filtersearchhidden,
-#report-content .switchsearchhidden, #summary-content .switchsearchhidden {
+#report-content .switchsearchhidden,
+#summary-content .switchsearchhidden {
+    /* stylelint-disable-next-line declaration-no-important -- must beat DataTables inline column display styles */
     display: none !important;
 }
 #report-content .table-scroll td {
     vertical-align: middle;
     padding: 6px;
 }
-#report-content  .filtercolumn {
+#report-content .filtercolumn {
     position: absolute;
     bottom: 05px;
     clear: both;
@@ -1349,7 +1354,7 @@
     margin-top: 5px;
     font-weight: normal;
 }
-#report-content  select.filtercolumn {
+#report-content select.filtercolumn {
     width: 130px;
 }
 #report-content .datatablescalefilter {
@@ -1365,7 +1370,7 @@
     width: 240px;
     position: relative;
     margin-bottom: 5px;
-    margin-top: 15px
+    margin-top: 15px;
 }
 #report-content a.nowrapcm {
     display: inline-block;
@@ -1384,15 +1389,15 @@
 
 /** full navigation **/
 .toggle-lp-list-users {
-    padding-top: 5px!important;
+    /* stylelint-disable declaration-no-important -- override theme button/spacing utility classes */
+    padding-top: 5px !important;
     padding-bottom: 5px !important;
     padding-right: 3px !important;
     width: 35px;
     padding-left: 3px !important;
     margin-bottom: 10px;
-    height: 60px;
-    display: inline-block;
     background-color: #1375c7 !important;
+    /* stylelint-enable declaration-no-important */
     display: block;
     float: left;
     margin-top: 13px;
@@ -1405,6 +1410,7 @@
     font-size: 25px;
     margin-bottom: 3px;
     display: block;
+    /* stylelint-disable-next-line declaration-no-important -- override theme icon color utility classes */
     color: #fff !important;
 }
 [data-region="blocks-lp-list-users"].lp-list-users-closed {
@@ -1467,12 +1473,14 @@
     margin: 0 auto;
 }
 .table-list-users tr.selected {
+    /* stylelint-disable-next-line declaration-no-important -- override DataTables row background */
     background-color: #bedbff !important;
 }
 .table-list-users tr {
     cursor: pointer;
 }
 .table-list-users td {
+    /* stylelint-disable-next-line declaration-no-important -- override DataTables default cell border */
     border: none !important;
     font-size: 0.9em;
     padding-left: 1px;
@@ -1489,11 +1497,12 @@
     white-space: normal;
 }
 .table-list-users td.img-user {
-    width: 30px
+    width: 30px;
 }
 .drawer-open-left .plan-info-detail {
     width: 70%;
 }
+
 @media (max-width: 1199px) {
     [data-region="blocks-lp-list-users"] {
         max-width: 100%;
@@ -1507,6 +1516,7 @@
         width: 100%;
     }
 }
+
 @media (max-width: 1500px) and (min-width: 1199px) {
     .plan-info-detail {
         width: 70%;
@@ -1518,16 +1528,13 @@
         width: 90%;
     }
 }
+
 @media (min-width: 1800px) {
     .drawer-open-left .plan-info-detail {
         width: 80%;
     }
 }
 .competencyreport .count {
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
     display: flex;
     -webkit-box-align: center;
     -moz-box-align: center;
@@ -1550,18 +1557,13 @@ ul.detail-comp-tab li a::first-letter {
 }
 .template-selector {
     display: flex;
-    flex-direction: row;
-    flex-flow: wrap;
+    flex-flow: row wrap;
     justify-content: flex-start;
 }
 .template-selector .label-template-selector {
     margin-right: 20px;
 }
 .scale-comp-container {
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
     display: flex;
     flex-flow: row wrap;
     -webkit-flex-flow: row wrap;
@@ -1576,10 +1578,6 @@ ul.detail-comp-tab li a::first-letter {
     margin-bottom: 15px;
     padding-left: 5px;
     padding-right: 5px;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
     display: flex;
     flex-flow: column wrap;
     -webkit-flex-flow: column wrap;
@@ -1624,11 +1622,12 @@ ul.detail-comp-tab li a::first-letter {
 }
 /* round sahpe image */
 #plan-user-info .profile_img {
+    /* stylelint-disable-next-line declaration-no-important -- override theme image utility classes */
     border-radius: 50% !important;
 }
 /*nav bar navigation of learning plan*/
-#page-report-lpmonitoring-index .plan-info-container .plan-info-detail #nav-tabs:not(.hidden)
-{
+#page-report-lpmonitoring-index .plan-info-container .plan-info-detail #nav-tabs:not(.hidden) {
+    /* stylelint-disable-next-line declaration-no-important -- override inline display:none set by jQuery .hide() */
     display: flex !important;
 }
 /* left arrow of navigation in learning plan */
@@ -1648,6 +1647,7 @@ ul.detail-comp-tab li a::first-letter {
 
 /* list of student's learning plan accordion */
 #page-report-lpmonitoring-index #region-main {
+    /* stylelint-disable-next-line declaration-no-important -- override theme layout padding */
     padding: 0.5rem !important;
 }
 
@@ -1668,11 +1668,14 @@ ul.detail-comp-tab li a::first-letter {
 }
 
 /*summary table*/
-.summary-table thead th.total-cell, .summary-table thead th.course-cell, .summary-table thead th.cm-cell {
+.summary-table thead th.total-cell,
+.summary-table thead th.course-cell,
+.summary-table thead th.cm-cell {
     vertical-align: middle;
 }
-.competencyreport .table-scroll .summary-parent th, .competencyreport .table-scroll .summary-parent td {
-    background-color: #D9D9D9;
+.competencyreport .table-scroll .summary-parent th,
+.competencyreport .table-scroll .summary-parent td {
+    background-color: #d9d9d9;
 }
 .lpmonitoringdialogue .row {
     width: 100%;
@@ -1694,18 +1697,18 @@ ul.detail-comp-tab li a::first-letter {
 }
 .summary-table tr:not(.summary-parent) .light-color,
 #report-content .table-scroll td.evaluation a.light-color {
-    color: #FFF;
+    color: #fff;
 }
 
 @media (max-width: 998px) {
     .competencyreport .form-autocomplete-suggestions li {
         flex-direction: column;
     }
-    .competencyreport .form-autocomplete-suggestions li>span.userplan-fullname {
+    .competencyreport .form-autocomplete-suggestions li > span.userplan-fullname {
         margin: 0;
         margin-bottom: 0.5rem;
     }
-    .competencyreport .form-autocomplete-suggestions li>span.nbratinguser {
+    .competencyreport .form-autocomplete-suggestions li > span.nbratinguser {
         margin: 0;
     }
 }

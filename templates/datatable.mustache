@@ -15,6 +15,11 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
+    @template report_lpmonitoring/datatable
+    Example context (json):
+    {}
+}}
+{{!
     Competency report data table.
 
     Classes required for JS:
@@ -87,10 +92,10 @@
                 </div>
             {{/iscmcompetencygradingenabled}}
             <div class="felement col-md-3 d-flex gap-2 filter-datatable-right" >
-                <input type="text" 
+                <input type="text"
                        placeholder="{{#iscmcompetencygradingenabled}}{{#str}}searchincoursesactivities, report_lpmonitoring{{/str}}{{/iscmcompetencygradingenabled}}
                        {{^iscmcompetencygradingenabled}}{{#str}}searchincourses, report_lpmonitoring{{/str}}{{/iscmcompetencygradingenabled}}"
-                       id="table-search-columns" class="form-control" 
+                       id="table-search-columns" class="form-control"
                        {{#tablesearchvaluecolumn}}value="{{tablesearchvaluecolumn}}"{{/tablesearchvaluecolumn}}
                        >
                 <div class="datatablescalefilter">
@@ -133,8 +138,8 @@
                 {{#competencies_list}}
                     <tr>
                         <td class='searchable'>
-                            {{competency.idnumber}} - 
-                            <a href="#" data-user-competency="true" data-userid="{{plan.user.id}}" data-competencyid="{{competency.id}}" 
+                            {{competency.idnumber}} -
+                            <a href="#" data-user-competency="true" data-userid="{{plan.user.id}}" data-competencyid="{{competency.id}}"
                                 data-planid="{{plan.id}}" title="{{competency.shortname}}" role="button">
                                 {{competency.shortname}}
                             </a>

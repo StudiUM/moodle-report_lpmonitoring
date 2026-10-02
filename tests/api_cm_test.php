@@ -28,8 +28,8 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
+require_once(__DIR__ . '/testapi.php');
 use core_competency\plan;
-use report_lpmonitoring\api as nontestable_api;
 use core_competency\api as core_competency_api;
 use tool_cohortroles\api as tool_cohortroles_api;
 
@@ -820,24 +820,5 @@ final class api_cm_test extends \externallib_advanced_testcase {
                 }
             }
         }
-    }
-}
-
-/**
- * Test subclass that makes some variables or methods we want to test public.
- *
- * @package    report_lpmonitoring
- * @author     Marie-Eve Lévesque <marie-eve.levesque.8@umontreal.ca>
- * @copyright  2019 Université de Montréal
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class testapi extends nontestable_api {
-    /**
-     * Change value for the iscmcompetencygradingenabled variable.
-     *
-     * @param bool $value True or false value for iscmcompetencygradingenabled
-     */
-    public static function set_is_cm_comptency_grading_enabled($value) {
-        self::$iscmcompetencygradingenabled = $value;
     }
 }

@@ -29,6 +29,9 @@
             * default - boolean True if default
     * templateid - template id
     * hascompetencies - boolean
+
+    Example context (json):
+    {}
  }}
 {{#hascompetencies}}
     <div class='clearfix'></div>
@@ -90,7 +93,7 @@
     </div>
     <div data-region="scale-buttons" class="m-t-1 pull-xs-right">
         <div>
-            <label><input type="checkbox" name="forcerating" value="1"/>{{#str}}forcerating, report_lpmonitoring{{/str}}</label>      
+            <label><input type="checkbox" name="forcerating" value="1"/>{{#str}}forcerating, report_lpmonitoring{{/str}}</label>
         </div>
         <input type="submit" class="btn btn-primary" data-action="submit" value="{{#str}}save{{/str}}" {{#submitdisabled}}disabled{{/submitdisabled}} />
     </div>
