@@ -40,7 +40,9 @@ use core_competency\plan;
 use core_competency\template_competency;
 use core_competency\competency_framework;
 use core_competency\user_competency;
+use core_competency\user_competency_course;
 use core_competency\user_competency_plan;
+use tool_cmcompetency\user_competency_coursemodule;
 use core_tag_area;
 use core_tag_tag;
 use report_lpmonitoring\report_competency_config;
@@ -721,6 +723,84 @@ class api {
     }
 
     /**
+     * Get the user competency in a course module, tolerating concurrent creation.
+     *
+     * The upstream get-or-create in \tool_cmcompetency\api::get_user_competency_in_coursemodule()
+     * is not atomic. When rapid, repeated navigation triggers concurrent report requests for the
+     * same userid-cmid-competencyid triplet whose record is still absent, both requests may attempt
+     * the INSERT and the second violates the usecmicom_uix unique key with a dml_write_exception.
+     * We absorb that exception and fetch the record that the concurrent request has now created.
+     *
+     * @param int $cmid Course module id.
+     * @param int $userid User id.
+     * @param int $competencyid Competency id.
+     * @return \tool_cmcompetency\user_competency_coursemodule The user competency course module record.
+     */
+    private static function get_user_competency_in_coursemodule_safe($cmid, $userid, $competencyid) {
+        try {
+            return \tool_cmcompetency\api::get_user_competency_in_coursemodule($cmid, $userid, $competencyid);
+        } catch (\dml_write_exception $exception) {
+            // A concurrent report request may have created the relation after the lookup.
+            $record = user_competency_coursemodule::get_record([
+                'cmid' => $cmid,
+                'userid' => $userid,
+                'competencyid' => $competencyid,
+            ]);
+            if (!$record) {
+                throw $exception;
+            }
+            return $record;
+        }
+    }
+
+    /**
+     * Get the plan competency, tolerating concurrent creation of the user competency.
+     *
+     * The upstream get-or-create in \core_competency\api::get_plan_competency() is not atomic.
+     * For a plan that is not complete and whose user_competency is still absent, the method
+     * reads it as missing and then INSERTs a new row into competency_usercomp. When rapid,
+     * repeated navigation triggers concurrent report requests for the same userid-competencyid
+     * pair, both requests may attempt the INSERT and the second violates the usecom_uix unique
+     * key with a dml_write_exception. We absorb that exception and rebuild the same result
+     * object from the row the concurrent request has now created.
+     *
+     * @param int|\core_competency\plan $planorid The plan, or its id.
+     * @param int $competencyid Competency id.
+     * @return \stdClass Object with keys competency, usercompetency and usercompetencyplan,
+     *                   matching the shape returned by \core_competency\api::get_plan_competency().
+     */
+    private static function get_plan_competency_safe($planorid, $competencyid) {
+        try {
+            return core_competency_api::get_plan_competency($planorid, $competencyid);
+        } catch (\dml_write_exception $exception) {
+            // A concurrent report request may have created the user_competency after the lookup.
+            $plan = is_object($planorid) ? $planorid : new plan($planorid);
+
+            // A completed plan never creates a user_competency (it reads from the archive), so a
+            // write failure there is unrelated to this race: do not mask it.
+            if ($plan->get('status') == plan::STATUS_COMPLETE) {
+                throw $exception;
+            }
+
+            $uc = user_competency::get_record([
+                'userid' => $plan->get('userid'),
+                'competencyid' => $competencyid,
+            ]);
+            if (!$uc) {
+                // The write failure is not the concurrent-creation race: do not mask it.
+                throw $exception;
+            }
+
+            $plancompetency = (object) [
+                'competency' => $plan->get_competency($competencyid),
+                'usercompetency' => $uc,
+                'usercompetencyplan' => null,
+            ];
+            return $plancompetency;
+        }
+    }
+
+    /**
      * Get comptency information for lpmonitoring report.
      *
      * @param int $userid User id.
@@ -733,7 +813,7 @@ class api {
 
         $competencydetails = new \stdClass();
 
-        $plancompetency = core_competency_api::get_plan_competency($planid, $competencyid);
+        $plancompetency = self::get_plan_competency_safe($planid, $competencyid);
         $competency = $plancompetency->competency;
 
         // User has necessary capapbility if he can read the framework.
@@ -800,11 +880,23 @@ class api {
             $courseinfo->course = $course;
 
             // Find rating in course.
-            $courseinfo->usecompetencyincourse = core_competency_api::get_user_competency_in_course(
-                $course->id,
-                $userid,
-                $competencyid
-            );
+            try {
+                $courseinfo->usecompetencyincourse = core_competency_api::get_user_competency_in_course(
+                    $course->id,
+                    $userid,
+                    $competencyid
+                );
+            } catch (\dml_write_exception $exception) {
+                // A concurrent report request may have created the relation after the lookup.
+                $courseinfo->usecompetencyincourse = user_competency_course::get_record([
+                    'courseid' => $course->id,
+                    'userid' => $userid,
+                    'competencyid' => $competencyid,
+                ]);
+                if (!$courseinfo->usecompetencyincourse) {
+                    throw $exception;
+                }
+            }
 
             // Find most recent course evidences.
             $sort = 'timecreated';
@@ -827,7 +919,7 @@ class api {
                 $modules = course_module_competency::list_course_modules($competencyid, $course->id);
                 $courseinfo->modules = [];
                 foreach ($modules as $cmid) {
-                    $courseinfo->modules[] = \tool_cmcompetency\api::get_user_competency_in_coursemodule(
+                    $courseinfo->modules[] = self::get_user_competency_in_coursemodule_safe(
                         $cmid,
                         $userid,
                         $competencyid
@@ -852,7 +944,7 @@ class api {
                 }
 
                 // Find rating in course module.
-                $cminfo->usecompetencyincm = \tool_cmcompetency\api::get_user_competency_in_coursemodule(
+                $cminfo->usecompetencyincm = self::get_user_competency_in_coursemodule_safe(
                     $cmid,
                     $userid,
                     $competencyid
@@ -923,7 +1015,7 @@ class api {
                 continue;
             }
 
-            $plancompetency = core_competency_api::get_plan_competency($userplan->get('id'), $competencyid);
+            $plancompetency = self::get_plan_competency_safe($userplan->get('id'), $competencyid);
             $user->usercompetency = $plancompetency->usercompetency;
             $user->usercompetencyplan = $plancompetency->usercompetencyplan;
             $competencystatistics->listusers[] = $user;
